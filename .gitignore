@@ -27,3 +27,9 @@
 *.exe
 *.out
 *.app
+
+#insight dir
+insight/*
+
+#doc dir
+doc/*
