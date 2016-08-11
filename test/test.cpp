@@ -71,8 +71,8 @@ int main(int argc, char **argv)
 	while(1){
 		char buf[1000];
 		NIF_MSG_UNIT2* testMsg=(NIF_MSG_UNIT2*)buf;
-		unsigned char mmssgg[6]={0xaa,0xaa,0xaa,0xbb,0xbb,0xbb};
-		printf("sizeof(mmssgg) is %u\n", sizeof(mmssgg));
+		unsigned char msg_body[6]={0xaa,0xaa,0xaa,0xbb,0xbb,0xbb};
+		printf("sizeof(msg_body) is %u\n", sizeof(msg_body));
 		printf("sizeof(NIF_MSG_UNIT2) is %u\n", sizeof(NIF_MSG_UNIT2));
 		printf("sizeof(unsigned char *) is %u\n", sizeof(unsigned char *));
 		
@@ -86,14 +86,14 @@ int main(int argc, char **argv)
 		testMsg->length=htonl(sizeof(unsigned char *));
 		
 		
-		testMsg->pData=reinterpret_cast<unsigned char *>(mmssgg);
+		testMsg->pData=reinterpret_cast<unsigned char *>(msg_body);
 	
 		printf("server connected\n");
 		bzero(buffer, MAXBUF + 1);
 	
 		memcpy(buffer, buf, sizeof(buf));
 		/* 发消息给服务器 */
-		len = send(sockfd, buffer, sizeof(NIF_MSG_UNIT2)-8+sizeof(mmssgg), 0);
+		len = send(sockfd, buffer, sizeof(NIF_MSG_UNIT2)-8+sizeof(msg_body), 0);
 		if(len < 0) printf("msg'%s send fail！error code is %d，error info is '%s'\n", buffer,
 		errno, strerror(errno));
 		else printf("msg'%s send success，sent %d Bytes！\n", buffer, len);
