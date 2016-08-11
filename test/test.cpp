@@ -69,18 +69,18 @@ int main(int argc, char **argv)
 	}
 	
 	while(1){
-
-		NIF_MSG_UNIT2 testMsg;
+		char buf[1000];
+		NIF_MSG_UNIT2* testMsg=(NIF_MSG_UNIT2*)buf;
 		unsigned char mmssgg[6]={0xaa,0xaa,0xaa,0xbb,0xbb,0xbb};
 		printf("sizeof(mmssgg) is %u\n", sizeof(mmssgg));
-		testMsg.length=sizeof(mmssgg);
-		testMsg.head=0x1a2b3c4d;
-		testMsg.pData=reinterpret_cast<unsigned char *>(mmssgg);
+		testMsg->length=sizeof(mmssgg);
+		testMsg->head=0x1a2b3c4d;
+		testMsg->pData=reinterpret_cast<unsigned char *>(mmssgg);
 	
 		printf("server connected\n");
 		bzero(buffer, MAXBUF + 1);
 	
-		strcpy(buffer, "test msg\n");
+		strcpy(buffer, buf);
 		/* 发消息给服务器 */
 		len = send(sockfd, buffer, strlen(buffer), 0);
 		if(len < 0) printf("msg'%s'send fail！error code is %d，error info is '%s'\n", buffer,
