@@ -14,7 +14,7 @@
 /*
 	./Client 127.0.0.1 7838
 */
-
+#pragma pack(1)
 typedef struct
 {
 	unsigned int head;
@@ -27,7 +27,7 @@ typedef struct
 	unsigned int length;
 	unsigned char* pData;
 } NIF_MSG_UNIT2;
-
+#pragma pack()
 
 int main(int argc, char **argv)
 {
