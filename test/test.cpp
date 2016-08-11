@@ -72,7 +72,8 @@ int main(int argc, char **argv)
 
 		NIF_MSG_UNIT2 testMsg;
 		unsigned char mmssgg[6]={0xaa,0xaa,0xaa,0xbb,0xbb,0xbb};
-		testMsg.length=strlen(mmssgg);
+		printf("sizeof(mmssgg) is %u\n", sizeof(mmssgg));
+		testMsg.length=sizeof(mmssgg);
 		testMsg.head=0x1a2b3c4d;
 		testMsg.pData=reinterpret_cast<unsigned char *>(mmssgg);
 	
