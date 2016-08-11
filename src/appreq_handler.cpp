@@ -73,7 +73,7 @@ int AppReqHandler::handle_recv()
 
     NIF_MSG_UNIT2 *header = (NIF_MSG_UNIT2*)recv_buf_;
 
-    tools::print_hex((unsigned char*)(recv_buf_,100));
+    tools::print_hex((unsigned char*)(recv_buf_),100);
 
     unsigned int msg_len = ntohl(header->length);
     CommonLogger::instance().log_info("AppReqHandler::handle_recv: msg_len=%u", msg_len);
