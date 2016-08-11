@@ -53,6 +53,8 @@ AppReqHandler::~AppReqHandler()
 int AppReqHandler::handle_recv()
 {
 	memset(recv_buf_,0,sizeof(recv_buf_)); /* luchq add 2015-08-03 */
+	CommonLogger::instance().log_info("AppReqHandler::handle_recv: offset_=%u", offset_);
+	
     int ret = recvn(recv_buf_+offset_, kBufferSize/2);
     if (ret<0) {
 		CommonLogger::instance().log_error("AppReqHandler::handle_recv: error ret %d, offset %d", ret, offset_);

@@ -7,6 +7,7 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <unistd.h>
+#include "usracc_common.h"
 #define MAXBUF 1024*4096
 
 
@@ -56,6 +57,12 @@ int main(int argc, char **argv)
 	}
 	
 	while(1){
+
+		NIF_MSG_UNIT2 testMsg;
+		char mmssgg[]="test msg";
+		testMsg.length=strlen(mmssgg);
+		testMsg.head=0x1a2b3c4d;
+		testMsg.pData=mmssgg;
 	
 		printf("server connected\n");
 		bzero(buffer, MAXBUF + 1);
