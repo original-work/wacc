@@ -81,7 +81,7 @@ int main(int argc, char **argv)
 		testMsg->invoke=htonl(0x2);
 		testMsg->dialog=htonl(0x3);
 		testMsg->seq=htonl(0x123456);
-		testMsg->length=sizeof(mmssgg);
+		testMsg->length=htonl(sizeof(mmssgg));
 		
 		testMsg->pData=reinterpret_cast<unsigned char *>(mmssgg);
 	
