@@ -74,7 +74,7 @@ int main(int argc, char **argv)
 		unsigned char mmssgg[6]={0xaa,0xaa,0xaa,0xbb,0xbb,0xbb};
 		testMsg.length=strlen(mmssgg);
 		testMsg.head=0x1a2b3c4d;
-		testMsg.pData=mmssgg;
+		testMsg.pData=reinterpret_cast<unsigned char *>(mmssgg);
 	
 		printf("server connected\n");
 		bzero(buffer, MAXBUF + 1);
