@@ -71,7 +71,7 @@ int main(int argc, char **argv)
 	while(1){
 
 		NIF_MSG_UNIT2 testMsg;
-		char mmssgg[]="test msg";
+		unsigned char mmssgg=0xabc;
 		testMsg.length=strlen(mmssgg);
 		testMsg.head=0x1a2b3c4d;
 		testMsg.pData=mmssgg;
