@@ -61,7 +61,7 @@ int AppReqHandler::handle_recv()
         return -1;
     }
 
-    //CommonLogger::instance().log_info("ret=%u", ret);
+    CommonLogger::instance().log_info("ret=%u", ret);
 
     unsigned int buf_length = offset_ + ret;
 
@@ -83,11 +83,13 @@ int AppReqHandler::handle_recv()
         return 0;
     }
 
-    //CommonLogger::instance().log_info("2ret=%u", ret);
+    CommonLogger::instance().log_info("2ret=%u", ret);
 
     offset_ = 0;
     while (offset_<buf_length) {
-        //CommonLogger::instance().log_info("3ret=%u", ret);
+        CommonLogger::instance().log_info("3ret=%u", ret);
+        CommonLogger::instance().log_info("offset_=%u", offset_);
+
         process(recv_buf_+offset_);
         offset_ += (sizeof(NIF_MSG_UNIT2) - sizeof(unsigned char*));
         offset_ += msg_len;
