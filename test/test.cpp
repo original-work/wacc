@@ -74,7 +74,7 @@ int main(int argc, char **argv)
 		unsigned char mmssgg[6]={0xaa,0xaa,0xaa,0xbb,0xbb,0xbb};
 		printf("sizeof(mmssgg) is %u\n", sizeof(mmssgg));
 		testMsg->length=sizeof(mmssgg);
-		testMsg->head=0x1a2b3c4d;
+		testMsg->head=htonl(0x1a2b3c4d);
 		testMsg->pData=reinterpret_cast<unsigned char *>(mmssgg);
 	
 		printf("server connected\n");
@@ -82,7 +82,7 @@ int main(int argc, char **argv)
 	
 		strcpy(buffer, buf);
 		/* 发消息给服务器 */
-		len = send(sockfd, buffer, strlen(buffer), 0);
+		len = send(sockfd, buffer, sizeof(NIF_MSG_UNIT2)-1+sizeof(mmssgg), 0);
 		if(len < 0) printf("msg'%s send fail！error code is %d，error info is '%s'\n", buffer,
 		errno, strerror(errno));
 		else printf("msg'%s send success，sent %d Bytes！\n", buffer, len);
