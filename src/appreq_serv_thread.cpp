@@ -158,7 +158,7 @@ int AppReqServThread::loop_process()
 		else if (events_[i].events & EPOLLIN)
 		{
 			// handle request
-			CommonLogger::instance().log_info("AppReqServThread: Recv request mag from App, fd:%d",events_[i].data.fd );
+			CommonLogger::instance().log_info("AppReqServThread: Recv request msg from App, fd:%d",events_[i].data.fd );
 			handle_request(events_[i].data.fd);
 		}
 	}
