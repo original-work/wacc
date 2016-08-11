@@ -73,11 +73,7 @@ int AppReqHandler::handle_recv()
 
     NIF_MSG_UNIT2 *header = (NIF_MSG_UNIT2*)recv_buf_;
 
-   CommonLogger::instance().log_error("recv_buf_ = 0x%02x-%02x-%02x-%02x-%02x-%02x-%02x-%02x\n",
-	(unsigned char)recv_buf_[0],(unsigned char)recv_buf_[1],
-	(unsigned char)recv_buf_[2],(unsigned char)recv_buf_[3],
-	(unsigned char)recv_buf_[4],(unsigned char)recv_buf_[5],
-	(unsigned char)recv_buf_[6],(unsigned char)recv_buf_[7]);
+    tools::print_hex((unsigned char*)(recv_buf_,100);
 
     unsigned int msg_len = ntohl(header->length);
     CommonLogger::instance().log_info("AppReqHandler::handle_recv: msg_len=%u", msg_len);
