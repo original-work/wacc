@@ -7,7 +7,7 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <unistd.h>
-#include "usracc_common.h"
+
 #define MAXBUF 1024*4096
 
 
@@ -15,6 +15,18 @@
 	./Client 127.0.0.1 7838
 */
 
+typedef struct
+{
+	unsigned int head;
+	unsigned int dIpAdrs;
+	unsigned int sIpAdrs;
+	unsigned int version;
+	unsigned int invoke;
+	unsigned int dialog;
+	unsigned int seq;
+	unsigned int length;
+	unsigned char* pData;
+} NIF_MSG_UNIT2;
 
 
 int main(int argc, char **argv)
