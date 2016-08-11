@@ -322,7 +322,7 @@ int AppReqServThread::deal_logic_resp_queue()
 			case 5:	// ACK
 				ack = (AckMsg*)resp->msg;
 				msisdn = info_mgr_->find_msisdn_by_tid(ack->tid);
-				CommonLogger::instance().log_info("deal_logic_resp_queue: Deal ACK msg");
+				CommonLogger::instance().log_info("deal_logic_resp_queue: Deal ACK msg, tid=%u", ack->tid);
 				CommonLogger::instance().log_info("deal_logic_resp_queue: num %s, result %d", msisdn.c_str(), ack->result);
 				if (msisdn != "")
 				{
