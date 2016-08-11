@@ -49,7 +49,7 @@ AppReqHandler::~AppReqHandler()
 {
 
 }  /* -----  end of method AppReqHandler::~AppReqHandler()  ----- */
-#if 0
+
 int AppReqHandler::handle_recv()
 {
 	memset(recv_buf_,0,sizeof(recv_buf_)); /* luchq add 2015-08-03 */
@@ -110,9 +110,8 @@ int AppReqHandler::handle_recv()
 
     return 0;
 }		/* -----  end of method AppReqHandler::handle_recv  ----- */
-#endif
 
-
+#if 0
 int AppReqHandler::handle_recv()
 {
 	memset(recv_buf_,0,sizeof(recv_buf_)); /* luchq add 2015-08-03 */
@@ -131,7 +130,7 @@ int AppReqHandler::handle_recv()
 
     return 0;
 }		/* -----  end of method AppReqHandler::handle_recv  ----- */
-
+#endif
 
 int AppReqHandler::process(char *pmsg)
 {
