@@ -134,11 +134,11 @@ int AppReqHandler::process(char *pmsg)
 	/* end of luchq add */
 
     switch (msg_type) {
-    case SEND_SMS_REQ:
+    case SMS_SEND:
 	CommonLogger::instance().log_info("AppReqHandler: Recv a MO msg");
         deal_MO(pmsg);
         break;
-    case ACTIVE_REQ:
+    case ADD_USER:
 	CommonLogger::instance().log_info("AppReqHandler: Recv a ACTIVE msg");
         deal_user_active(pmsg);
         break;
@@ -150,7 +150,7 @@ int AppReqHandler::process(char *pmsg)
 	CommonLogger::instance().log_info("AppReqHandler: Recv a CALL REPORT msg");
         deal_call_record(pmsg);
         break;
-    case PUSH_SMS_REQ:
+    case SMS_PUSH:
 	CommonLogger::instance().log_info("AppReqHandler: Recv a MT-ACK msg");
         deal_mt_ack(pmsg);
         break;

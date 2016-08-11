@@ -293,7 +293,7 @@ int AppReqServThread::deal_logic_resp_queue()
 					CommonLogger::instance().log_info("deal_logic_resp_queue: sms len=%d",strlen(mt->sms_content));
 					unit = (NIF_MSG_UNIT2*)send_buf;
 					unit->dialog = htonl(BEGIN);
-					unit->invoke = htonl(PUSH_SMS_REQ);
+					unit->invoke = htonl(SMS_PUSH);
 					unit->length = htonl(sizeof(MTData));
 					data = (MTData*)(send_buf + sizeof(NIF_MSG_UNIT2) - sizeof(unsigned char*));
 					memset(data->content,0,sizeof(data->content));

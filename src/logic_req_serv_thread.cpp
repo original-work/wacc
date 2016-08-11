@@ -637,11 +637,11 @@ int LogicReqServThread::deal_ack_req(unsigned int type, unsigned char *data, uns
 	ack->tid = ntohl(*((unsigned int*)(data+sizeof(unsigned int))));
 	if (type == SERVLOGIC_ACTIVATE_REQ)
 	{
-		ack->msg_type = ACTIVE_REQ;
+		ack->msg_type = ADD_USER;
 	}
 	else
 	{
-		ack->msg_type = SEND_SMS_REQ;
+		ack->msg_type = SMS_SEND;
 	}
 
 	logic_resp_queue_->insert_record((char*)&resp, sizeof(RespMsg));

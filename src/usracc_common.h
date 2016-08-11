@@ -296,10 +296,10 @@ typedef struct {
 //======================================================
 //与用户APP接口结构
 
-#define SEND_SMS_REQ	0XEEEEEE01
-#define PUSH_SMS_REQ	0XEEEEEE02
-#define ACTIVE_REQ	0XEEEEEE03
-#define DEACTIVE_REQ	0XEEEEEE04
+#define SMS_SEND	0XEEEEEE03
+#define SMS_PUSH	0XEEEEEE04
+#define ADD_USER	0XEEEEEE01
+#define DEACTIVE_REQ	0XEEEEEE02
 #define CALL_REPORT_REQ	0XEEEEEE05
 #define OFFLINE_REQ	0XEEEEEE06
 
