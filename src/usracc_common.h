@@ -147,7 +147,7 @@ typedef struct {
 
 
 typedef struct {
-	Unsigned int tid;
+	unsigned int tid;
 	unsigned int mod_id;	//模块id,从0开始编号
 	char msisdn[32];
 } LocreqData;
