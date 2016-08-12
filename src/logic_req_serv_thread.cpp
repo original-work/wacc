@@ -318,7 +318,7 @@ int LogicReqServThread::deal_app_req_queue()
 
 				//todo 向logic_resp_queue_ 消息队列插入成功响应
 				RespMsg resp;
-				resp.msg_type = 1;
+				resp.msg_type = 8;
 				AckMsg *ack = (AckMsg*)resp.msg;
 				ReqMsg* p = (ReqMsg*)pmsg;
 				ActivateMsg* record = (ActivateMsg*)p->msg;

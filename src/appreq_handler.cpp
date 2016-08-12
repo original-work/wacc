@@ -135,23 +135,23 @@ int AppReqHandler::process(char *pmsg)
 
     switch (msg_type) {
     case ADD_USER:
-	CommonLogger::instance().log_info("AppReqHandler: Recv a ACTIVE msg");
+	CommonLogger::instance().log_info("AppReqHandler: Recv a ADD_USER msg");
         deal_user_active(pmsg);
         break;
     case DEL_USER:
-	CommonLogger::instance().log_info("AppReqHandler: Recv a DEACTIVE msg");
+	CommonLogger::instance().log_info("AppReqHandler: Recv a DEL_USER msg");
         deal_user_deactive(pmsg);
         break;
     case SMS_SEND:
-	CommonLogger::instance().log_info("AppReqHandler: Recv a MO msg");
+	CommonLogger::instance().log_info("AppReqHandler: Recv a SMS_SEND msg");
         deal_MO(pmsg);
         break;		
     case SMS_PUSH:
-	CommonLogger::instance().log_info("AppReqHandler: Recv a MT-ACK msg");
+	CommonLogger::instance().log_info("AppReqHandler: Recv a SMS_PUSH msg");
         deal_mt_ack(pmsg);
         break;
     case PING:
-	CommonLogger::instance().log_info("AppReqHandler: Recv a CALL REPORT msg");
+	CommonLogger::instance().log_info("AppReqHandler: Recv a PING msg");
         deal_ping(pmsg);
         break;
     default:
@@ -168,7 +168,7 @@ int AppReqHandler::deal_ping(char *data)
 	
 	app_req_queue_->insert_record((char*)&red_msg, sizeof(ReqMsg));
 	app_req_queue_->advance_widx();
-	CommonLogger::instance().log_info("deal_MO: insert MO Msg into app_req_queue");
+	CommonLogger::instance().log_info("deal_ping: insert PING Msg into app_req_queue_");
 	
 	return 0;
 }/* -----  end of method AppReqHandler::deal_ping(char *data)  ----- */

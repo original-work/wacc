@@ -321,10 +321,12 @@ int AppReqServThread::deal_logic_resp_queue()
 				else
 					CommonLogger::instance().log_info("deal_logic_resp_queue: Call find_num fail, user maybe not exist");
 				break;
+				#if 0
 			case 5: //PING ACK
 				ack = (AckMsg*)resp->msg;
-				CommonLogger::instance().log_info("deal_logic_resp_queue: Call find_num fail, user maybe not exist");
+				CommonLogger::instance().log_info("deal_logic_resp_queue: PING ACK");
 				unit = (NIF_MSG_UNIT2*)send_buf;
+				unit->head = htonl(0x1a2b3c4d);
 				unit->dialog = htonl(END);
 				unit->invoke = htonl(ack->msg_type);
 
@@ -335,11 +337,13 @@ int AppReqServThread::deal_logic_resp_queue()
 				}
 				CommonLogger::instance().log_info("deal_logic_resp_queue: send PING msg to APP");
 				break;
+				#endif
 			case 8:	// ACK
 				ack = (AckMsg*)resp->msg;
 				msisdn = info_mgr_->find_msisdn_by_tid(ack->tid);
 				CommonLogger::instance().log_info("deal_logic_resp_queue: Deal ACK msg, tid=%u", ack->tid);
-				CommonLogger::instance().log_info("deal_logic_resp_queue: num %s, result %d", msisdn.c_str(), ack->result);
+				CommonLogger::instance().log_info("deal_logic_resp_queue: num %s, result %u", msisdn.c_str(), ack->result);
+				CommonLogger::instance().log_info("[%s %d] deal_logic_resp_queue: msg_type %u", __FILE__,__LINE__,ack->msg_type);
 				if (msisdn != "")
 				{
 					StrToBCD(msisdn.c_str(), bcd_buf_, sizeof(bcd_buf_));
@@ -347,6 +351,7 @@ int AppReqServThread::deal_logic_resp_queue()
 					if (user != NULL)
 					{
 						unit = (NIF_MSG_UNIT2*)send_buf;
+						unit->head = htonl(0x1a2b3c4d);
 						unit->dialog = htonl(END);
 						unit->invoke = htonl(ack->msg_type);
 						unit->length = htonl(sizeof(unsigned int));
