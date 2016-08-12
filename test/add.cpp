@@ -77,8 +77,7 @@ int main(int argc, char **argv)
 		char buf[1000];
 		NIF_MSG_UNIT2* testMsg=(NIF_MSG_UNIT2*)buf;
 		AddUser user;
-		char msisdn[]={0x18,0x01,0x93,0x98,0x63,0x90};
-		memcpy(user.mdn, msisdn, strlen(msisdn));
+		strcpy(user.mdn, "18019398639");
 
 		printf("sizeof(msg_body) is %u\n", sizeof(user));
 		printf("sizeof(NIF_MSG_UNIT2) is %u\n", sizeof(NIF_MSG_UNIT2));
