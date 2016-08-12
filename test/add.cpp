@@ -73,43 +73,41 @@ int main(int argc, char **argv)
 		exit(errno);
 	}
 	
-	while(1){
-		char buf[1000];
-		NIF_MSG_UNIT2* testMsg=(NIF_MSG_UNIT2*)buf;
-		AddUser user;
-		strcpy(user.mdn, "18019398639");
+	char buf[1000];
+	NIF_MSG_UNIT2* testMsg=(NIF_MSG_UNIT2*)buf;
+	AddUser user;
+	strcpy(user.mdn, "18019398639");
 
-		printf("sizeof(msg_body) is %u\n", sizeof(user));
-		printf("sizeof(NIF_MSG_UNIT2) is %u\n", sizeof(NIF_MSG_UNIT2));
-		printf("sizeof(unsigned char *) is %u\n", sizeof(unsigned char *));
-		
-		testMsg->head=htonl(0x1a2b3c4d);
-		testMsg->dIpAdrs=htonl(0xdddddd);
-		testMsg->sIpAdrs=htonl(0xaaaaaa);
-		testMsg->version=htonl(0x1);
-		testMsg->invoke=htonl(0XEEEEEE01);
-		testMsg->dialog=htonl(0x3);
-		testMsg->seq=htonl(0x123456);
-		testMsg->length=htonl(sizeof(user));
-		char* p_user =(char*)&user;
-		memcpy(buf+sizeof(NIF_MSG_UNIT2)-8, p_user, sizeof(user));
-		
-		
+	printf("sizeof(msg_body) is %u\n", sizeof(user));
+	printf("sizeof(NIF_MSG_UNIT2) is %u\n", sizeof(NIF_MSG_UNIT2));
+	printf("sizeof(unsigned char *) is %u\n", sizeof(unsigned char *));
 	
-		printf("server connected\n");
-		bzero(buffer, MAXBUF + 1);
+	testMsg->head=htonl(0x1a2b3c4d);
+	testMsg->dIpAdrs=htonl(0xdddddd);
+	testMsg->sIpAdrs=htonl(0xaaaaaa);
+	testMsg->version=htonl(0x1);
+	testMsg->invoke=htonl(0XEEEEEE01);
+	testMsg->dialog=htonl(0x3);
+	testMsg->seq=htonl(0x123456);
+	testMsg->length=htonl(sizeof(user));
+	char* p_user =(char*)&user;
+	memcpy(buf+sizeof(NIF_MSG_UNIT2)-8, p_user, sizeof(user));
 	
-		memcpy(buffer, buf, sizeof(buf));
-		/* 发消息给服务器 */
+	
 
-		len = send(sockfd, buffer, sizeof(NIF_MSG_UNIT2)-8+sizeof(user), 0);
-		if(len < 0) printf("msg'%s send fail！error code is %d，error info is '%s'\n", buffer,
-		errno, strerror(errno));
-		else printf("msg'%s send success，sent %d Bytes！\n", buffer, len);
-			
-		sleep(1);	
+	printf("server connected\n");
+	bzero(buffer, MAXBUF + 1);
+
+	memcpy(buffer, buf, sizeof(buf));
+	/* 发消息给服务器 */
+
+	len = send(sockfd, buffer, sizeof(NIF_MSG_UNIT2)-8+sizeof(user), 0);
+	if(len < 0) printf("msg'%s send fail！error code is %d，error info is '%s'\n", buffer,
+	errno, strerror(errno));
+	else printf("msg'%s send success，sent %d Bytes！\n", buffer, len);
 		
-	}	
+	sleep(1);	
+		
 	/* 关闭连接 */
 	close(sockfd);
 
