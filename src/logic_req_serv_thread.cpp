@@ -199,14 +199,15 @@ int LogicReqServThread::loop_process()
 									break;
 								case SERVLOGIC_ACTIVATE_REQ:
 								case SERVLOGIC_MO_REQ:
-									CommonLogger::instance().log_info("LogicReqServThread: Recv a ACK  msg");
+									CommonLogger::instance().log_info("[%s %d] LogicReqServThread: Recv a ACK  msg 0x%08x", __FILE__,__LINE__,unit->invoke);
 									deal_ack_req(ntohl(unit->invoke), (data_buf_ + sizeof(NIF_MSG_UNIT) - sizeof(unsigned char*)), ntohl(unit->length));
 									break;
 								case SERVLOGIC_USER_SYNC_REQ:
 								case SERVLOGIC_DEACTIVATE_REQ:
+									CommonLogger::instance().log_info("[%s %d] LogicReqServThread: Recv a ACK  msg 0x%08x", __FILE__,__LINE__,unit->invoke);
 									break;
 								case SERVLOGIC_MT_REQ:
-									CommonLogger::instance().log_info("LogicReqServThread: Recv a MT msg");
+									CommonLogger::instance().log_info("LogicReqServThread: Recv a MT req msg");
 									deal_mt_req((data_buf_ + sizeof(NIF_MSG_UNIT) - sizeof(unsigned char*)), ntohl(unit->length));
 									break;
 								case SERVLOGIC_LOCREQ_REQ:

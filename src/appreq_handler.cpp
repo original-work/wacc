@@ -244,11 +244,12 @@ int AppReqHandler::deal_user_active(char *data)
 		memcpy(user->msisdn, re->mdn, strlen(re->mdn));
 	}
 	user->operTime = time(NULL); /* luchq add 2016-02-01 */
-	memcpy(record->msisdn, re->mdn, sizeof(record->msisdn));
 
-	record->user_info = user;
-	record->mod_id = UsrAccConfig::instance().module_id();
+	
 	record->tid = generate_tid();
+	record->mod_id = UsrAccConfig::instance().module_id();
+	memcpy(record->msisdn, re->mdn, sizeof(record->msisdn));
+	record->user_info = user;
 	info_mgr_->add_tid_msisdn(record->tid, record->msisdn);
 	//CommonLogger::instance().log_debug("record  msg %u", record->tid);
 
