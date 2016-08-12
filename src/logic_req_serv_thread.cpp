@@ -413,7 +413,7 @@ int LogicReqServThread::deal_app_req_queue()
 			CommonLogger::instance().log_info("deal_app_req_queue: Deal PING MSG.");
 
 			RespMsg resp;
-			resp.msg_type = 8;
+			resp.msg_type = 5;
 			AckMsg *ack = (AckMsg*)resp.msg;
 			ack->msg_type = PING;
 			
