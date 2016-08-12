@@ -109,7 +109,6 @@ int main(int argc, char **argv)
 	char buf[1000];
 	NIF_MSG_UNIT2* testMsg=(NIF_MSG_UNIT2*)buf;
 	AddUser user;
-	memset(user.mdn,0,sizeof(user.mdn));
 	strcpy(user.mdn, "8618123835762");
 
 	printf("sizeof(msg_body) is %u\n", sizeof(user));
@@ -123,8 +122,9 @@ int main(int argc, char **argv)
 	testMsg->invoke=htonl(0XEEEEEE01);
 	testMsg->dialog=htonl(0x3);
 	testMsg->seq=htonl(0x123456);
-	testMsg->length=htonl(strlen(user.mdn));
-	memcpy(buf+sizeof(NIF_MSG_UNIT2)-8, (char*)&user, strlen(user.mdn));
+	testMsg->length=htonl(sizeof(user));
+	char* p_user =(char*)&user;
+	memcpy(buf+sizeof(NIF_MSG_UNIT2)-8, p_user, sizeof(user));
 	
 	
 
@@ -134,7 +134,7 @@ int main(int argc, char **argv)
 	memcpy(buffer, buf, sizeof(buf));
 	/* 发消息给服务器 */
 
-	len = send(sockfd, buffer, sizeof(NIF_MSG_UNIT2)-8+strlen(user.mdn), 0);
+	len = send(sockfd, buffer, sizeof(NIF_MSG_UNIT2)-8+sizeof(user), 0);
 	if(len < 0) {
 		printf("send fail!  error code is %d,  error info is '%s'\n", buffer, errno, strerror(errno));
 	}
