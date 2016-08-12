@@ -83,8 +83,9 @@ int main(int argc, char **argv)
 		testMsg->invoke=htonl(0XEEEEEE05);
 		testMsg->dialog=htonl(0x3);
 		testMsg->seq=htonl(0x123456);
-		testMsg->length=htonl(sizeof(msg_body));
-		memcpy(buf+sizeof(NIF_MSG_UNIT2)-8, msg_body, sizeof(msg_body));
+		//testMsg->length=htonl(sizeof(msg_body));
+		//memcpy(buf+sizeof(NIF_MSG_UNIT2)-8, msg_body, sizeof(msg_body));
+		
 		
 	
 		printf("server connected\n");
