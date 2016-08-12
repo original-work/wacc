@@ -74,7 +74,7 @@ int main(int argc, char **argv)
 	char buffer[MAXBUF + 1];
 	if (argc != 3) 
 	{
-		printf("args error£¡correct usage is£º\n\t\t%s ip  port\n\tfor example:\t%s 127.0.0.1 80\nthis program\
+		printf("args error! correct usage is£º\n\t\t%s ip  port\n\tfor example:\t%s 127.0.0.1 80\nthis program\
 			receive from ip port MAXBUF Bytes for most",
 		argv[0], argv[0]);
 		exit(0);
@@ -136,10 +136,10 @@ int main(int argc, char **argv)
 
 	len = send(sockfd, buffer, sizeof(NIF_MSG_UNIT2)-8+sizeof(user), 0);
 	if(len < 0) {
-		printf("send fail£¡error code is %d£¬error info is '%s'\n", buffer, errno, strerror(errno));
+		printf("send fail!  error code is %d,  error info is '%s'\n", buffer, errno, strerror(errno));
 	}
 	else{
-		printf("send success£¬sent %d Bytes£¡\n", buffer, len);
+		printf("send success,  sent %d Bytes  \n", buffer, len);
 		print_hex(buffer, len);
 	}
 		
