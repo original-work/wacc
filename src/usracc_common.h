@@ -146,6 +146,13 @@ typedef struct {
 } PeriodData;
 
 
+typedef struct {
+	Unsigned int tid;
+	unsigned int mod_id;	//模块id,从0开始编号
+	char msisdn[32];
+} LocreqData;
+
+
 // ===================================================
 
 typedef struct {
@@ -232,6 +239,7 @@ typedef struct {
 	char mdn[32];
 	char imsi[16];
 	char esn[32];
+	unsigned int msg_type;
 } LocReqAck;
 
 typedef struct {

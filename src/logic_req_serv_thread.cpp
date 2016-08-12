@@ -255,13 +255,17 @@ int LogicReqServThread::deal_app_req_queue()
 			ActivateMsg *active = (ActivateMsg*)req->msg;
 
 			NIF_MSG_UNIT *unit = (NIF_MSG_UNIT*)send_buf;
+			unit->head = htonl(0x1a2b3c4d);
 			unit->dialog = htonl(BEGIN);
 			unit->invoke = htonl(SERVLOGIC_LOCREQ_REQ);
-			unit->length = htonl(sizeof(PeriodData));
-			//*((unsigned int*)req->msg) = htonl(*((unsigned int*)req->msg));
+			unit->length = htonl(sizeof(LocreqData));
+			LocreqData body;
+			body.tid=active->tid;
+			body.mod_id=active->mod_id;
+			memcp(body.msisdn, active->msisdn, strlen(active->msisdn));
 			
-			memcpy((send_buf + sizeof(NIF_MSG_UNIT) - sizeof(unsigned char*)), req->msg, sizeof(PeriodData));
-			int send_len =  sizeof(NIF_MSG_UNIT) - sizeof(unsigned char*) + sizeof(PeriodData);
+			memcpy((send_buf + sizeof(NIF_MSG_UNIT) - sizeof(unsigned char*)), (char*)&body, sizeof(LocreqData));
+			int send_len =  sizeof(NIF_MSG_UNIT) - sizeof(unsigned char*) + sizeof(LocreqData);
 
 			int n = client_list_.size();
 			int i = 0;
@@ -302,7 +306,7 @@ int LogicReqServThread::deal_app_req_queue()
 
 				//todo 向logic_resp_queue_ 消息队列插入成功响应
 				RespMsg resp;
-				resp.msg_type = 8;
+				resp.msg_type = 1;
 				AckMsg *ack = (AckMsg*)resp.msg;
 				ReqMsg* p = (ReqMsg*)pmsg;
 				ActivateMsg* record = (ActivateMsg*)p->msg;
@@ -518,11 +522,13 @@ int LogicReqServThread::deal_locreq_ack(unsigned char *data, unsigned int len)
 		
 		RespMsg resp;
 		resp.msg_type = 1;
-		AckMsg *ack = (AckMsg*)resp.msg;
-
-		ack->tid = ntohl(*((unsigned int*)(data+sizeof(unsigned int))));
-		ack->msg_type = ADD_USER;
-		ack->result= 1;
+		LocReqAck *body = (LocReqAck*)resp.msg;
+		body->nResult=1;
+		body->tid=ack->tid;
+		memcpy(body->mdn,ack->mdn,strlen(ack->mdn));
+		memcpy(body->imsi,ack->imsi,strlen(ack->imsi));
+		memcpy(body->esn,ack->esn,strlen(ack->esn));
+		body->msg_type=ADD_USER;
 
 		logic_resp_queue_->insert_record((char*)&resp, sizeof(RespMsg));
 		logic_resp_queue_->advance_widx();
@@ -653,7 +659,7 @@ int LogicReqServThread::deal_mt_req(unsigned char *data, unsigned int len)
 int LogicReqServThread::deal_ack_req(unsigned int type, unsigned char *data, unsigned int len)
 {
 	RespMsg resp;
-	resp.msg_type = 8;
+	resp.msg_type = 1;
 	AckMsg *ack = (AckMsg*)resp.msg;
 	ack->result = ntohl(*((unsigned int*)data));
 	ack->tid = ntohl(*((unsigned int*)(data+sizeof(unsigned int))));
