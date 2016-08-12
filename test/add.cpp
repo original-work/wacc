@@ -34,6 +34,39 @@ typedef struct {
 #pragma pack()
 
 
+void print_hex(unsigned char* p_msg, int length)
+{
+	short i, j, len;
+	char buf[2048];
+	j   = 0;
+	len = 0;
+	memset(buf,0,2048);
+	for (i = 0; (i<length)&&(i<512); i++)
+	{
+		sprintf(&buf[len], "%.2X ", *(p_msg + i));
+		len += 3;
+		j++;
+		if (j >= 16)
+		{
+			buf[len] = '\r';
+			len++;
+			buf[len]= '\n';
+			len++;
+			j = 0;
+		}
+	}
+
+	buf[len] = '\r';
+	buf[len + 1] = '\n';
+	buf[len + 2] = '\r';
+	buf[len + 3] = '\n';
+	buf[len + 4] = 0;
+
+	CommonLogger::instance().log_info("%s",buf);
+}
+
+
+
 int main(int argc, char **argv)
 {
 	int sockfd, len;
@@ -102,9 +135,13 @@ int main(int argc, char **argv)
 	/* 发消息给服务器 */
 
 	len = send(sockfd, buffer, sizeof(NIF_MSG_UNIT2)-8+sizeof(user), 0);
-	if(len < 0) printf("msg'%s send fail！error code is %d，error info is '%s'\n", buffer,
-	errno, strerror(errno));
-	else printf("msg'%s send success，sent %d Bytes！\n", buffer, len);
+	if(len < 0) {
+		printf("send fail！error code is %d，error info is '%s'\n", buffer, errno, strerror(errno));
+	}
+	else{
+		printf("send success，sent %d Bytes！\n", buffer, len);
+		print_hex(buffer, len);
+	}
 		
 	sleep(1);	
 		
