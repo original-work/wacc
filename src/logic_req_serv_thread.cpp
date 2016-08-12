@@ -609,9 +609,8 @@ int LogicReqServThread::deal_locreq_ack(unsigned char *data, unsigned int len)
 						msg->user_info->reconnect_cnt_list[n] = info[n].reconnect_cnt;
 					}
 
-					/*todo 向logic_resp_queue_ 消息队列插入成功响应( 现在觉得这里应该什么都不做
-					应该等业务逻辑返回成功之后我再返回成功) */
-					#if 0
+					/*todo 向logic_resp_queue_ 消息队列插入成功响应*/
+					
 					RespMsg resp;
 					resp.msg_type = 1;
 					AckMsg *ack = (AckMsg*)resp.msg;
@@ -622,7 +621,7 @@ int LogicReqServThread::deal_locreq_ack(unsigned char *data, unsigned int len)
 
 					logic_resp_queue_->insert_record((char*)&resp, sizeof(RespMsg));
 					logic_resp_queue_->advance_widx();
-					#endif
+					
 					
 					rsCode=0;
 					return rsCode;
