@@ -34,7 +34,7 @@ typedef struct {
 #pragma pack()
 
 
-void print_hex(unsigned char* p_msg, int length)
+void print_hex(char* p_msg, int length)
 {
 	short i, j, len;
 	char buf[2048];

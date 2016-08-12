@@ -29,6 +29,39 @@ typedef struct
 } NIF_MSG_UNIT2;
 #pragma pack()
 
+
+void print_hex(char* p_msg, int length)
+{
+	short i, j, len;
+	char buf[2048];
+	j   = 0;
+	len = 0;
+	memset(buf,0,2048);
+	for (i = 0; (i<length)&&(i<512); i++)
+	{
+		sprintf(&buf[len], "%.2X ", *(p_msg + i));
+		len += 3;
+		j++;
+		if (j >= 16)
+		{
+			buf[len] = '\r';
+			len++;
+			buf[len]= '\n';
+			len++;
+			j = 0;
+		}
+	}
+
+	buf[len] = '\r';
+	buf[len + 1] = '\n';
+	buf[len + 2] = '\r';
+	buf[len + 3] = '\n';
+	buf[len + 4] = 0;
+
+	printf("%s",buf);
+}
+
+
 int main(int argc, char **argv)
 {
 	int sockfd, len;
