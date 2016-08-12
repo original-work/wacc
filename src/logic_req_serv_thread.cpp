@@ -321,7 +321,7 @@ int LogicReqServThread::deal_app_req_queue()
 				resp.msg_type = 1;
 				AckMsg *ack = (AckMsg*)resp.msg;
 				ReqMsg* p = (ReqMsg*)pmsg;
-				ActivateMsg* record = p->msg;
+				ActivateMsg* record = (ActivateMsg*)p->msg;
 				
 				ack->tid = record->tid;
 				ack->msg_type = ADD_USER;
