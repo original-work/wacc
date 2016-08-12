@@ -262,7 +262,7 @@ int LogicReqServThread::deal_app_req_queue()
 			LocreqData body;
 			body.tid=active->tid;
 			body.mod_id=active->mod_id;
-			memcp(body.msisdn, active->msisdn, strlen(active->msisdn));
+			memcpy(body.msisdn, active->msisdn, strlen(active->msisdn));
 			
 			memcpy((send_buf + sizeof(NIF_MSG_UNIT) - sizeof(unsigned char*)), (char*)&body, sizeof(LocreqData));
 			int send_len =  sizeof(NIF_MSG_UNIT) - sizeof(unsigned char*) + sizeof(LocreqData);
