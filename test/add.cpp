@@ -109,7 +109,7 @@ int main(int argc, char **argv)
 	char buf[1000];
 	NIF_MSG_UNIT2* testMsg=(NIF_MSG_UNIT2*)buf;
 	AddUser user;
-	strcpy(user.mdn, "18123835762");
+	strcpy(user.mdn, "8618123835762");
 
 	printf("sizeof(msg_body) is %u\n", sizeof(user));
 	printf("sizeof(NIF_MSG_UNIT2) is %u\n", sizeof(NIF_MSG_UNIT2));
