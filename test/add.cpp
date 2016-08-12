@@ -27,7 +27,12 @@ typedef struct
 	unsigned int length;
 	unsigned char* pData;
 } NIF_MSG_UNIT2;
+
+typedef struct {
+    char mdn[32];
+} AddUser;
 #pragma pack()
+
 
 int main(int argc, char **argv)
 {
@@ -71,8 +76,10 @@ int main(int argc, char **argv)
 	while(1){
 		char buf[1000];
 		NIF_MSG_UNIT2* testMsg=(NIF_MSG_UNIT2*)buf;
-		unsigned char msg_body[6]={0xaa,0xaa,0xaa,0xbb,0xbb,0xbb};
-		printf("sizeof(msg_body) is %u\n", sizeof(msg_body));
+		AddUser user;
+		user.mdn={0x18,0x01,0x93,0x98,0x63,0x90};
+
+		printf("sizeof(msg_body) is %u\n", sizeof(user));
 		printf("sizeof(NIF_MSG_UNIT2) is %u\n", sizeof(NIF_MSG_UNIT2));
 		printf("sizeof(unsigned char *) is %u\n", sizeof(unsigned char *));
 		
@@ -83,8 +90,8 @@ int main(int argc, char **argv)
 		testMsg->invoke=htonl(0XEEEEEE05);
 		testMsg->dialog=htonl(0x3);
 		testMsg->seq=htonl(0x123456);
-		//testMsg->length=htonl(sizeof(msg_body));
-		//memcpy(buf+sizeof(NIF_MSG_UNIT2)-8, msg_body, sizeof(msg_body));
+		testMsg->length=htonl(sizeof(user));
+		memcpy(buf+sizeof(NIF_MSG_UNIT2)-8, user, sizeof(user));
 		
 		
 	
@@ -93,7 +100,8 @@ int main(int argc, char **argv)
 	
 		memcpy(buffer, buf, sizeof(buf));
 		/* 发消息给服务器 */
-		len = send(sockfd, buffer, sizeof(NIF_MSG_UNIT2)-8+sizeof(msg_body), 0);
+
+		len = send(sockfd, buffer, sizeof(NIF_MSG_UNIT2)-8+sizeof(user), 0);
 		if(len < 0) printf("msg'%s send fail！error code is %d，error info is '%s'\n", buffer,
 		errno, strerror(errno));
 		else printf("msg'%s send success，sent %d Bytes！\n", buffer, len);
