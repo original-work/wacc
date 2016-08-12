@@ -62,7 +62,7 @@ void print_hex(unsigned char* p_msg, int length)
 	buf[len + 3] = '\n';
 	buf[len + 4] = 0;
 
-	CommonLogger::instance().log_info("%s",buf);
+	printf("%s",buf);
 }
 
 
