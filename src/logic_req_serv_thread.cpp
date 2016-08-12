@@ -262,6 +262,7 @@ int LogicReqServThread::deal_app_req_queue()
 			LocreqData body;
 			body.tid=active->tid;
 			body.mod_id=active->mod_id;
+			memset(body.msisdn,0,sizeof(body.msisdn));
 			memcpy(body.msisdn, active->msisdn, strlen(active->msisdn));
 			
 			memcpy((send_buf + sizeof(NIF_MSG_UNIT) - sizeof(unsigned char*)), (char*)&body, sizeof(LocreqData));
@@ -513,6 +514,7 @@ int LogicReqServThread::deal_locreq_ack(unsigned char *data, unsigned int len)
 	LocReqAck *ack = (LocReqAck*)data;
 	int rsCode = 1;//0 成功1 失败
 
+	
 	/* 如果esn, imsi, mdn 中任意字段为空，则返回失败*/
 	if(strlen(ack->esn)==0||strlen(ack->imsi)==0||strlen(ack->mdn)==0){
 		
@@ -541,6 +543,44 @@ int LogicReqServThread::deal_locreq_ack(unsigned char *data, unsigned int len)
 			{
 				ActivateMsg* msg = (ActivateMsg*)iter->second;
 			       CommonLogger::instance().log_debug("deal_locreq_ack: Find mdn %s.", msg->msisdn);
+
+				   
+				if(1==ack->nResult){
+/*当收到来自业务逻辑模块的周期性位置登记失败响应消息时，
+重新要求业务逻辑模块发起LOCREQ请求*/					
+					
+					NIF_MSG_UNIT *unit = (NIF_MSG_UNIT*)send_buf;
+					unit->head = htonl(0x1a2b3c4d);
+					unit->dialog = htonl(BEGIN);
+					unit->invoke = htonl(SERVLOGIC_LOCREQ_REQ);
+					unit->length = htonl(sizeof(LocreqData));
+					
+					LocreqData body;
+					body.tid=ack->tid;
+					body.mod_id=msg->mod_id;
+					memcpy(body.msisdn, ack->mdn, strlen(ack->mdn));
+					
+					memcpy((send_buf + sizeof(NIF_MSG_UNIT) - sizeof(unsigned char*)), (char*)&body, sizeof(LocreqData));
+					int send_len =  sizeof(NIF_MSG_UNIT) - sizeof(unsigned char*) + sizeof(LocreqData);
+					
+					int n = client_list_.size();
+					for (int i = 0; i < n; ++i)
+					{
+						if (client_list_[i].connected())
+						{
+							int r = client_list_[i].send_data(send_buf, send_len);
+							if (r < send_len || r == -1)
+							{
+								client_list_[i].disconnect_to_server();
+							}
+						}
+					}
+				}
+
+
+
+			
+				
 				ActiveUser* user = (ActiveUser*)info_mgr_->active_usr_table_.find_num(msg->msisdn, strlen(msg->msisdn));
 				memcpy(user->imsi, ack->imsi, strlen(ack->imsi));
 				memcpy(user->esn, ack->esn, strlen(ack->esn));
