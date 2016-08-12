@@ -65,9 +65,10 @@ int AppReqHandler::handle_recv()
 
     unsigned int buf_length = offset_ + ret;
 
-    if (buf_length<=(sizeof(NIF_MSG_UNIT2)-sizeof(unsigned char*))) {
+    //if (buf_length<=(sizeof(NIF_MSG_UNIT2)-sizeof(unsigned char*))) {
+    if (buf_length<(sizeof(NIF_MSG_UNIT2)-sizeof(unsigned char*))) {//modified by wangxx 20160812 for PING msg size == sizeof(NIF_MSG_UNIT2)-sizeof(unsigned char*)
         offset_ += ret;
-		CommonLogger::instance().log_error("AppReqHandler::handle_recv: length error, length=%d", buf_length);
+		CommonLogger::instance().log_error("[%s %d] AppReqHandler::handle_recv: length error, length=%d", __FILE__,__LINE__,buf_length);
         return 0;
     }
 
