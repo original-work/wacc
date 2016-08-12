@@ -136,10 +136,10 @@ int main(int argc, char **argv)
 
 	len = send(sockfd, buffer, sizeof(NIF_MSG_UNIT2)-8+sizeof(user), 0);
 	if(len < 0) {
-		printf("send fail!  error code is %d,  error info is '%s'\n", buffer, errno, strerror(errno));
+		printf("send fail!  error code is %d,  error info is '%s'\n", errno, strerror(errno));
 	}
 	else{
-		printf("send success,  sent %d Bytes  \n", buffer, len);
+		printf("send success,  sent %d Bytes  \n", len);
 		print_hex(buffer, len);
 	}
 		
