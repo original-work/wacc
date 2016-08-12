@@ -94,10 +94,13 @@ int main(int argc, char **argv)
 		memcpy(buffer, buf, sizeof(buf));
 		/* 发消息给服务器 */
 		len = send(sockfd, buffer, sizeof(NIF_MSG_UNIT2)-8, 0);
-		//len = send(sockfd, buffer, sizeof(NIF_MSG_UNIT2)-8+sizeof(msg_body), 0);
-		if(len < 0) printf("msg'%s send fail！error code is %d，error info is '%s'\n", buffer,
-		errno, strerror(errno));
-		else printf("msg'%s send success，sent %d Bytes！\n", buffer, len);
+		if(len < 0) {
+			printf("send fail！error code is %d，error info is '%s'\n", buffer, errno, strerror(errno));
+		}
+		else{
+			printf("send success，sent %d Bytes！\n", buffer, len);
+			print_hex(buffer, len);
+		}
 			
 		sleep(1);	
 		
