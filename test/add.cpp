@@ -77,7 +77,8 @@ int main(int argc, char **argv)
 		char buf[1000];
 		NIF_MSG_UNIT2* testMsg=(NIF_MSG_UNIT2*)buf;
 		AddUser user;
-		user.mdn={0x18,0x01,0x93,0x98,0x63,0x90};
+		char msisdn[]={0x18,0x01,0x93,0x98,0x63,0x90};
+		memcpy(user.mdn, msisdn, strlen(msisdn));
 
 		printf("sizeof(msg_body) is %u\n", sizeof(user));
 		printf("sizeof(NIF_MSG_UNIT2) is %u\n", sizeof(NIF_MSG_UNIT2));
@@ -91,7 +92,8 @@ int main(int argc, char **argv)
 		testMsg->dialog=htonl(0x3);
 		testMsg->seq=htonl(0x123456);
 		testMsg->length=htonl(sizeof(user));
-		memcpy(buf+sizeof(NIF_MSG_UNIT2)-8, user, sizeof(user));
+		char* p_user =(char*)user;
+		memcpy(buf+sizeof(NIF_MSG_UNIT2)-8, p_user, sizeof(user));
 		
 		
 	
