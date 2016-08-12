@@ -255,7 +255,7 @@ int LogicReqServThread::deal_app_req_queue()
 
 			NIF_MSG_UNIT *unit = (NIF_MSG_UNIT*)send_buf;
 			unit->dialog = htonl(BEGIN);
-			unit->invoke = htonl(SERVLOGIC_ACTIVATE_REQ);
+			unit->invoke = htonl(SERVLOGIC_LOCREQ_REQ);
 			unit->length = htonl(sizeof(PeriodData));
 			//*((unsigned int*)req->msg) = htonl(*((unsigned int*)req->msg));
 			
@@ -285,23 +285,6 @@ int LogicReqServThread::deal_app_req_queue()
 							__FILE__,__LINE__,active->msisdn);
 						++i;
 						break;
-					}
-				}
-
-				unit->invoke = htonl(SERVLOGIC_LOCREQ_REQ);
-				CommonLogger::instance().log_debug("deal_app_req_queue:  Sync user info to other socket(servicelogic modle)");
-				/* luchq add for test */
-				CommonLogger::instance().log_debug("[%s %d] deal_app_req_queue: user esn:%s imsi:%s msisdn %s",
-					__FILE__,__LINE__,active->esn,active->imsi,active->msisdn);
-				for (; i < n; ++i)
-				{
-					if (client_list_[i].connected())
-					{
-						int r = client_list_[i].send_data(send_buf, send_len);
-						if (r < send_len || r == -1)
-						{
-							client_list_[i].disconnect_to_server();
-						}
 					}
 				}
 
