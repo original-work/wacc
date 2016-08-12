@@ -159,6 +159,7 @@ int AppReqServThread::loop_process()
 		{
 			// handle request
 			CommonLogger::instance().log_info("AppReqServThread: Recv request msg from App, fd:%d",events_[i].data.fd );
+			mihao_fd_= events_[i].data.fd;
 			handle_request(events_[i].data.fd);
 		}
 	}
@@ -320,7 +321,21 @@ int AppReqServThread::deal_logic_resp_queue()
 				else
 					CommonLogger::instance().log_info("deal_logic_resp_queue: Call find_num fail, user maybe not exist");
 				break;
-			case 5:	// ACK
+			case 5: //PING ACK
+				ack = (AckMsg*)resp->msg;
+				CommonLogger::instance().log_info("deal_logic_resp_queue: Call find_num fail, user maybe not exist");
+				unit = (NIF_MSG_UNIT2*)send_buf;
+				unit->dialog = htonl(END);
+				unit->invoke = htonl(ack->msg_type);
+
+				sendlen = send_data(mihao_fd_, send_buf, sizeof(NIF_MSG_UNIT2)-sizeof(unsigned char*)+sizeof(unsigned int));
+				if (sendlen != sizeof(NIF_MSG_UNIT2)-sizeof(unsigned char*)+sizeof(unsigned int))
+				{
+					CommonLogger::instance().log_error("deal_logic_resp_queue: send PING msg to %s FAIL!!!", mt->cd);
+				}
+				CommonLogger::instance().log_info("deal_logic_resp_queue: send PING msg to APP");
+				break;
+			case 8:	// ACK
 				ack = (AckMsg*)resp->msg;
 				msisdn = info_mgr_->find_msisdn_by_tid(ack->tid);
 				CommonLogger::instance().log_info("deal_logic_resp_queue: Deal ACK msg, tid=%u", ack->tid);
@@ -336,7 +351,6 @@ int AppReqServThread::deal_logic_resp_queue()
 						unit->invoke = htonl(ack->msg_type);
 						unit->length = htonl(sizeof(unsigned int));
 						*((unsigned int*)(send_buf + sizeof(NIF_MSG_UNIT2) - sizeof(unsigned char*))) = htonl(ack->result);
-						//send_data(user->fd, send_buf, sizeof(NIF_MSG_UNIT2) - sizeof(unsigned char*) + sizeof(unsigned int));
 						sendlen = send_data(user->fd, send_buf, sizeof(NIF_MSG_UNIT2)-sizeof(unsigned char*)+sizeof(unsigned int));
 						if (sendlen != sizeof(NIF_MSG_UNIT2)-sizeof(unsigned char*)+sizeof(unsigned int))
 						{
@@ -346,7 +360,7 @@ int AppReqServThread::deal_logic_resp_queue()
 					}
 					else
 						CommonLogger::instance().log_info("deal_logic_resp_queue: Call find_num fail");
-                              	info_mgr_->remove_tid_msisdn(ack->tid);
+                              		info_mgr_->remove_tid_msisdn(ack->tid);
 				}
 				break;
 			default:

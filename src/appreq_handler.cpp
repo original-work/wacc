@@ -134,25 +134,25 @@ int AppReqHandler::process(char *pmsg)
 	/* end of luchq add */
 
     switch (msg_type) {
-    case SMS_SEND:
-	CommonLogger::instance().log_info("AppReqHandler: Recv a MO msg");
-        deal_MO(pmsg);
-        break;
     case ADD_USER:
 	CommonLogger::instance().log_info("AppReqHandler: Recv a ACTIVE msg");
         deal_user_active(pmsg);
         break;
-    case DEACTIVE_REQ:
+    case DEL_USER:
 	CommonLogger::instance().log_info("AppReqHandler: Recv a DEACTIVE msg");
         deal_user_deactive(pmsg);
         break;
-    case CALL_REPORT_REQ:
-	CommonLogger::instance().log_info("AppReqHandler: Recv a CALL REPORT msg");
-        deal_call_record(pmsg);
-        break;
+    case SMS_SEND:
+	CommonLogger::instance().log_info("AppReqHandler: Recv a MO msg");
+        deal_MO(pmsg);
+        break;		
     case SMS_PUSH:
 	CommonLogger::instance().log_info("AppReqHandler: Recv a MT-ACK msg");
         deal_mt_ack(pmsg);
+        break;
+    case PING:
+	CommonLogger::instance().log_info("AppReqHandler: Recv a CALL REPORT msg");
+        deal_ping(pmsg);
         break;
     default:
         break;
@@ -161,10 +161,17 @@ int AppReqHandler::process(char *pmsg)
     return 0;
 }		/* -----  end of method AppReqHandler::process(char *pmsg)  ----- */
 
-int AppReqHandler::deal_call_record(char *data)
+int AppReqHandler::deal_ping(char *data)
 {
+	ReqMsg red_msg;
+	red_msg.msg_type = 5;
+	
+	app_req_queue_->insert_record((char*)&red_msg, sizeof(ReqMsg));
+	app_req_queue_->advance_widx();
+	CommonLogger::instance().log_info("deal_MO: insert MO Msg into app_req_queue");
+	
 	return 0;
-}/* -----  end of method AppReqHandler::deal_call_record(char *data)  ----- */
+}/* -----  end of method AppReqHandler::deal_ping(char *data)  ----- */
 
 
 int AppReqHandler::deal_user_active(char *data)
@@ -250,9 +257,77 @@ int AppReqHandler::deal_user_active(char *data)
 	return 0;
 }		/* -----  end of method AppReqHandler::deal_user_active  ----- */
 
+
 int AppReqHandler::deal_user_deactive(char *data)
 {
-	return 0;
+	ReqMsg red_msg;
+
+	memset((char*)&red_msg,0,sizeof(red_msg));
+	red_msg.msg_type = 2;
+	DeactivateMsg *record = (DeactivateMsg*)red_msg.msg;
+
+	NIF_MSG_UNIT2 *header = (NIF_MSG_UNIT2*)data;
+	unsigned int msg_length = ntohl(header->length);
+
+	memcpy(send_buf_, data, (sizeof(NIF_MSG_UNIT2)-sizeof(unsigned char*)));
+	NIF_MSG_UNIT2 *header1 = (NIF_MSG_UNIT2*)send_buf_;
+	header1->dialog = htonl(END);
+	header1->length = htonl(sizeof(int));
+
+	if (msg_length % sizeof(DelUser) != 0)
+	{
+		unsigned int *result = (unsigned int *)(send_buf_ + (sizeof(NIF_MSG_UNIT2) - sizeof(unsigned char*)));
+		*result = htonl(11);
+		sendn(send_buf_, sizeof(NIF_MSG_UNIT2) - sizeof(unsigned char*) + sizeof(unsigned int));
+		CommonLogger::instance().log_error("deal_user_deactive: length error");
+		return -1;
+	}
+
+	DelUser *re = (DelUser*)(data+sizeof(NIF_MSG_UNIT2)-sizeof(unsigned char*));
+
+	CommonLogger::instance().log_debug("deal_user_deactive: deal deactive user %s, fd:%d", re->mdn,sockfd());
+
+	StrToBCD(re->mdn, bcd_buf_, sizeof(bcd_buf_));
+	ActiveUser* user = (ActiveUser*)info_mgr_->active_usr_table_.find_num((char*)bcd_buf_, strlen(re->mdn));
+	if (user != NULL)
+	{
+		/* luchq add for test */
+		CommonLogger::instance().log_debug("deal_user_deactive: user imsi:%s msisdn %s\n",user->imsi,user->msisdn);
+
+		info_mgr_->active_usr_table_.remove_num((char*)bcd_buf_, strlen(re->mdn));
+
+		memcpy(record->msisdn, re->mdn, strlen(re->mdn));
+		record->tid = generate_tid();
+		info_mgr_->add_tid_msisdn(record->tid, record->msisdn);
+		//CommonLogger::instance().log_debug("record  msg %u", record->tid);
+
+		app_req_queue_->insert_record((char*)&red_msg, sizeof(ReqMsg));
+		app_req_queue_->advance_widx();
+
+		map<int, BaseCollectionHandler*>::iterator iter = client_list_->find(user->fd);
+		if (iter != client_list_->end())
+		{
+			if (strcmp(msisdn_, ((AppReqHandler*)iter->second)->msisdn()) == 0)
+			{
+				//CommonLogger::instance().log_debug("deal deactive ### %d, %d", user->fd, this->sockfd());
+				unsigned int *result = (unsigned int *)(send_buf_ + (sizeof(NIF_MSG_UNIT2) - sizeof(unsigned char*)));
+				*result = htonl(0);
+				sendn(send_buf_, sizeof(NIF_MSG_UNIT2) - sizeof(unsigned char*) + sizeof(unsigned int));
+				close(iter->first);
+				delete iter->second;
+				client_list_->erase(iter);
+
+				return 0;
+			}
+		}
+
+	}
+
+	unsigned int *result = (unsigned int *)(send_buf_ + (sizeof(NIF_MSG_UNIT2) - sizeof(unsigned char*)));
+	*result = htonl(11);
+	sendn(send_buf_, sizeof(NIF_MSG_UNIT2) - sizeof(unsigned char*) + sizeof(unsigned int));
+
+	return -1;
 }		/* -----  end of method AppReqHandler::deal_user_deactive  ----- */
 
 
@@ -348,42 +423,11 @@ unsigned int AppReqHandler::generate_tid()
     return TidGenerator::instance().generator_tid();
 }		/* -----  end of method AppReqHandler::generate_tid  ----- */
 
-#if 0
 int AppReqHandler::logout_notification(int fd)
 {
 	char send_buf[256];
 	NIF_MSG_UNIT2 *unit = (NIF_MSG_UNIT2*)send_buf;
-	unit->invoke = htonl(OFFLINE_REQ);
-	unit->length = 0;
-	unit->dialog = htonl(BEGIN);
-
-	/* luchq modify 2015-10-28 	放弃使用函数sendn()，改用下面的方法发送消息，目的是可以指定fd
-	if (-1 == sendn(send_buf, sizeof(NIF_MSG_UNIT2)-sizeof(unsigned char*)))
-	{
-		CommonLogger::instance().log_info("logout_notification: call sendn fail!");
-	}*/
-	CommonLogger::instance().log_info("logout_notification: fd=%d",fd);
-	map<int,BaseCollectionHandler*>::iterator iter = client_list_->find(fd);
-	if (iter != client_list_->end())
-	{
-		BaseCollectionHandler *handler = iter->second;
-		if (-1 == handler->logout(send_buf, sizeof(NIF_MSG_UNIT2)-sizeof(unsigned char*)))
-		{
-			CommonLogger::instance().log_info("logout_notification: call logout fail!");
-		}
-	}
-	else
-	{
-		CommonLogger::instance().log_info("logout_notification: can't find fd!");
-	}
-    	return 0;
-}		/* -----  end of method AppReqHandler::logout_notification  ----- */
-#endif
-int AppReqHandler::logout_notification(int fd)
-{
-	char send_buf[256];
-	NIF_MSG_UNIT2 *unit = (NIF_MSG_UNIT2*)send_buf;
-	unit->invoke = htonl(OFFLINE_REQ);
+	unit->invoke = htonl(NOTIFY_ACTIVE);
 	unit->length = 0;
 	unit->dialog = htonl(BEGIN);
 	if (-1 == sendn(send_buf, sizeof(NIF_MSG_UNIT2)-sizeof(unsigned char*)))

@@ -149,17 +149,17 @@ typedef struct {
 // ===================================================
 
 typedef struct {
-    unsigned char msg_type;		// 消息类型，6：用户操作记录消息；7：短信操作记录消息；8：话单记录消息；
+    unsigned char msg_type;   // 消息类型，6：用户操作记录消息；7：短信操作记录消息；8：话单记录消息；
     unsigned char msg[256];    // 消息
 } RecordMsg;
 
 typedef struct {
-    unsigned char msg_type;		// 消息类型，1：用户激活；2：用户去激活；3：MO短信；9：MT短信的ACK；
+    unsigned char msg_type;    // 1:ADD    2:DEL   3:MO   4:MT   5: PING    6: NOTIFY_ACTIVE    9: MT  ACK；
     unsigned char msg[3000];    // 消息
 } ReqMsg;
 
 typedef struct {
-    unsigned char msg_type;		//1：用户激活；2：用户去激活； 4：MT短信；5：ACK消息；
+    unsigned char msg_type;   // 1:ADD    2:DEL   3:MO   4:MT   5: PING    6: NOTIFY_ACTIVE    8: ACK；
     unsigned char msg[456];    // 消息
 } RespMsg;
 
@@ -193,6 +193,7 @@ typedef struct {
 
 //用户去激活消息结构
 typedef struct {
+	unsigned int tid;
 	char msisdn[32];
 } DeactivateMsg;
 
@@ -296,12 +297,12 @@ typedef struct {
 //======================================================
 //与用户APP接口结构
 
+#define ADD_USER	0XEEEEEE01
+#define DEL_USER	0XEEEEEE02
 #define SMS_SEND	0XEEEEEE03
 #define SMS_PUSH	0XEEEEEE04
-#define ADD_USER	0XEEEEEE01
-#define DEACTIVE_REQ	0XEEEEEE02
-#define CALL_REPORT_REQ	0XEEEEEE05
-#define OFFLINE_REQ	0XEEEEEE06
+#define PING			0XEEEEEE05
+#define NOTIFY_ACTIVE	0XEEEEEE06
 
 
 
@@ -332,6 +333,9 @@ typedef struct {
     char mnc[2];
 } Activation;
 
+typedef struct {
+    char mdn[32];
+} DelUser;
 
 typedef struct {
     char mdn[32];

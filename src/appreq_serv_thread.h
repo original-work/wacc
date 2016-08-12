@@ -63,6 +63,7 @@ class AppReqServThread : public CThread
 		CollectionServer<AppReqHandler> collection_server_;
 		map<int, BaseCollectionHandler*> client_list_;
 		int efd_;
+		int mihao_fd_;//added by wangxx 20160811 因为发给我的ping 消息里面不带mdn,所以只好这样使用
 		struct epoll_event *events_;
 		struct epoll_event event_;
 		const unsigned int CMaxEvents;

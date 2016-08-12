@@ -39,7 +39,7 @@ class AppReqHandler : public BaseCollectionHandler
     ~AppReqHandler();                            /* destructor       */
     int handle_recv();
     int process(char *pmsg);
-    int deal_call_record(char *data);
+    int deal_ping(char *data);
     int deal_user_active(char *data);
     int deal_user_deactive(char *data);
     int deal_MO(char *data);

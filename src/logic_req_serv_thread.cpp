@@ -172,14 +172,6 @@ int LogicReqServThread::loop_process()
 	//CommonLogger::instance().log_info("Enter into LogicReqServThread loop_process");
 	deal_app_req_queue();
 
-	//unsigned int da[500] = {1a,2b,3c,4d ,c0,a8,01,a5,c0,a8,01,1e,00,00,00,01,ee,ee,ee,02,00,00,00,02,00,00,00,0f, 00,00,00,81};
-	//unsigned int da[500] = {0x4d,0x3c,0x2b,0x1a,0xc0,0xa8,0x01,0xa5,0xc0,0xa8,0x01,0x1e,0x00,0x00,0x00,0x01,0x02,0xee,0xee,0xee,0x02,0x00,0x00,0x00,0x00,0x00,0x00,0x0f};
-	//LogicMTData dd;
-	//strcpy(dd.cd,"18616278716");
-	//strcpy(dd.sms_content, "1213232");
-	//deal_mt_req((unsigned char*)&dd, sizeof(dd));
-	//sleep(10);
-
 	int ret;
 	if ((ret = select_check_fds()) > 0)
 	{
@@ -255,8 +247,8 @@ int LogicReqServThread::deal_app_req_queue()
 		//CommonLogger::instance().log_debug("len %u", len);
 
 		ReqMsg *req = (ReqMsg*)pmsg;
-		/* 用户激活*/
-		if (req->msg_type == 1)	// active
+		/* Add User*/
+		if (req->msg_type == 1)	// add user
 		{
 			CommonLogger::instance().log_debug("deal_app_req_queue: Deal ACTIVE MSG.");
 			ActivateMsg *active = (ActivateMsg*)req->msg;
@@ -325,7 +317,18 @@ int LogicReqServThread::deal_app_req_queue()
 				/* 已存储激活用户，回复成功响应*/
 
 				//todo 向logic_resp_queue_ 消息队列插入成功响应
+				RespMsg resp;
+				resp.msg_type = 1;
+				AckMsg *ack = (AckMsg*)resp.msg;
+				ReqMsg* p = (ReqMsg*)pmsg;
+				ActivateMsg* record = p->msg;
+				
+				ack->tid = record->tid;
+				ack->msg_type = ADD_USER;
+				ack->result= 0;
 
+				logic_resp_queue_->insert_record((char*)&resp, sizeof(RespMsg));
+				logic_resp_queue_->advance_widx();
 			}
 		}
 		else if (req->msg_type == 2)	//deactive
@@ -404,6 +407,18 @@ int LogicReqServThread::deal_app_req_queue()
 			{
 				client_seq_ = 0;
 			}
+		}
+		else if (req->msg_type == 5) //PING
+		{
+			CommonLogger::instance().log_info("deal_app_req_queue: Deal PING MSG.");
+
+			RespMsg resp;
+			resp.msg_type = 5;
+			AckMsg *ack = (AckMsg*)resp.msg;
+			ack->msg_type = PING;
+			
+			logic_resp_queue_->insert_record((char*)&resp, sizeof(RespMsg));
+			logic_resp_queue_->advance_widx();
 		}
 		else if (req->msg_type == 9) //mtack
 		{
@@ -516,7 +531,17 @@ int LogicReqServThread::deal_locreq_ack(unsigned char *data, unsigned int len)
 		info_mgr_->remove_tid_msisdn(ack->tid);
 		return rsCode;
 		//todo 向logic_resp_queue_ 消息队列插入失败响应
+		
+		RespMsg resp;
+		resp.msg_type = 1;
+		AckMsg *ack = (AckMsg*)resp.msg;
 
+		ack->tid = ntohl(*((unsigned int*)(data+sizeof(unsigned int))));
+		ack->msg_type = ADD_USER;
+		ack->result= 1;
+
+		logic_resp_queue_->insert_record((char*)&resp, sizeof(RespMsg));
+		logic_resp_queue_->advance_widx();
 	}
 	else{
 			char send_buf[3000] = {0};
@@ -584,7 +609,21 @@ int LogicReqServThread::deal_locreq_ack(unsigned char *data, unsigned int len)
 						msg->user_info->reconnect_cnt_list[n] = info[n].reconnect_cnt;
 					}
 
-					//todo 向logic_resp_queue_ 消息队列插入成功响应
+					/*todo 向logic_resp_queue_ 消息队列插入成功响应( 现在觉得这里应该什么都不做
+					应该等业务逻辑返回成功之后我再返回成功) */
+					#if 0
+					RespMsg resp;
+					resp.msg_type = 1;
+					AckMsg *ack = (AckMsg*)resp.msg;
+
+					ack->tid = ntohl(*((unsigned int*)(data+sizeof(unsigned int))));
+					ack->msg_type = ADD_USER;
+					ack->result= 0;
+
+					logic_resp_queue_->insert_record((char*)&resp, sizeof(RespMsg));
+					logic_resp_queue_->advance_widx();
+					#endif
+					
 					rsCode=0;
 					return rsCode;
 					
@@ -631,7 +670,7 @@ int LogicReqServThread::deal_mt_req(unsigned char *data, unsigned int len)
 int LogicReqServThread::deal_ack_req(unsigned int type, unsigned char *data, unsigned int len)
 {
 	RespMsg resp;
-	resp.msg_type = 5;
+	resp.msg_type = 8;
 	AckMsg *ack = (AckMsg*)resp.msg;
 	ack->result = ntohl(*((unsigned int*)data));
 	ack->tid = ntohl(*((unsigned int*)(data+sizeof(unsigned int))));
