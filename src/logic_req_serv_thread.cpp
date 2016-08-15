@@ -590,15 +590,15 @@ int LogicReqServThread::deal_locreq_ack(unsigned char *data, unsigned int len)
 			map<string, char*>::iterator  iter = add_user_req_.find(ack->mdn);
 			if(iter != add_user_req_.end())
 			{
-				ActivateMsg* msg = (ActivateMsg*)iter->second;
-			       CommonLogger::instance().log_debug("deal_locreq_ack: Find mdn %s.", msg->msisdn);
+				ActivateMsg* ActReq = (ActivateMsg*)iter->second;
+			       CommonLogger::instance().log_debug("deal_locreq_ack: Find mdn %s.", ActReq->msisdn);
 
 				   
 				if(1==ack->nResult){
 /*当收到来自业务逻辑模块的周期性位置登记失败响应消息时，
 重新要求业务逻辑模块发起LOCREQ请求*/	
 
-					CommonLogger::instance().log_debug("deal_locreq_ack: locreq fail, ask ServiceLogic do LOCREQ again %s.", msg->msisdn);
+					CommonLogger::instance().log_debug("deal_locreq_ack: locreq fail, ask ServiceLogic do LOCREQ again %s.", ActReq->msisdn);
 					
 					NIF_MSG_UNIT *unit = (NIF_MSG_UNIT*)send_buf;
 					unit->head = htonl(0x1a2b3c4d);
@@ -608,7 +608,7 @@ int LogicReqServThread::deal_locreq_ack(unsigned char *data, unsigned int len)
 					
 					LocreqData body;
 					body.tid=ack->tid;
-					body.mod_id=msg->mod_id;
+					body.mod_id=ActReq->mod_id;
 					memcpy(body.msisdn, ack->mdn, strlen(ack->mdn));
 					
 					memcpy((send_buf + sizeof(NIF_MSG_UNIT) - sizeof(unsigned char*)), (char*)&body, sizeof(LocreqData));
@@ -630,14 +630,14 @@ int LogicReqServThread::deal_locreq_ack(unsigned char *data, unsigned int len)
 					return rsCode;
 				}
 
-				CommonLogger::instance().log_debug("[%s %d] lalalala.", __FILE__,__LINE__,msg->msisdn );
+				CommonLogger::instance().log_debug("[%s %d] lalalala.", __FILE__,__LINE__,ActReq->msisdn );
 				memset(bcd_buf_,0,sizeof(bcd_buf_));
-				StrToBCD(msg->msisdn, bcd_buf_, sizeof(bcd_buf_));
+				StrToBCD(ActReq->msisdn, bcd_buf_, sizeof(bcd_buf_));
 				
-				ActiveUser* user = (ActiveUser*)info_mgr_->active_usr_table_.find_num((char*)bcd_buf_, strlen(msg->msisdn));
+				ActiveUser* user = (ActiveUser*)info_mgr_->active_usr_table_.find_num((char*)bcd_buf_, strlen(ActReq->msisdn));
 				if (user != NULL)
 				{
-					CommonLogger::instance().log_debug("[%s %d] deal_locreq_ack: info_mgr_->active_usr_table_.find_num %s success.", __FILE__,__LINE__,msg->msisdn );
+					CommonLogger::instance().log_debug("[%s %d] deal_locreq_ack: info_mgr_->active_usr_table_.find_num %s success.", __FILE__,__LINE__,ActReq->msisdn );
 					memcpy(user->imsi, ack->imsi, strlen(ack->imsi));
 					memcpy(user->esn, ack->esn, strlen(ack->esn));
 
@@ -645,14 +645,14 @@ int LogicReqServThread::deal_locreq_ack(unsigned char *data, unsigned int len)
 					unit->dialog = htonl(BEGIN);
 					unit->invoke = htonl(SERVLOGIC_ACTIVATE_REQ);
 					unit->length = htonl(sizeof(PeriodData));
-					memcpy((send_buf + sizeof(NIF_MSG_UNIT) - sizeof(unsigned char*)), msg, sizeof(PeriodData));
+					memcpy((send_buf + sizeof(NIF_MSG_UNIT) - sizeof(unsigned char*)), ActReq, sizeof(PeriodData));
 					int send_len =  sizeof(NIF_MSG_UNIT) - sizeof(unsigned char*) + sizeof(PeriodData);
 
 					int n = client_list_.size();
 					int i = 0;
 					/* 新用户*/
 
-					if (msg->actived == 0)
+					if (ActReq->actived == 0)
 					{
 						CommonLogger::instance().log_debug("deal_locreq_ack: New user.");
 						for (; i < n; ++i)
@@ -667,7 +667,7 @@ int LogicReqServThread::deal_locreq_ack(unsigned char *data, unsigned int len)
 								CommonLogger::instance().log_debug("deal_locreq_ack: Send Active Msg to first connected socket(servicelogic modle), index=%d",i);
 								/* luchq add for test */
 								CommonLogger::instance().log_debug("[%s %d] deal_locreq_ack: user msisdn 	%s  esn  %s  imsi  %s ",
-									__FILE__,__LINE__,msg->msisdn, msg->esn, msg->imsi);
+									__FILE__,__LINE__,user->msisdn, user->esn, user->imsi);
 								++i;
 								break;
 							}
@@ -692,7 +692,7 @@ int LogicReqServThread::deal_locreq_ack(unsigned char *data, unsigned int len)
 						int info_cnt = info_mgr_->logic_conns_mgr_.conns_counts();
 						for (int n = 0; n < info_cnt; ++n)
 						{
-							msg->user_info->reconnect_cnt_list[n] = info[n].reconnect_cnt;
+							ActReq->user_info->reconnect_cnt_list[n] = info[n].reconnect_cnt;
 						}
 
 						/*todo 向logic_resp_queue_ 消息队列插入成功响应*/
@@ -723,7 +723,7 @@ int LogicReqServThread::deal_locreq_ack(unsigned char *data, unsigned int len)
 				else{
 					/*内存数据库中没有这个mdn，删除数据返回失败*/
 
-					CommonLogger::instance().log_debug("[%s %d] deal_locreq_ack: no mdn %s in info_mgr_->active_usr_table_.", __FILE__,__LINE__, msg->msisdn);
+					CommonLogger::instance().log_debug("[%s %d] deal_locreq_ack: no mdn %s in info_mgr_->active_usr_table_.", __FILE__,__LINE__, ActReq->msisdn);
 					info_mgr_->remove_tid_msisdn(ack->tid);
 					//todo 向logic_resp_queue_ 消息队列插入失败响应
 					
@@ -733,7 +733,6 @@ int LogicReqServThread::deal_locreq_ack(unsigned char *data, unsigned int len)
 					body->tid=ack->tid;
 					body->msg_type=ADD_USER;
 					body->result=1;
-					/*虽然没有mdn，还是假装拷贝下*/
 					memcpy(body->cd,ack->mdn,strlen(ack->mdn));
 
 					logic_resp_queue_->insert_record((char*)&resp, sizeof(RespMsg));
