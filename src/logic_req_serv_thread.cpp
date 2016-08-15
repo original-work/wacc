@@ -674,7 +674,7 @@ int LogicReqServThread::deal_locreq_ack(unsigned char *data, unsigned int len)
 				else{
 					/*内存数据库中没有这个mdn，删除数据返回失败*/
 
-					CommonLogger::instance().log_debug("[%s %d] deal_locreq_ack: no mdn %s in info_mgr_->active_usr_table_ .", __FILE__,__LINE__);
+					CommonLogger::instance().log_debug("[%s %d] deal_locreq_ack: no mdn %s in info_mgr_->active_usr_table_ .", __FILE__,__LINE__, msg->msisdn);
 					info_mgr_->remove_tid_msisdn(ack->tid);
 					//todo 向logic_resp_queue_ 消息队列插入失败响应
 					
