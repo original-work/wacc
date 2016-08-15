@@ -522,14 +522,13 @@ int LogicReqServThread::deal_locreq_ack(unsigned char *data, unsigned int len)
 		//todo 向logic_resp_queue_ 消息队列插入失败响应
 		
 		RespMsg resp;
-		resp.msg_type = 1;
-		LocReqAck *body = (LocReqAck*)resp.msg;
-		body->nResult=1;
+		resp.msg_type = 8;
+		AckMsg *body = (AckMsg*)resp.msg;
 		body->tid=ack->tid;
-		memcpy(body->mdn,ack->mdn,strlen(ack->mdn));
-		memcpy(body->imsi,ack->imsi,strlen(ack->imsi));
-		memcpy(body->esn,ack->esn,strlen(ack->esn));
 		body->msg_type=ADD_USER;
+		body->result=1;
+		/*虽然没有mdn，还是假装拷贝下*/
+		memcpy(body->cd,ack->mdn,strlen(ack->mdn));
 
 		logic_resp_queue_->insert_record((char*)&resp, sizeof(RespMsg));
 		logic_resp_queue_->advance_widx();
@@ -548,7 +547,9 @@ int LogicReqServThread::deal_locreq_ack(unsigned char *data, unsigned int len)
 				   
 				if(1==ack->nResult){
 /*当收到来自业务逻辑模块的周期性位置登记失败响应消息时，
-重新要求业务逻辑模块发起LOCREQ请求*/					
+重新要求业务逻辑模块发起LOCREQ请求*/	
+
+					CommonLogger::instance().log_debug("deal_locreq_ack: locreq fail, ask ServiceLogic do LOCREQ again %s.", msg->msisdn);
 					
 					NIF_MSG_UNIT *unit = (NIF_MSG_UNIT*)send_buf;
 					unit->head = htonl(0x1a2b3c4d);
@@ -576,6 +577,8 @@ int LogicReqServThread::deal_locreq_ack(unsigned char *data, unsigned int len)
 							}
 						}
 					}
+					
+					return rsCode;
 				}
 				
 				ActiveUser* user = (ActiveUser*)info_mgr_->active_usr_table_.find_num(msg->msisdn, strlen(msg->msisdn));
