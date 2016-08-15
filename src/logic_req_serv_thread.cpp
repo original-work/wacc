@@ -577,15 +577,10 @@ int LogicReqServThread::deal_locreq_ack(unsigned char *data, unsigned int len)
 						}
 					}
 				}
-
-
-
-			
 				
 				ActiveUser* user = (ActiveUser*)info_mgr_->active_usr_table_.find_num(msg->msisdn, strlen(msg->msisdn));
 				memcpy(user->imsi, ack->imsi, strlen(ack->imsi));
 				memcpy(user->esn, ack->esn, strlen(ack->esn));
-
 
 				NIF_MSG_UNIT *unit = (NIF_MSG_UNIT*)send_buf;
 				unit->dialog = htonl(BEGIN);
