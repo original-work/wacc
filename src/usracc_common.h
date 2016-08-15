@@ -125,9 +125,9 @@ typedef struct {
 	unsigned int tid;
 	char cd[32];	//被叫号码
 	char cg[32];	//主叫号码
-	char sms_center[32];	//短信中心号码
 	char sms_code;	//短信编码格式
-	char sms_content[2048];	 //短信内容
+	unsigned int content_len;
+	unsigned char sms_content[256];	 //短信内容
 } LogicMOData;
 
 typedef struct {
@@ -209,20 +209,20 @@ typedef struct {
 	unsigned int tid;
 	char cd[32];	//被叫号码
 	char cg[32];	//主叫号码
-	char sms_center[32];	//短信中心号码
 	char sms_code;	//短信编码格式
-	char sms_content[2048];	 //短信内容
+	unsigned int content_len;
+	unsigned char sms_content[256];	 //短信内容
 } SMSData;
 
 //MT短信消息结构
 typedef struct {
+	unsigned int seq;
 	unsigned int tid;
-	unsigned char seq;
 	char cd[32];
 	char cg[32];
-	char sms_center[32];
 	char sms_code;
-	char sms_content[256];
+	unsigned int content_len;
+	unsigned char sms_content[256];
 } MTMsg;
 
 //RespMsg的char msg[456] 消息结构
@@ -352,14 +352,11 @@ typedef struct {
 
 
 typedef struct {
-    unsigned long long appid;
     char cd[32];
     char cg[32];
-    char smsc[32];
     char sms_code;
-    char mcc[3];
-    char mnc[2];
-    char content[2048];
+    unsigned int content_len;
+    char content[256];
 } MOData;
 
 typedef struct {

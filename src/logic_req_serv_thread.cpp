@@ -361,8 +361,8 @@ int LogicReqServThread::deal_app_req_queue()
 
 			memcpy(logic_mo->cd, mo->cd, strlen(mo->cd));
 			memcpy(logic_mo->cg, mo->cg, strlen(mo->cg));
-			memcpy(logic_mo->sms_center, mo->sms_center, strlen(mo->sms_center));
-			memcpy(logic_mo->sms_content, mo->sms_content, strlen(mo->sms_content));
+			logic_mo->content_len = htonl(mo->content_len);
+			memcpy(logic_mo->sms_content, mo->sms_content, logic_mo->content_len);
 			logic_mo->sms_code = mo->sms_code;
 			CommonLogger::instance().log_info("deal_app_req_queue: mo cg len:%d, num:%s",strlen(mo->cg),mo->cg);
 			CommonLogger::instance().log_info("deal_app_req_queue: logic-mo cg len:%d, num:%s",strlen(logic_mo->cg),logic_mo->cg);
@@ -679,13 +679,12 @@ int LogicReqServThread::deal_mt_req(unsigned char *data, unsigned int len)
 	MTMsg *mt = (MTMsg*)resp.msg;
 	memset(mt,0,sizeof(MTMsg));
 	LogicMTData *logic_mt = (LogicMTData*)data;
-	mt->tid = ntohl(logic_mt->tid);
-	mt->sms_code = logic_mt->sms_code;
 	mt->seq = logic_mt->mod_id;
-
+	mt->tid = ntohl(logic_mt->tid);
 	memcpy(mt->cd, logic_mt->cd, strlen(logic_mt->cd));
 	memcpy(mt->cg, logic_mt->cg, strlen(logic_mt->cg));
-	memcpy(mt->sms_center, logic_mt->sms_center, strlen(logic_mt->sms_center));
+	mt->sms_code = logic_mt->sms_code;
+	mt->content_len = logic_mt->content_len;
 	memcpy(mt->sms_content, logic_mt->sms_content, strlen(logic_mt->sms_content));
 
 	CommonLogger::instance().log_info("deal_mt_req: MT %s, len %d, tid %u",

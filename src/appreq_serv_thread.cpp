@@ -291,7 +291,7 @@ int AppReqServThread::deal_logic_resp_queue()
 						break;
 					}
 					/* end of luchq add */
-					CommonLogger::instance().log_info("deal_logic_resp_queue: sms len=%d",strlen(mt->sms_content));
+					CommonLogger::instance().log_info("deal_logic_resp_queue: sms len=%d",mt->content_len);
 					unit = (NIF_MSG_UNIT2*)send_buf;
 					unit->dialog = htonl(BEGIN);
 					unit->invoke = htonl(SMS_PUSH);

@@ -338,47 +338,41 @@ int AppReqHandler::deal_MO(char *data)
 	ReqMsg red_msg;
 
 	memset((char*)&red_msg,0,sizeof(red_msg));
-    red_msg.msg_type = 3;
-    SMSData *record = (SMSData*)red_msg.msg;
+	red_msg.msg_type = 3;
+	SMSData *record = (SMSData*)red_msg.msg;
 
-	//CommonLogger::instance().log_info("AppReqHandler: deal MO Msg");
+	CommonLogger::instance().log_info("AppReqHandler: deal MO Msg");
 
-    MOData *re = (MOData*)(data+sizeof(NIF_MSG_UNIT2)-sizeof(unsigned char*));
+	MOData *re = (MOData*)(data+sizeof(NIF_MSG_UNIT2)-sizeof(unsigned char*));
 
 	StrToBCD(re->cg, bcd_buf_, sizeof(bcd_buf_));
-    ActiveUser* user = (ActiveUser*)info_mgr_->active_usr_table_.find_num((char*)bcd_buf_, strlen(re->cg));
+	ActiveUser* user = (ActiveUser*)info_mgr_->active_usr_table_.find_num((char*)bcd_buf_, strlen(re->cg));
 	if (user != NULL)
 	{
+		memcpy(record->cg, re->cg, strlen(re->cg));
 
-			/*memcpy(record->cg, re->cg, sizeof(record->cg));
-			memcpy(record->cd, re->cd, sizeof(record->cd));
-			memcpy(record->sms_center, re->smsc, sizeof(record->sms_center));
-			memcpy(record->sms_content, re->content, sizeof(record->sms_content));*/
-			memcpy(record->cg, re->cg, strlen(re->cg));
-			/*memcpy(record->cd, re->cd, strlen(re->cd));*/
-			/* luchq add 2015-12-11 */
-			if (re->cd[0] == '+')
-			{
-				memcpy(record->cd, &re->cd[1], strlen(re->cd)-1);
-			}
-			else
-			{
-				memcpy(record->cd, re->cd, strlen(re->cd));
-			}
-			memcpy(record->sms_center, re->smsc, strlen(re->smsc));
-			memcpy(record->sms_content, re->content, strlen(re->content));
+		if (re->cd[0] == '+')
+		{
+			memcpy(record->cd, &re->cd[1], strlen(re->cd)-1);
+		}
+		else
+		{
+			memcpy(record->cd, re->cd, strlen(re->cd));
+		}
+		memcpy(record->sms_content, re->content, strlen(re->content));
 
-			CommonLogger::instance().log_info("deal_MO: cd:%s",re->cd);
-			CommonLogger::instance().log_info("deal_MO: re cg len:%d, num:%s",strlen(re->cg),re->cg);
-			CommonLogger::instance().log_info("deal_MO: record cg len:%d, num:%s",strlen(record->cg),record->cg);
-			CommonLogger::instance().log_info("sms len:%d,content:", strlen(re->content));
-			tools::print_hex((unsigned char*)re->content,strlen(re->content));/* luchq add 2015-06-18 */
+		CommonLogger::instance().log_info("deal_MO: cd:%s",re->cd);
+		CommonLogger::instance().log_info("deal_MO: re cg len:%d, num:%s",strlen(re->cg),re->cg);
+		CommonLogger::instance().log_info("deal_MO: record cg len:%d, num:%s",strlen(record->cg),record->cg);
+		CommonLogger::instance().log_info("sms len:%d,content:", strlen(re->content));
+		tools::print_hex((unsigned char*)re->content,strlen(re->content));/* luchq add 2015-06-18 */
 
-			record->sms_code = re->sms_code;
-			record->tid = generate_tid();
-			app_req_queue_->insert_record((char*)&red_msg, sizeof(ReqMsg));
-			app_req_queue_->advance_widx();
-			CommonLogger::instance().log_info("deal_MO: insert MO Msg into app_req_queue");
+		record->sms_code = re->sms_code;
+		record->tid = generate_tid();
+		memcpy(record->sms_content, re->content, re->content_len);
+		app_req_queue_->insert_record((char*)&red_msg, sizeof(ReqMsg));
+		app_req_queue_->advance_widx();
+		CommonLogger::instance().log_info("deal_MO: insert MO Msg into app_req_queue");
 
 	}
 	else
@@ -386,7 +380,7 @@ int AppReqHandler::deal_MO(char *data)
 		CommonLogger::instance().log_error("deal_MO: Call find_num fail");
 	}
 
-    return 0;
+	return 0;
 }		/* -----  end of method AppReqHandler::deal_MO  ----- */
 
 int AppReqHandler::deal_mt_ack(char *data)
