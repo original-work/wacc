@@ -111,8 +111,8 @@ typedef struct {
 	unsigned char mod_id;	//模块id,从0开始编号
 	char cd[32];
 	char cg[32];
-	char sms_center[32];
 	char sms_code;
+	unsigned int content_len;
 	char sms_content[256];
 } LogicMTData;
 
