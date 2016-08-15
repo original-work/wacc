@@ -298,11 +298,11 @@ int AppReqServThread::deal_logic_resp_queue()
 					unit->length = htonl(sizeof(MTData));
 					data = (MTData*)(send_buf + sizeof(NIF_MSG_UNIT2) - sizeof(unsigned char*));
 					memset(data->content,0,sizeof(data->content));
-					CommonLogger::instance().log_info("deal_logic_resp_queue: sms len=%d",strlen(mt->sms_content));
+					CommonLogger::instance().log_info("deal_logic_resp_queue: sms len=%u",mt->content_len);
 					data->seq = mt->seq;
 					data->tid = htonl(mt->tid);
 					memcpy(data->sender, mt->cg, strlen(mt->cg));
-					memcpy(data->content, mt->sms_content, strlen(mt->sms_content));
+					memcpy(data->content, mt->sms_content, mt->content_len);
 					if (strcmp(user->msisdn,mt->cd))
 					{
 						CommonLogger::instance().log_error("deal_logic_resp_queue: Check App number fail, App=%s",user->msisdn);
