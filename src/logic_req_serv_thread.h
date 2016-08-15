@@ -48,6 +48,7 @@ class LogicReqServThread : public CThread
 		int select_check_fds();
 		vector<TcpClient>* client_list() {return &client_list_;}
 	protected:
+		bool StrToBCD(const char *Src,unsigned char *Des,int iDesLen);
 		int loop_process();
 		int deal_app_req_queue();
 		int send_msg(int fd, const char *buf, const unsigned int &len);
@@ -68,6 +69,7 @@ class LogicReqServThread : public CThread
 		unsigned char data_buf_[3000];
 		CTimer timer_;
 		bool all_stopped_;
+		unsigned char bcd_buf_[256];
 }; /* -----  end of class LogicReqServThread  ----- */
 
 

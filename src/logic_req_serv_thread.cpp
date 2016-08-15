@@ -167,6 +167,53 @@ int LogicReqServThread::select_check_fds()
 	return 0;
 }		/* -----  end of method LogicReqServThread::select_check_fds  ----- */
 
+
+bool LogicReqServThread::StrToBCD(const char *Src,unsigned char *Des,int iDesLen)
+{
+	if (NULL == Src)
+	{
+		return false;
+	}
+	if (NULL == Des)
+	{
+		return false;
+	}
+	if (0 == iDesLen)
+	{
+		return false;
+	}
+	int iSrcLen = strlen(Src);
+	if(iSrcLen==0)
+	{
+		memset(Des,0xFF,8);
+		return true;
+	}
+	if (iSrcLen > iDesLen * 2)
+	{
+		return false;
+	}
+	unsigned char chTemp = 0;
+	int i;
+	for (i = 0; i < iSrcLen; i++)
+	{
+		if (i % 2 == 0)
+		{
+			chTemp = (Src[i]-'0'); // << 4) & 0xF0;
+		}
+		else
+		{
+			chTemp = chTemp | (((Src[i]-'0')<<4) & 0xF0);
+			Des[i / 2] = chTemp;
+		}
+	}
+	if (i % 2 != 0)
+	{
+		Des[i / 2] = (chTemp|0xf0);
+	}
+	return true;
+}
+
+
 int LogicReqServThread::loop_process()
 {
 	//CommonLogger::instance().log_info("Enter into LogicReqServThread loop_process");
@@ -584,8 +631,10 @@ int LogicReqServThread::deal_locreq_ack(unsigned char *data, unsigned int len)
 				}
 
 				CommonLogger::instance().log_debug("[%s %d] lalalala.", __FILE__,__LINE__,msg->msisdn );
+				memset(bcd_buf_,0,sizeof(bcd_buf_));
+				StrToBCD(msg->msisdn, bcd_buf_, sizeof(bcd_buf_));
 				
-				ActiveUser* user = (ActiveUser*)info_mgr_->active_usr_table_.find_num(msg->msisdn, strlen(msg->msisdn));
+				ActiveUser* user = (ActiveUser*)info_mgr_->active_usr_table_.find_num((char*)bcd_buf_, strlen(msg->msisdn));
 				if (user != NULL)
 				{
 					CommonLogger::instance().log_debug("[%s %d] deal_locreq_ack: info_mgr_->active_usr_table_.find_num %s success.", __FILE__,__LINE__,msg->msisdn );
@@ -674,7 +723,7 @@ int LogicReqServThread::deal_locreq_ack(unsigned char *data, unsigned int len)
 				else{
 					/*内存数据库中没有这个mdn，删除数据返回失败*/
 
-					CommonLogger::instance().log_debug("[%s %d] deal_locreq_ack: no mdn %s in info_mgr_->active_usr_table_ .", __FILE__,__LINE__, msg->msisdn);
+					CommonLogger::instance().log_debug("[%s %d] deal_locreq_ack: no mdn %s in info_mgr_->active_usr_table_.", __FILE__,__LINE__, msg->msisdn);
 					info_mgr_->remove_tid_msisdn(ack->tid);
 					//todo 向logic_resp_queue_ 消息队列插入失败响应
 					

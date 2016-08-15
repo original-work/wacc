@@ -280,6 +280,7 @@ int AppReqServThread::deal_logic_resp_queue()
 				mt = (MTMsg*)resp->msg;
                          	CommonLogger::instance().log_info("deal_logic_resp_queue: Deal MT mag, len=%d",len);
 				CommonLogger::instance().log_info("deal_logic_resp_queue: cd %s, tid %d", mt->cd,mt->tid);
+				memset(bcd_buf_,0,sizeof(bcd_buf_));
 				StrToBCD(mt->cd, bcd_buf_, sizeof(bcd_buf_));
 				user = (ActiveUser*)info_mgr_->active_usr_table_.find_num((char*)bcd_buf_, strlen(mt->cd));
 				if (user != NULL)
@@ -343,6 +344,7 @@ int AppReqServThread::deal_logic_resp_queue()
 				CommonLogger::instance().log_info("[%s %d] deal_logic_resp_queue: msg_type 0x%08x", __FILE__,__LINE__,ack->msg_type);
 				if (msisdn != "")
 				{
+					memset(bcd_buf_,0,sizeof(bcd_buf_));
 					StrToBCD(msisdn.c_str(), bcd_buf_, sizeof(bcd_buf_));
 					user = (ActiveUser*)info_mgr_->active_usr_table_.find_num((char*)bcd_buf_, msisdn.length());
 					if (user != NULL)

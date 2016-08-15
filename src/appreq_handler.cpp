@@ -195,7 +195,7 @@ int AppReqHandler::deal_user_active(char *data)
 	AddUser *re = (AddUser*)(data+sizeof(NIF_MSG_UNIT2)-sizeof(unsigned char*));
 
 	memcpy(msisdn_, re->mdn, strlen(re->mdn));
-
+	memset(bcd_buf_,0,sizeof(bcd_buf_));
 	StrToBCD(re->mdn, bcd_buf_, sizeof(bcd_buf_));
 	ActiveUser* user = (ActiveUser*)info_mgr_->active_usr_table_.find_num((char*)bcd_buf_, strlen(re->mdn));
 	if (user != NULL)
@@ -288,7 +288,7 @@ int AppReqHandler::deal_user_deactive(char *data)
 	DelUser *re = (DelUser*)(data+sizeof(NIF_MSG_UNIT2)-sizeof(unsigned char*));
 
 	CommonLogger::instance().log_debug("deal_user_deactive: deal deactive user %s, fd:%d", re->mdn,sockfd());
-
+	memset(bcd_buf_,0,sizeof(bcd_buf_));
 	StrToBCD(re->mdn, bcd_buf_, sizeof(bcd_buf_));
 	ActiveUser* user = (ActiveUser*)info_mgr_->active_usr_table_.find_num((char*)bcd_buf_, strlen(re->mdn));
 	if (user != NULL)
@@ -344,7 +344,7 @@ int AppReqHandler::deal_MO(char *data)
 	CommonLogger::instance().log_info("AppReqHandler: deal MO Msg");
 
 	MOData *re = (MOData*)(data+sizeof(NIF_MSG_UNIT2)-sizeof(unsigned char*));
-
+	memset(bcd_buf_,0,sizeof(bcd_buf_));
 	StrToBCD(re->cg, bcd_buf_, sizeof(bcd_buf_));
 	ActiveUser* user = (ActiveUser*)info_mgr_->active_usr_table_.find_num((char*)bcd_buf_, strlen(re->cg));
 	if (user != NULL)
