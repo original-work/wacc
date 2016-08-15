@@ -519,7 +519,6 @@ int LogicReqServThread::deal_locreq_ack(unsigned char *data, unsigned int len)
 	if(strlen(ack->esn)==0||strlen(ack->imsi)==0||strlen(ack->mdn)==0){
 		
 		info_mgr_->remove_tid_msisdn(ack->tid);
-		return rsCode;
 		//todo 向logic_resp_queue_ 消息队列插入失败响应
 		
 		RespMsg resp;
@@ -534,6 +533,8 @@ int LogicReqServThread::deal_locreq_ack(unsigned char *data, unsigned int len)
 
 		logic_resp_queue_->insert_record((char*)&resp, sizeof(RespMsg));
 		logic_resp_queue_->advance_widx();
+		return rsCode;
+
 	}
 	else{
 			char send_buf[3000] = {0};
