@@ -518,6 +518,8 @@ int LogicReqServThread::deal_locreq_ack(unsigned char *data, unsigned int len)
 	/* 如果esn, imsi, mdn 中任意字段为空，则返回失败*/
 	if(strlen(ack->esn)==0||strlen(ack->imsi)==0||strlen(ack->mdn)==0){
 		
+		CommonLogger::instance().log_debug("[%s %d] deal_locreq_ack: esn or imsi or mdn in locreq ack is null .", __FILE__,__LINE__);
+		
 		info_mgr_->remove_tid_msisdn(ack->tid);
 		//todo 向logic_resp_queue_ 消息队列插入失败响应
 		
@@ -582,85 +584,108 @@ int LogicReqServThread::deal_locreq_ack(unsigned char *data, unsigned int len)
 				}
 				
 				ActiveUser* user = (ActiveUser*)info_mgr_->active_usr_table_.find_num(msg->msisdn, strlen(msg->msisdn));
-				memcpy(user->imsi, ack->imsi, strlen(ack->imsi));
-				memcpy(user->esn, ack->esn, strlen(ack->esn));
-
-				NIF_MSG_UNIT *unit = (NIF_MSG_UNIT*)send_buf;
-				unit->dialog = htonl(BEGIN);
-				unit->invoke = htonl(SERVLOGIC_ACTIVATE_REQ);
-				unit->length = htonl(sizeof(PeriodData));
-				memcpy((send_buf + sizeof(NIF_MSG_UNIT) - sizeof(unsigned char*)), msg, sizeof(PeriodData));
-				int send_len =  sizeof(NIF_MSG_UNIT) - sizeof(unsigned char*) + sizeof(PeriodData);
-
-				int n = client_list_.size();
-				int i = 0;
-				/* 新用户*/
-
-				if (msg->actived == 0)
+				if (user != NULL)
 				{
-					CommonLogger::instance().log_debug("deal_locreq_ack: New user.");
-					for (; i < n; ++i)
+					memcpy(user->imsi, ack->imsi, strlen(ack->imsi));
+					memcpy(user->esn, ack->esn, strlen(ack->esn));
+
+					NIF_MSG_UNIT *unit = (NIF_MSG_UNIT*)send_buf;
+					unit->dialog = htonl(BEGIN);
+					unit->invoke = htonl(SERVLOGIC_ACTIVATE_REQ);
+					unit->length = htonl(sizeof(PeriodData));
+					memcpy((send_buf + sizeof(NIF_MSG_UNIT) - sizeof(unsigned char*)), msg, sizeof(PeriodData));
+					int send_len =  sizeof(NIF_MSG_UNIT) - sizeof(unsigned char*) + sizeof(PeriodData);
+
+					int n = client_list_.size();
+					int i = 0;
+					/* 新用户*/
+
+					if (msg->actived == 0)
 					{
-						if (client_list_[i].connected())
+						CommonLogger::instance().log_debug("deal_locreq_ack: New user.");
+						for (; i < n; ++i)
 						{
-							int r = client_list_[i].send_data(send_buf, send_len);
-							if (r < send_len || r == -1)
+							if (client_list_[i].connected())
 							{
-								client_list_[i].disconnect_to_server();
+								int r = client_list_[i].send_data(send_buf, send_len);
+								if (r < send_len || r == -1)
+								{
+									client_list_[i].disconnect_to_server();
+								}
+								CommonLogger::instance().log_debug("deal_locreq_ack: Send Active Msg to first connected socket(servicelogic modle), index=%d",i);
+								/* luchq add for test */
+								CommonLogger::instance().log_debug("[%s %d] deal_locreq_ack: user msisdn 	%s  esn  %s  imsi  %s ",
+									__FILE__,__LINE__,msg->msisdn, msg->esn, msg->imsi);
+								++i;
+								break;
 							}
-							CommonLogger::instance().log_debug("deal_locreq_ack: Send Active Msg to first connected socket(servicelogic modle), index=%d",i);
-							/* luchq add for test */
-							CommonLogger::instance().log_debug("[%s %d] deal_locreq_ack: user msisdn 	%s  esn  %s  imsi  %s ",
-								__FILE__,__LINE__,msg->msisdn, msg->esn, msg->imsi);
-							++i;
-							break;
 						}
-					}
 
-					unit->invoke = htonl(SERVLOGIC_USER_SYNC_REQ);
-					CommonLogger::instance().log_debug("deal_locreq_ack:  Sync user info to other socket(servicelogic modle)");
+						unit->invoke = htonl(SERVLOGIC_USER_SYNC_REQ);
+						CommonLogger::instance().log_debug("deal_locreq_ack:  Sync user info to other socket(servicelogic modle)");
 
-					for (; i < n; ++i)
-					{
-						if (client_list_[i].connected())
+						for (; i < n; ++i)
 						{
-							int r = client_list_[i].send_data(send_buf, send_len);
-							if (r < send_len || r == -1)
+							if (client_list_[i].connected())
 							{
-								client_list_[i].disconnect_to_server();
+								int r = client_list_[i].send_data(send_buf, send_len);
+								if (r < send_len || r == -1)
+								{
+									client_list_[i].disconnect_to_server();
+								}
 							}
 						}
-					}
 
-					LogicConnInfo *info = info_mgr_->logic_conns_mgr_.logic_conns();
-					int info_cnt = info_mgr_->logic_conns_mgr_.conns_counts();
-					for (int n = 0; n < info_cnt; ++n)
+						LogicConnInfo *info = info_mgr_->logic_conns_mgr_.logic_conns();
+						int info_cnt = info_mgr_->logic_conns_mgr_.conns_counts();
+						for (int n = 0; n < info_cnt; ++n)
+						{
+							msg->user_info->reconnect_cnt_list[n] = info[n].reconnect_cnt;
+						}
+
+						/*todo 向logic_resp_queue_ 消息队列插入成功响应*/
+						
+						RespMsg resp;
+						resp.msg_type = 1;
+						AckMsg *ack = (AckMsg*)resp.msg;
+
+						ack->tid = ntohl(*((unsigned int*)(data+sizeof(unsigned int))));
+						ack->msg_type = ADD_USER;
+						ack->result= 0;
+
+						logic_resp_queue_->insert_record((char*)&resp, sizeof(RespMsg));
+						logic_resp_queue_->advance_widx();
+						
+						
+						rsCode=0;
+						return rsCode;
+						
+					}
+					else
 					{
-						msg->user_info->reconnect_cnt_list[n] = info[n].reconnect_cnt;
+						/* 已存储激活用户，不可能走到这里*/
+						CommonLogger::instance().log_debug("deal_locreq_ack: Error, in't possible to go here.");
+						return rsCode;
 					}
+				}
+				else{
+					/*内存数据库中没有这个mdn，删除数据返回失败*/
 
-					/*todo 向logic_resp_queue_ 消息队列插入成功响应*/
+					CommonLogger::instance().log_debug("[%s %d] deal_locreq_ack: no mdn %s in info_mgr_->active_usr_table_ .", __FILE__,__LINE__);
+					info_mgr_->remove_tid_msisdn(ack->tid);
+					//todo 向logic_resp_queue_ 消息队列插入失败响应
 					
 					RespMsg resp;
-					resp.msg_type = 1;
-					AckMsg *ack = (AckMsg*)resp.msg;
-
-					ack->tid = ntohl(*((unsigned int*)(data+sizeof(unsigned int))));
-					ack->msg_type = ADD_USER;
-					ack->result= 0;
+					resp.msg_type = 8;
+					AckMsg *body = (AckMsg*)resp.msg;
+					body->tid=ack->tid;
+					body->msg_type=ADD_USER;
+					body->result=1;
+					/*虽然没有mdn，还是假装拷贝下*/
+					memcpy(body->cd,ack->mdn,strlen(ack->mdn));
 
 					logic_resp_queue_->insert_record((char*)&resp, sizeof(RespMsg));
 					logic_resp_queue_->advance_widx();
-					
-					
-					rsCode=0;
-					return rsCode;
-					
-				}
-				else
-				{
-					/* 已存储激活用户，不可能走到这里*/
-					CommonLogger::instance().log_debug("deal_locreq_ack: Error, in't possible to go here.");
 					return rsCode;
 				}
 			}
