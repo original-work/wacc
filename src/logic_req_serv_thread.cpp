@@ -598,6 +598,7 @@ int LogicReqServThread::deal_locreq_ack(unsigned char *data, unsigned int len)
 
 				if (msg->actived == 0)
 				{
+					CommonLogger::instance().log_debug("deal_locreq_ack: New user.");
 					for (; i < n; ++i)
 					{
 						if (client_list_[i].connected())
@@ -607,9 +608,9 @@ int LogicReqServThread::deal_locreq_ack(unsigned char *data, unsigned int len)
 							{
 								client_list_[i].disconnect_to_server();
 							}
-							CommonLogger::instance().log_debug("deal_app_req_queue: Send Active Msg to first connected socket(servicelogic modle), index=%d",i);
+							CommonLogger::instance().log_debug("deal_locreq_ack: Send Active Msg to first connected socket(servicelogic modle), index=%d",i);
 							/* luchq add for test */
-							CommonLogger::instance().log_debug("[%s %d] deal_app_req_queue: user msisdn 	%s  esn  %s  imsi  %s ",
+							CommonLogger::instance().log_debug("[%s %d] deal_locreq_ack: user msisdn 	%s  esn  %s  imsi  %s ",
 								__FILE__,__LINE__,msg->msisdn, msg->esn, msg->imsi);
 							++i;
 							break;
@@ -617,7 +618,7 @@ int LogicReqServThread::deal_locreq_ack(unsigned char *data, unsigned int len)
 					}
 
 					unit->invoke = htonl(SERVLOGIC_USER_SYNC_REQ);
-					CommonLogger::instance().log_debug("deal_app_req_queue:  Sync user info to other socket(servicelogic modle)");
+					CommonLogger::instance().log_debug("deal_locreq_ack:  Sync user info to other socket(servicelogic modle)");
 
 					for (; i < n; ++i)
 					{
