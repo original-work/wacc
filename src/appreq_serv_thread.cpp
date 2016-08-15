@@ -303,7 +303,6 @@ int AppReqServThread::deal_logic_resp_queue()
 					data->tid = htonl(mt->tid);
 					memcpy(data->sender, mt->cg, strlen(mt->cg));
 					memcpy(data->content, mt->sms_content, strlen(mt->sms_content));
-					//send_data(user->fd, send_buf, sizeof(NIF_MSG_UNIT2)-sizeof(unsigned char*)+sizeof(MTData));
 					if (strcmp(user->msisdn,mt->cd))
 					{
 						CommonLogger::instance().log_error("deal_logic_resp_queue: Check App number fail, App=%s",user->msisdn);
@@ -387,6 +386,7 @@ int AppReqServThread::send_data(int fd, char *buf, unsigned int send_size)
 	int sended_length=0;
 	while (need_send_length>0) {
 		int ret = send(fd,buf+sended_length,need_send_length,0);
+		CommonLogger::instance().log_info("AppReqServThread: send_data send %u Bytes", ret);
 		if (ret<0) {
             if(errno == EINTR){
             } else if(errno == EAGAIN) {
