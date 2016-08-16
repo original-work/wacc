@@ -308,7 +308,7 @@ int LogicReqServThread::deal_app_req_queue()
 			unit->length = htonl(sizeof(LocreqData));
 			LocreqData body;
 			body.tid=htonl(active->tid);
-			body.mod_id=htonl(active->mod_id);
+			body.mod_id=active->mod_id;
 			memset(body.msisdn,0,sizeof(body.msisdn));
 			memcpy(body.msisdn, active->msisdn, strlen(active->msisdn));
 			
@@ -613,7 +613,7 @@ int LogicReqServThread::deal_locreq_ack(unsigned char *data, unsigned int len)
 					
 					LocreqData body;
 					body.tid=htonl(ack->tid);
-					body.mod_id=htonl(ActReq->mod_id);
+					body.mod_id=ActReq->mod_id;
 					memcpy(body.msisdn, ActReq->msisdn, strlen(ActReq->msisdn));
 					
 					memcpy((send_buf + sizeof(NIF_MSG_UNIT) - sizeof(unsigned char*)), (char*)&body, sizeof(LocreqData));
@@ -654,7 +654,7 @@ int LogicReqServThread::deal_locreq_ack(unsigned char *data, unsigned int len)
 					memset(body.msisdn,0,sizeof(body.msisdn));
 					memset(body.esn,0,sizeof(body.esn));
 					body.tid=htonl(ActReq->tid);
-					body.mod_id=htonl(ActReq->mod_id);
+					body.mod_id=ActReq->mod_id;
 					memcpy(body.imsi,ack->imsi, strlen(ack->imsi));
 					memcpy(body.msisdn,ActReq->msisdn, strlen(ActReq->msisdn));
 					memcpy(body.esn,ack->esn, strlen(ack->esn));
