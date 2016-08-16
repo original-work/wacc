@@ -371,7 +371,7 @@ int AppReqHandler::deal_MO(char *data)
 		record->content_len = strlen(re->content);
 		app_req_queue_->insert_record((char*)&red_msg, sizeof(ReqMsg));
 		app_req_queue_->advance_widx();
-		CommonLogger::instance().log_info("deal_MO: tid is %d",record->tid);
+		CommonLogger::instance().log_info("deal_MO: tid is %d sms_code is %u",record->tid,record->sms_code);
 		CommonLogger::instance().log_info("deal_MO: insert MO Msg into app_req_queue");
 
 	}
