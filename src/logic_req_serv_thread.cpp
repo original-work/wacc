@@ -299,7 +299,6 @@ int LogicReqServThread::deal_app_req_queue()
 		if (req->msg_type == 1)	// add user
 		{
 			ActivateMsg *active = (ActivateMsg*)req->msg;
-			CommonLogger::instance().log_debug("deal_app_req_queue: Deal ACTIVE MSG. tid=%u", active->tid);
 
 			NIF_MSG_UNIT *unit = (NIF_MSG_UNIT*)send_buf;
 			unit->head = htonl(0x1a2b3c4d);
@@ -309,6 +308,7 @@ int LogicReqServThread::deal_app_req_queue()
 			LocreqData body;
 			body.tid=htonl(active->tid);
 			body.mod_id=active->mod_id;
+			CommonLogger::instance().log_debug("deal_app_req_queue: Deal ACTIVE MSG. tid=%u mod_id=%u", active->tid,body.mod_id);
 			memset(body.msisdn,0,sizeof(body.msisdn));
 			memcpy(body.msisdn, active->msisdn, strlen(active->msisdn));
 			
@@ -614,6 +614,7 @@ int LogicReqServThread::deal_locreq_ack(unsigned char *data, unsigned int len)
 					LocreqData body;
 					body.tid=htonl(ack->tid);
 					body.mod_id=ActReq->mod_id;
+					CommonLogger::instance().log_debug("deal_locreq_ack: locreq fail, ask ServiceLogic do LOCREQ again mod_id %u.", ActReq->msisdn, body.mod_id);
 					memcpy(body.msisdn, ActReq->msisdn, strlen(ActReq->msisdn));
 					
 					memcpy((send_buf + sizeof(NIF_MSG_UNIT) - sizeof(unsigned char*)), (char*)&body, sizeof(LocreqData));
@@ -655,6 +656,7 @@ int LogicReqServThread::deal_locreq_ack(unsigned char *data, unsigned int len)
 					memset(body.esn,0,sizeof(body.esn));
 					body.tid=htonl(ActReq->tid);
 					body.mod_id=ActReq->mod_id;
+					CommonLogger::instance().log_debug("[%s %d] deal_locreq_ack: mod_id %u.", __FILE__,__LINE__,body.mod_id);
 					memcpy(body.imsi,ack->imsi, strlen(ack->imsi));
 					memcpy(body.msisdn,ActReq->msisdn, strlen(ActReq->msisdn));
 					memcpy(body.esn,ack->esn, strlen(ack->esn));
@@ -776,8 +778,8 @@ int LogicReqServThread::deal_mt_req(unsigned char *data, unsigned int len)
 	mt->content_len = logic_mt->content_len;
 	memcpy(mt->sms_content, logic_mt->sms_content, strlen(logic_mt->sms_content));
 
-	CommonLogger::instance().log_info("deal_mt_req: MT %s, len %d, tid %u",
-		logic_mt->cd, strlen(logic_mt->sms_content), mt->tid);
+	CommonLogger::instance().log_info("deal_mt_req: MT %s, len %d, tid %u, mod_id %u",
+		logic_mt->cd, strlen(logic_mt->sms_content), mt->tid, logic_mt->mod_id);
 
 	logic_resp_queue_->insert_record((char*)&resp, sizeof(RespMsg));
 	logic_resp_queue_->advance_widx();

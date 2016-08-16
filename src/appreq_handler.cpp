@@ -249,7 +249,7 @@ int AppReqHandler::deal_user_active(char *data)
 	memcpy(record->msisdn, re->mdn, sizeof(record->msisdn));
 	record->user_info = user;
 	info_mgr_->add_tid_msisdn(record->tid, record->msisdn);
-	CommonLogger::instance().log_debug("record  tid %u", record->tid);
+	CommonLogger::instance().log_debug("record  tid %u mod_id %u", record->tid, record->mod_id);
 
 	app_req_queue_->insert_record((char*)&red_msg, sizeof(ReqMsg));
 	app_req_queue_->advance_widx();
