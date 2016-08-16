@@ -369,7 +369,7 @@ int AppReqHandler::deal_MO(char *data)
 
 		record->sms_code = re->sms_code;
 		record->tid = generate_tid();
-		memcpy(record->sms_content, re->content, re->content_len);
+		record->content_len = strlen(re->content);
 		app_req_queue_->insert_record((char*)&red_msg, sizeof(ReqMsg));
 		app_req_queue_->advance_widx();
 		CommonLogger::instance().log_info("deal_MO: insert MO Msg into app_req_queue");
