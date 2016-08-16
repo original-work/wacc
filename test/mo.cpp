@@ -117,8 +117,8 @@ int main(int argc, char **argv)
 	strcpy(mo_msg.cg, "13816154202");
 	strcpy(mo_msg.cg, "18019398639");
 	mo_msg.smsCode=htonl(8);
-	memcpy((void*)mo_msg.content,(void*)&data,strlen(data));
-	mo_msg.content_len=htonl(strlen(data));
+	memcpy((void*)mo_msg.content,(void*)&data,strlen((char*)data));
+	mo_msg.content_len=htonl(strlen((char*)data));
 
 	printf("sizeof(msg_body) is %u\n", sizeof(mo_msg));
 	printf("sizeof(NIF_MSG_UNIT2) is %u\n", sizeof(NIF_MSG_UNIT2));
