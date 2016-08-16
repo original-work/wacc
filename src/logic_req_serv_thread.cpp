@@ -580,7 +580,7 @@ int LogicReqServThread::deal_locreq_ack(unsigned char *data, unsigned int len)
 		if(iter != add_user_req_.end())
 		{
 			ActivateMsg* ActReq = (ActivateMsg*)iter->second;
-			memcpy(body->cd,ActReq->mdn,strlen(ActReq->mdn));
+			memcpy(body->cd,ActReq->msisdn,strlen(ActReq->msisdn));
 		}
 
 		logic_resp_queue_->insert_record((char*)&resp, sizeof(RespMsg));
@@ -613,7 +613,7 @@ int LogicReqServThread::deal_locreq_ack(unsigned char *data, unsigned int len)
 					LocreqData body;
 					body.tid=htonl(ack->tid);
 					body.mod_id=htonl(ActReq->mod_id);
-					memcpy(body.msisdn, ActReq->mdn, strlen(ActReq->mdn));
+					memcpy(body.msisdn, ActReq->msisdn, strlen(ActReq->msisdn));
 					
 					memcpy((send_buf + sizeof(NIF_MSG_UNIT) - sizeof(unsigned char*)), (char*)&body, sizeof(LocreqData));
 					int send_len =  sizeof(NIF_MSG_UNIT) - sizeof(unsigned char*) + sizeof(LocreqData);
