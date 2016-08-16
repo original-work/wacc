@@ -176,8 +176,8 @@ typedef struct {
 	char imsi[16];
 	char msisdn[32];
 	char esn[32];
-	unsigned int *reconnect_cnt_list;
-	unsigned int conn_cnt;
+	unsigned int *reconnect_cnt_list;/*与每台业务逻辑服务器的重连次数*/
+	unsigned int conn_cnt;/*有几台业务逻辑服务器*/
 	time_t operTime; /* luchq add 2016-02-01 */
 } ActiveUser;
 
