@@ -186,6 +186,11 @@ int AppReqHandler::deal_user_active(char *data)
 	NIF_MSG_UNIT2 *header = (NIF_MSG_UNIT2*)data;
 	unsigned int msg_length = ntohl(header->length);
 
+	if (msg_length % sizeof(AddUser) != 0)
+	{
+		CommonLogger::instance().log_error("deal_user_active: length error");
+		return 0;
+	}
 	/* 获取用户激活信息re*/
 	AddUser *re = (AddUser*)(data+sizeof(NIF_MSG_UNIT2)-sizeof(unsigned char*));
 
@@ -270,6 +275,15 @@ int AppReqHandler::deal_user_deactive(char *data)
 	NIF_MSG_UNIT2 *header1 = (NIF_MSG_UNIT2*)send_buf_;
 	header1->dialog = htonl(END);
 	header1->length = htonl(sizeof(int));
+
+	if (msg_length % sizeof(DelUser) != 0)
+	{
+		unsigned int *result = (unsigned int *)(send_buf_ + (sizeof(NIF_MSG_UNIT2) - sizeof(unsigned char*)));
+		*result = htonl(11);
+		sendn(send_buf_, sizeof(NIF_MSG_UNIT2) - sizeof(unsigned char*) + sizeof(unsigned int));
+		CommonLogger::instance().log_error("deal_user_deactive: length error");
+		return -1;
+	}
 
 	DelUser *re = (DelUser*)(data+sizeof(NIF_MSG_UNIT2)-sizeof(unsigned char*));
 
@@ -379,6 +393,11 @@ int AppReqHandler::deal_mt_ack(char *data)
 
     NIF_MSG_UNIT2 *header = (NIF_MSG_UNIT2*)data;
     unsigned int msg_length = ntohl(header->length);
+
+	if (msg_length % sizeof(UsrMTAckData) != 0)
+	{
+		return 0;
+	}
 
     UsrMTAckData *re = (UsrMTAckData*)(data+sizeof(NIF_MSG_UNIT2)-sizeof(unsigned char*));
 
