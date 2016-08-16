@@ -158,7 +158,7 @@ int main(int argc, char **argv)
 
 	MO mo_msg;
 	unsigned char data[]="this is a test mo msg!";
-	strcpy(mo_msg.cg, "13816154202");
+	strcpy(mo_msg.cd, "13816154202");
 	strcpy(mo_msg.cg, "18019398639");
 	mo_msg.smsCode=htonl(8);
 	memcpy((void*)mo_msg.content,(void*)&data,strlen((char*)data));
