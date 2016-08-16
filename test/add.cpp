@@ -155,13 +155,13 @@ int main(int argc, char **argv)
 	sleep(6);	
 
 	
-
+#if 0
 
 	MO mo_msg;
 	unsigned char data[]="this is a test mo msg!";
 	strcpy(mo_msg.cd, "13816154202");
 	strcpy(mo_msg.cg, "18019398639");
-	mo_msg.smsCode=8;
+	mo_msg.smsCode=4;
 	memcpy((void*)mo_msg.content,(void*)&data,strlen((char*)data));
 	mo_msg.content_len=htonl(strlen((char*)data));
 
@@ -197,7 +197,9 @@ int main(int argc, char **argv)
 		printf("send success,  sent %d Bytes  \n", len);
 		print_hex(buffer, len);
 	}
-		
+
+#endif
+
 	sleep(20);	
 
 
