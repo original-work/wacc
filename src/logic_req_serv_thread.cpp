@@ -320,8 +320,7 @@ int LogicReqServThread::deal_app_req_queue()
 			/* 新用户*/
 			if (active->actived == 0)
 			{
-				string mdn = active->msisdn;
-				add_user_req_.insert(pair<string, char*>(mdn, (char*)active));
+				add_user_req_.insert(pair<unsigned int, char*>(active->tid, (char*)active));
 
 				for (; i < n; ++i)
 				{
@@ -562,11 +561,12 @@ int LogicReqServThread::deal_locreq_ack(unsigned char *data, unsigned int len)
 	int rsCode = 1;//0 成功1 失败
 
 	
-	/* 如果esn, imsi, mdn 中任意字段为空，则返回失败*/
-	if(strlen(ack->esn)==0||strlen(ack->imsi)==0||strlen(ack->mdn)==0){
+	/* 如果esn, imsi 中任意字段为空，则返回失败*/
+	if(strlen(ack->esn)==0||strlen(ack->imsi)==0){
 		
-		CommonLogger::instance().log_debug("[%s %d] deal_locreq_ack: esn or imsi or mdn in locreq ack is null .", __FILE__,__LINE__);
-		
+		CommonLogger::instance().log_debug("[%s %d] deal_locreq_ack: esn or imsi in locreq ack is null .", __FILE__,__LINE__);
+
+		/*虽然可能没有tid，还是假装删除下*/
 		info_mgr_->remove_tid_msisdn(ack->tid);
 		//todo 向logic_resp_queue_ 消息队列插入失败响应
 		
@@ -576,8 +576,12 @@ int LogicReqServThread::deal_locreq_ack(unsigned char *data, unsigned int len)
 		body->tid=ack->tid;
 		body->msg_type=ADD_USER;
 		body->result=1;
-		/*虽然没有mdn，还是假装拷贝下*/
-		memcpy(body->cd,ack->mdn,strlen(ack->mdn));
+		map<unsigned int, char*>::iterator  iter = add_user_req_.find(ack->tid);
+		if(iter != add_user_req_.end())
+		{
+			ActivateMsg* ActReq = (ActivateMsg*)iter->second;
+			memcpy(body->cd,ActReq->mdn,strlen(ActReq->mdn));
+		}
 
 		logic_resp_queue_->insert_record((char*)&resp, sizeof(RespMsg));
 		logic_resp_queue_->advance_widx();
@@ -587,7 +591,7 @@ int LogicReqServThread::deal_locreq_ack(unsigned char *data, unsigned int len)
 	else{
 			char send_buf[3000] = {0};
 			CommonLogger::instance().log_debug("deal_locreq_ack: Deal ACTIVE MSG.");
-			map<string, char*>::iterator  iter = add_user_req_.find(ack->mdn);
+			map<unsigned int, char*>::iterator  iter = add_user_req_.find(ack->tid);
 			if(iter != add_user_req_.end())
 			{
 				ActivateMsg* ActReq = (ActivateMsg*)iter->second;
@@ -609,7 +613,7 @@ int LogicReqServThread::deal_locreq_ack(unsigned char *data, unsigned int len)
 					LocreqData body;
 					body.tid=htonl(ack->tid);
 					body.mod_id=htonl(ActReq->mod_id);
-					memcpy(body.msisdn, ack->mdn, strlen(ack->mdn));
+					memcpy(body.msisdn, ActReq->mdn, strlen(ActReq->mdn));
 					
 					memcpy((send_buf + sizeof(NIF_MSG_UNIT) - sizeof(unsigned char*)), (char*)&body, sizeof(LocreqData));
 					int send_len =  sizeof(NIF_MSG_UNIT) - sizeof(unsigned char*) + sizeof(LocreqData);

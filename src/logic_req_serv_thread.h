@@ -60,7 +60,7 @@ class LogicReqServThread : public CThread
 		int deal_heartbeat();
 	private:
 		vector<TcpClient> client_list_;
-		map<string, char*> add_user_req_; 
+		map<unsigned int, char*> add_user_req_; 
 		unsigned int client_seq_;
 		MsgList *app_req_queue_;
 		MsgList *logic_resp_queue_;
