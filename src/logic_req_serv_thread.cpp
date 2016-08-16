@@ -790,12 +790,12 @@ int LogicReqServThread::deal_ack_req(unsigned int type, unsigned char *data, uns
 	if (type == SERVLOGIC_ACTIVATE_REQ)
 	{
 		ack->msg_type = ADD_USER;
-		CommonLogger::instance().log_debug("deal_ack_req: ADD_USER  tid is %u",ack->tid);
+		CommonLogger::instance().log_debug("deal_ack_req: ADD_USER  result is %u tid is %u",ack->result,ack->tid);
 
 	}
 	else
 	{
-		CommonLogger::instance().log_debug("deal_ack_req: MO  tid is %u",ack->tid);
+		CommonLogger::instance().log_debug("deal_ack_req: MO  result is %u tid is %u",ack->result,ack->tid);
 		ack->msg_type = SMS_SEND;
 	}
 

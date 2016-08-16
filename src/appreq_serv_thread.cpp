@@ -366,6 +366,9 @@ int AppReqServThread::deal_logic_resp_queue()
 						CommonLogger::instance().log_info("deal_logic_resp_queue: Call find_num fail");
                               		info_mgr_->remove_tid_msisdn(ack->tid);
 				}
+				else{
+					CommonLogger::instance().log_info("deal_logic_resp_queue: tid %u not found",ack->tid);
+				}
 				break;
 			default:
 				break;
