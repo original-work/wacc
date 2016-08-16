@@ -597,7 +597,6 @@ int LogicReqServThread::deal_locreq_ack(unsigned char *data, unsigned int len)
 				ActivateMsg* ActReq = (ActivateMsg*)iter->second;
 			       CommonLogger::instance().log_debug("deal_locreq_ack: Find mdn %s.", ActReq->msisdn);
 
-				   
 				if(1==ack->nResult){
 /*当收到来自业务逻辑模块的周期性位置登记失败响应消息时，
 重新要求业务逻辑模块发起LOCREQ请求*/	
@@ -634,7 +633,6 @@ int LogicReqServThread::deal_locreq_ack(unsigned char *data, unsigned int len)
 					return rsCode;
 				}
 
-				CommonLogger::instance().log_debug("[%s %d] lalalala.", __FILE__,__LINE__,ActReq->msisdn );
 				memset(bcd_buf_,0,sizeof(bcd_buf_));
 				StrToBCD(ActReq->msisdn, bcd_buf_, sizeof(bcd_buf_));
 				
