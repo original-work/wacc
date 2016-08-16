@@ -394,7 +394,7 @@ int LogicReqServThread::deal_app_req_queue()
 		}
 		else if (req->msg_type == 3)	//MO
 		{
-			CommonLogger::instance().log_info("deal_app_req_queue: Deal MO MSG.");
+			CommonLogger::instance().log_info("deal_app_req_queue: Deal MO MSG. tid is %u", mo->tid);
 
 			SMSData *mo = (SMSData*)req->msg;
 			NIF_MSG_UNIT *unit = (NIF_MSG_UNIT*)send_buf;
@@ -410,7 +410,7 @@ int LogicReqServThread::deal_app_req_queue()
 			logic_mo->content_len = htonl(mo->content_len);
 			CommonLogger::instance().log_debug("deal_app_req_queue: mo->content_len:%u",mo->content_len);
 			memcpy(logic_mo->sms_content, mo->sms_content, mo->content_len);
-			logic_mo->sms_code = mo->sms_code;
+			logic_mo->sms_code = htonl(mo->sms_code);
 			CommonLogger::instance().log_info("deal_app_req_queue: mo cg len:%d, num:%s",strlen(mo->cg),mo->cg);
 			CommonLogger::instance().log_info("deal_app_req_queue: logic-mo cg len:%d, num:%s",strlen(logic_mo->cg),logic_mo->cg);
 			int send_len =  sizeof(NIF_MSG_UNIT) - sizeof(unsigned char*) + sizeof(LogicMOData);
@@ -790,9 +790,12 @@ int LogicReqServThread::deal_ack_req(unsigned int type, unsigned char *data, uns
 	if (type == SERVLOGIC_ACTIVATE_REQ)
 	{
 		ack->msg_type = ADD_USER;
+		CommonLogger::instance().log_debug("deal_ack_req: ADD_USER  tid is %u",ack->tid);
+
 	}
 	else
 	{
+		CommonLogger::instance().log_debug("deal_ack_req: MO  tid is %u",ack->tid);
 		ack->msg_type = SMS_SEND;
 	}
 

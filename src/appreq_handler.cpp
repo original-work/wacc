@@ -363,15 +363,15 @@ int AppReqHandler::deal_MO(char *data)
 
 		CommonLogger::instance().log_info("deal_MO: cd:%s",re->cd);
 		CommonLogger::instance().log_info("deal_MO: re cg len:%d, num:%s",strlen(re->cg),re->cg);
-		CommonLogger::instance().log_info("deal_MO: record cg len:%d, num:%s",strlen(record->cg),record->cg);
 		CommonLogger::instance().log_info("sms len:%d,content:", strlen(re->content));
 		tools::print_hex((unsigned char*)re->content,strlen(re->content));/* luchq add 2015-06-18 */
 
-		record->sms_code = re->sms_code;
+		record->sms_code = ntohl(re->sms_code);
 		record->tid = generate_tid();
 		record->content_len = strlen(re->content);
 		app_req_queue_->insert_record((char*)&red_msg, sizeof(ReqMsg));
 		app_req_queue_->advance_widx();
+		CommonLogger::instance().log_info("deal_MO: tid is %d",record->tid);
 		CommonLogger::instance().log_info("deal_MO: insert MO Msg into app_req_queue");
 
 	}
