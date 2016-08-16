@@ -646,10 +646,10 @@ int LogicReqServThread::deal_locreq_ack(unsigned char *data, unsigned int len)
 					unit->invoke = htonl(SERVLOGIC_ACTIVATE_REQ);
 					unit->length = htonl(sizeof(PeriodData));
 					PeriodData body;
-					body.tid=honl(ActReq->tid);
+					body.tid=htonl(ActReq->tid);
 					body.mod_id=htonl(ActReq->mod_id);
 					memcpy(body.imsi,ack->imsi, strlen(ack->imsi));
-					memcpy(body.msisdn,ack->msisdn, strlen(ack->msisdn));
+					memcpy(body.msisdn,ActReq->msisdn, strlen(ActReq->msisdn));
 					memcpy(body.esn,ack->esn, strlen(ack->esn));
 					memcpy((send_buf + sizeof(NIF_MSG_UNIT) - sizeof(unsigned char*)), (char*)&body, sizeof(PeriodData));
 					int send_len =  sizeof(NIF_MSG_UNIT) - sizeof(unsigned char*) + sizeof(PeriodData);
