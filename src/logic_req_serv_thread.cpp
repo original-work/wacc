@@ -253,7 +253,7 @@ int LogicReqServThread::loop_process()
 								case SERVLOGIC_DEACTIVATE_REQ:
 									CommonLogger::instance().log_info("[%s %d] LogicReqServThread: Recv a ACK  msg 0x%08x", __FILE__,__LINE__,ntohl(unit->invoke));
 									break;
-								case SERVLOGIC_MT_REQ:
+								case SERVLOGIC_MH_MT_REQ:
 									CommonLogger::instance().log_info("LogicReqServThread: Recv a MT req msg");
 									deal_mt_req((data_buf_ + sizeof(NIF_MSG_UNIT) - sizeof(unsigned char*)), ntohl(unit->length));
 									break;
@@ -397,7 +397,7 @@ int LogicReqServThread::deal_app_req_queue()
 			SMSData *mo = (SMSData*)req->msg;
 			NIF_MSG_UNIT *unit = (NIF_MSG_UNIT*)send_buf;
 			unit->dialog = htonl(BEGIN);
-			unit->invoke = htonl(SERVLOGIC_MO_REQ);
+			unit->invoke = htonl(SERVLOGIC_MH_MO_REQ);
 			unit->length = htonl(sizeof(LogicMOData));
 
 			CommonLogger::instance().log_info("deal_app_req_queue: Deal MO MSG. tid is %u", mo->tid);
