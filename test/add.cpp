@@ -118,7 +118,7 @@ int main(int argc, char **argv)
 	NIF_MSG_UNIT2* testMsg=(NIF_MSG_UNIT2*)buf;
 	AddUser user;
 	memset(user.mdn,0,sizeof(user.mdn));
-	strcpy(user.mdn, "13301605333");
+	strcpy(user.mdn, "18019398639");
 
 	printf("sizeof(msg_body) is %u\n", sizeof(user));
 	printf("sizeof(NIF_MSG_UNIT2) is %u\n", sizeof(NIF_MSG_UNIT2));
@@ -160,7 +160,7 @@ int main(int argc, char **argv)
 	MO mo_msg;
 	unsigned char data[]="this is a test mo msg!";
 	strcpy(mo_msg.cd, "13816154202");
-	strcpy(mo_msg.cg, "13301605333");
+	strcpy(mo_msg.cg, "18019398639");
 	mo_msg.smsCode=8;
 	memcpy((void*)mo_msg.content,(void*)&data,strlen((char*)data));
 	mo_msg.content_len=htonl(strlen((char*)data));
