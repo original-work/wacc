@@ -176,7 +176,7 @@ int main(int argc, char **argv)
 	testMsg->dialog=htonl(0x3);
 	testMsg->seq=htonl(0x123456);
 	testMsg->length=htonl(sizeof(mo_msg));
-	char* p_user =(char*)&mo_msg;
+	p_user =(char*)&mo_msg;
 	memcpy(buf+sizeof(NIF_MSG_UNIT2)-8, p_user, sizeof(mo_msg));
 	
 	
