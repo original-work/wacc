@@ -115,7 +115,7 @@ int main(int argc, char **argv)
 	MO mo_msg;
 	unsigned char data[]="this is a test mo msg!";
 	strcpy(mo_msg.cg, "13816154202");
-	strcpy(mo_msg.cg, "18019398639");
+	strcpy(mo_msg.cg, "13301605333");
 	mo_msg.smsCode=8;
 	memcpy((void*)mo_msg.content,(void*)&data,strlen((char*)data));
 	mo_msg.content_len=htonl(strlen((char*)data));
@@ -152,7 +152,7 @@ int main(int argc, char **argv)
 		print_hex(buffer, len);
 	}
 		
-	sleep(1);	
+	sleep(20);	
 		
 	/* πÿ±’¡¨Ω” */
 	close(sockfd);
