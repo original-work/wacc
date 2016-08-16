@@ -410,7 +410,7 @@ int LogicReqServThread::deal_app_req_queue()
 			logic_mo->content_len = htonl(mo->content_len);
 			CommonLogger::instance().log_debug("deal_app_req_queue: mo->content_len:%u",mo->content_len);
 			memcpy(logic_mo->sms_content, mo->sms_content, mo->content_len);
-			logic_mo->sms_code = htonl(mo->sms_code);
+			logic_mo->sms_code = mo->sms_code;
 			CommonLogger::instance().log_debug("deal_app_req_queue: sms_code is %u",mo->sms_code);
 			CommonLogger::instance().log_debug("deal_app_req_queue: mo cg len:%d, num:%s",strlen(mo->cg),mo->cg);
 			CommonLogger::instance().log_debug("deal_app_req_queue: logic-mo cg len:%d, num:%s",strlen(logic_mo->cg),logic_mo->cg);

@@ -366,7 +366,7 @@ int AppReqHandler::deal_MO(char *data)
 		CommonLogger::instance().log_info("sms len:%d,content:", strlen(re->content));
 		tools::print_hex((unsigned char*)re->content,strlen(re->content));/* luchq add 2015-06-18 */
 
-		record->sms_code = ntohl(re->sms_code);
+		record->sms_code = re->sms_code;
 		record->tid = generate_tid();
 		record->content_len = strlen(re->content);
 		app_req_queue_->insert_record((char*)&red_msg, sizeof(ReqMsg));
