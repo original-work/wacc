@@ -298,8 +298,8 @@ int LogicReqServThread::deal_app_req_queue()
 		/* Add User*/
 		if (req->msg_type == 1)	// add user
 		{
-			CommonLogger::instance().log_debug("deal_app_req_queue: Deal ACTIVE MSG.");
 			ActivateMsg *active = (ActivateMsg*)req->msg;
+			CommonLogger::instance().log_debug("deal_app_req_queue: Deal ACTIVE MSG. tid=%u", active->tid);
 
 			NIF_MSG_UNIT *unit = (NIF_MSG_UNIT*)send_buf;
 			unit->head = htonl(0x1a2b3c4d);
@@ -307,8 +307,8 @@ int LogicReqServThread::deal_app_req_queue()
 			unit->invoke = htonl(SERVLOGIC_LOCREQ_REQ);
 			unit->length = htonl(sizeof(LocreqData));
 			LocreqData body;
-			body.tid=active->tid;
-			body.mod_id=active->mod_id;
+			body.tid=htonl(active->tid);
+			body.mod_id=htonl(active->mod_id);
 			memset(body.msisdn,0,sizeof(body.msisdn));
 			memcpy(body.msisdn, active->msisdn, strlen(active->msisdn));
 			
@@ -590,8 +590,8 @@ int LogicReqServThread::deal_locreq_ack(unsigned char *data, unsigned int len)
 	}
 	else{
 			char send_buf[3000] = {0};
-			CommonLogger::instance().log_debug("deal_locreq_ack: Deal ACTIVE MSG.");
-			map<unsigned int, char*>::iterator  iter = add_user_req_.find(ack->tid);
+			CommonLogger::instance().log_debug("deal_locreq_ack: Deal ACTIVE MSG. tid=%u", ntohl(ack->tid));
+			map<unsigned int, char*>::iterator  iter = add_user_req_.find(ntohl(ack->tid));
 			if(iter != add_user_req_.end())
 			{
 				ActivateMsg* ActReq = (ActivateMsg*)iter->second;
