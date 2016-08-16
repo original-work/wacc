@@ -128,7 +128,7 @@ int main(int argc, char **argv)
 	testMsg->dIpAdrs=htonl(0xdddddd);
 	testMsg->sIpAdrs=htonl(0xaaaaaa);
 	testMsg->version=htonl(0x1);
-	testMsg->invoke=htonl(0XEEEEEE01);
+	testMsg->invoke=htonl(0XEEEEEE03);
 	testMsg->dialog=htonl(0x3);
 	testMsg->seq=htonl(0x123456);
 	testMsg->length=htonl(sizeof(mo_msg));
