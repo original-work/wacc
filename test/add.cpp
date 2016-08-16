@@ -31,6 +31,14 @@ typedef struct
 typedef struct {
     char mdn[32];
 } AddUser;
+
+typedef struct {
+	char cd[32];
+	char cg[32];
+	char smsCode;
+	unsigned int content_len;
+	unsigned char content[256];
+} MO;
 #pragma pack()
 
 
