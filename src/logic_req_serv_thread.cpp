@@ -394,13 +394,13 @@ int LogicReqServThread::deal_app_req_queue()
 		}
 		else if (req->msg_type == 3)	//MO
 		{
-			CommonLogger::instance().log_info("deal_app_req_queue: Deal MO MSG. tid is %u", mo->tid);
-
 			SMSData *mo = (SMSData*)req->msg;
 			NIF_MSG_UNIT *unit = (NIF_MSG_UNIT*)send_buf;
 			unit->dialog = htonl(BEGIN);
 			unit->invoke = htonl(SERVLOGIC_MO_REQ);
 			unit->length = htonl(sizeof(LogicMOData));
+
+			CommonLogger::instance().log_info("deal_app_req_queue: Deal MO MSG. tid is %u", mo->tid);
 
 			LogicMOData *logic_mo = (LogicMOData*)(send_buf + sizeof(NIF_MSG_UNIT) - sizeof(unsigned char*));
 			logic_mo->tid = htonl(mo->tid);

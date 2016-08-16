@@ -167,7 +167,7 @@ int main(int argc, char **argv)
 	printf("sizeof(msg_body) is %u\n", sizeof(mo_msg));
 	printf("sizeof(NIF_MSG_UNIT2) is %u\n", sizeof(NIF_MSG_UNIT2));
 	printf("sizeof(unsigned char *) is %u\n", sizeof(unsigned char *));
-	printf("mo_msg.content_len is %u\n", strlen((char*)data);
+	printf("mo_msg.content_len is %u\n", strlen((char*)data));
 	
 	testMsg->head=htonl(0x1a2b3c4d);
 	testMsg->dIpAdrs=htonl(0xdddddd);
