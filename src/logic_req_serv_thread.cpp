@@ -353,14 +353,15 @@ int LogicReqServThread::deal_app_req_queue()
 
 				//todo 向logic_resp_queue_ 消息队列插入成功响应
 				RespMsg resp;
-				resp.msg_type = 1;
+				resp.msg_type = 8;
 				AckMsg *ack = (AckMsg*)resp.msg;
 				ReqMsg* p = (ReqMsg*)pmsg;
 				ActivateMsg* record = (ActivateMsg*)p->msg;
 				
-				ack->tid = record->tid;
+				ack->tid = ntohl(record->tid);
+				CommonLogger::instance().log_debug("deal_app_req_queue: Deal ACTIVE MSG, already activated, tid=%u.",ack->tid);
 				ack->msg_type = ADD_USER;
-				ack->result= 0;
+				ack->result= 2;/*0,success   1,fail   2,already activated*/
 
 				logic_resp_queue_->insert_record((char*)&resp, sizeof(RespMsg));
 				logic_resp_queue_->advance_widx();
@@ -709,11 +710,11 @@ int LogicReqServThread::deal_locreq_ack(unsigned char *data, unsigned int len)
 						{
 							ActReq->user_info->reconnect_cnt_list[n] = info[n].reconnect_cnt;
 						}
-
+#if 0
 						/*todo 向logic_resp_queue_ 消息队列插入成功响应*/
 						
 						RespMsg resp;
-						resp.msg_type = 1;
+						resp.msg_type = 8;
 						AckMsg *ack = (AckMsg*)resp.msg;
 
 						ack->tid = ntohl(*((unsigned int*)(data+sizeof(unsigned int))));
@@ -722,7 +723,7 @@ int LogicReqServThread::deal_locreq_ack(unsigned char *data, unsigned int len)
 
 						logic_resp_queue_->insert_record((char*)&resp, sizeof(RespMsg));
 						logic_resp_queue_->advance_widx();
-						
+#endif						
 						
 						rsCode=0;
 						return rsCode;
