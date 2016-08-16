@@ -151,7 +151,7 @@ int main(int argc, char **argv)
 		print_hex(buffer, len);
 	}
 		
-	sleep(3);	
+	sleep(6);	
 
 	
 
