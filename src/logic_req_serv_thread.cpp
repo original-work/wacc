@@ -358,7 +358,7 @@ int LogicReqServThread::deal_app_req_queue()
 				ReqMsg* p = (ReqMsg*)pmsg;
 				ActivateMsg* record = (ActivateMsg*)p->msg;
 				
-				ack->tid = ntohl(record->tid);
+				ack->tid = record->tid;
 				CommonLogger::instance().log_debug("deal_app_req_queue: Deal ACTIVE MSG, already activated, tid=%u.",ack->tid);
 				ack->msg_type = ADD_USER;
 				ack->result= 2;/*0,success   1,fail   2,already activated*/
