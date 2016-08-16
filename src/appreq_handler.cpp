@@ -243,8 +243,6 @@ int AppReqHandler::deal_user_active(char *data)
 		memset(user->reconnect_cnt_list, 0, user->conn_cnt*sizeof(unsigned int));
 		memcpy(user->msisdn, re->mdn, strlen(re->mdn));
 	}
-	user->operTime = time(NULL); /* luchq add 2016-02-01 */
-
 	
 	record->tid = generate_tid();
 	record->mod_id = UsrAccConfig::instance().module_id();

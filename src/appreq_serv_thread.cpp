@@ -285,13 +285,6 @@ int AppReqServThread::deal_logic_resp_queue()
 				user = (ActiveUser*)info_mgr_->active_usr_table_.find_num((char*)bcd_buf_, strlen(mt->cd));
 				if (user != NULL)
 				{
-					/* luchq add 2016-02-01 */
-					if ( (time(NULL)-user->operTime) > UsrAccConfig::instance().app_heartbeat_overtime())
-					{
-						CommonLogger::instance().log_info("deal_logic_resp_queue: over time, user maybe not active");
-						break;
-					}
-					/* end of luchq add */
 					CommonLogger::instance().log_info("deal_logic_resp_queue: sms len=%d",mt->content_len);
 					unit = (NIF_MSG_UNIT2*)send_buf;
 					unit->dialog = htonl(BEGIN);
