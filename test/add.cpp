@@ -158,6 +158,7 @@ int main(int argc, char **argv)
 
 
 	MO mo_msg;
+	memset(mo_msg,0,sizeof(mo_msg));
 	unsigned char data[]="this is a test mo msg!";
 	strcpy(mo_msg.cd, "13816154202");
 	strcpy(mo_msg.cg, "18019398639");
