@@ -649,6 +649,9 @@ int LogicReqServThread::deal_locreq_ack(unsigned char *data, unsigned int len)
 					unit->invoke = htonl(SERVLOGIC_ACTIVATE_REQ);
 					unit->length = htonl(sizeof(PeriodData));
 					PeriodData body;
+					memset(body.imsi,0,sizeof(body.imsi));
+					memset(body.msisdn,0,sizeof(body.msisdn));
+					memset(body.esn,0,sizeof(body.esn));
 					body.tid=htonl(ActReq->tid);
 					body.mod_id=htonl(ActReq->mod_id);
 					memcpy(body.imsi,ack->imsi, strlen(ack->imsi));

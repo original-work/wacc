@@ -193,7 +193,7 @@ int AppReqHandler::deal_user_active(char *data)
 	}
 	/* 获取用户激活信息re*/
 	AddUser *re = (AddUser*)(data+sizeof(NIF_MSG_UNIT2)-sizeof(unsigned char*));
-
+	memset(msisdn_,0,sizeof(msisdn_));
 	memcpy(msisdn_, re->mdn, strlen(re->mdn));
 	memset(bcd_buf_,0,sizeof(bcd_buf_));
 	StrToBCD(re->mdn, bcd_buf_, sizeof(bcd_buf_));
