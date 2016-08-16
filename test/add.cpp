@@ -106,10 +106,10 @@ int main(int argc, char **argv)
 		exit(errno);
 	}
 	
-	char buf[1000];
+	char buf[1000]={0};
 	NIF_MSG_UNIT2* testMsg=(NIF_MSG_UNIT2*)buf;
 	AddUser user;
-	strcpy(user.mdn, "18123835762");
+	strcpy(user.mdn, "18019398639");
 
 	printf("sizeof(msg_body) is %u\n", sizeof(user));
 	printf("sizeof(NIF_MSG_UNIT2) is %u\n", sizeof(NIF_MSG_UNIT2));
@@ -143,7 +143,58 @@ int main(int argc, char **argv)
 		print_hex(buffer, len);
 	}
 		
+	sleep(3);	
+
+	
+
+
+	MO mo_msg;
+	unsigned char data[]="this is a test mo msg!";
+	strcpy(mo_msg.cg, "13816154202");
+	strcpy(mo_msg.cg, "18019398639");
+	mo_msg.smsCode=htonl(8);
+	memcpy(mo_msg.content,(void*)&data,strlen(data));
+	mo_msg.content_len=htonl(strlen(data));
+
+	printf("sizeof(msg_body) is %u\n", sizeof(mo_msg));
+	printf("sizeof(NIF_MSG_UNIT2) is %u\n", sizeof(NIF_MSG_UNIT2));
+	printf("sizeof(unsigned char *) is %u\n", sizeof(unsigned char *));
+	
+	testMsg->head=htonl(0x1a2b3c4d);
+	testMsg->dIpAdrs=htonl(0xdddddd);
+	testMsg->sIpAdrs=htonl(0xaaaaaa);
+	testMsg->version=htonl(0x1);
+	testMsg->invoke=htonl(0XEEEEEE01);
+	testMsg->dialog=htonl(0x3);
+	testMsg->seq=htonl(0x123456);
+	testMsg->length=htonl(sizeof(mo_msg));
+	char* p_user =(char*)&mo_msg;
+	memcpy(buf+sizeof(NIF_MSG_UNIT2)-8, p_user, sizeof(mo_msg));
+	
+	
+
+	printf("server connected\n");
+	bzero(buffer, MAXBUF + 1);
+
+	memcpy(buffer, buf, sizeof(buf));
+	/* 发消息给服务器 */
+
+	len = send(sockfd, buffer, sizeof(NIF_MSG_UNIT2)-8+sizeof(mo_msg), 0);
+	if(len < 0) {
+		printf("send fail!  error code is %d,  error info is '%s'\n", errno, strerror(errno));
+	}
+	else{
+		printf("send success,  sent %d Bytes  \n", len);
+		print_hex(buffer, len);
+	}
+		
 	sleep(1);	
+
+
+
+
+
+	
 		
 	/* 关闭连接 */
 	close(sockfd);

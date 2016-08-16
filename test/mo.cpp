@@ -27,6 +27,14 @@ typedef struct
 	unsigned int length;
 	unsigned char* pData;
 } NIF_MSG_UNIT2;
+
+typedef struct {
+	char cd[32];
+	char cg[32];
+	char smsCode;
+	unsigned int content_len;
+	unsigned char content[256];
+} MO;
 #pragma pack()
 
 
@@ -62,6 +70,7 @@ void print_hex(char* p_msg, int length)
 }
 
 
+
 int main(int argc, char **argv)
 {
 	int sockfd, len;
@@ -69,7 +78,7 @@ int main(int argc, char **argv)
 	char buffer[MAXBUF + 1];
 	if (argc != 3) 
 	{
-		printf("args error！correct usage is：\n\t\t%s ip  port\n\tfor example:\t%s 127.0.0.1 80\nthis program\
+		printf("args error! correct usage is：\n\t\t%s ip  port\n\tfor example:\t%s 127.0.0.1 80\nthis program\
 			receive from ip port MAXBUF Bytes for most",
 		argv[0], argv[0]);
 		exit(0);
@@ -101,45 +110,53 @@ int main(int argc, char **argv)
 		exit(errno);
 	}
 	
-	while(1){
-		char buf[1000]={0};
-		NIF_MSG_UNIT2* testMsg=(NIF_MSG_UNIT2*)buf;
-		unsigned char msg_body[6]={0xaa,0xaa,0xaa,0xbb,0xbb,0xbb};
-		printf("sizeof(msg_body) is %u\n", sizeof(msg_body));
-		printf("sizeof(NIF_MSG_UNIT2) is %u\n", sizeof(NIF_MSG_UNIT2));
-		printf("sizeof(unsigned char *) is %u\n", sizeof(unsigned char *));
-		
-		testMsg->head=htonl(0x1a2b3c4d);
-		testMsg->dIpAdrs=htonl(0xdddddd);
-		testMsg->sIpAdrs=htonl(0xaaaaaa);
-		testMsg->version=htonl(0x1);
-		testMsg->invoke=htonl(0XEEEEEE05);
-		testMsg->dialog=htonl(0x3);
-		testMsg->seq=htonl(0x123456);
-		//testMsg->length=htonl(sizeof(msg_body));
-		//memcpy(buf+sizeof(NIF_MSG_UNIT2)-8, msg_body, sizeof(msg_body));
-		
-		
+	char buf[1000]={0};
+	NIF_MSG_UNIT2* testMsg=(NIF_MSG_UNIT2*)buf;
+	MO mo_msg;
+	unsigned char data[]="this is a test mo msg!";
+	strcpy(mo_msg.cg, "13816154202");
+	strcpy(mo_msg.cg, "18019398639");
+	mo_msg.smsCode=htonl(8);
+	memcpy(mo_msg.content,(void*)&data,strlen(data));
+	mo_msg.content_len=htonl(strlen(data));
+
+	printf("sizeof(msg_body) is %u\n", sizeof(mo_msg));
+	printf("sizeof(NIF_MSG_UNIT2) is %u\n", sizeof(NIF_MSG_UNIT2));
+	printf("sizeof(unsigned char *) is %u\n", sizeof(unsigned char *));
 	
-		printf("server connected\n");
-		bzero(buffer, MAXBUF + 1);
+	testMsg->head=htonl(0x1a2b3c4d);
+	testMsg->dIpAdrs=htonl(0xdddddd);
+	testMsg->sIpAdrs=htonl(0xaaaaaa);
+	testMsg->version=htonl(0x1);
+	testMsg->invoke=htonl(0XEEEEEE01);
+	testMsg->dialog=htonl(0x3);
+	testMsg->seq=htonl(0x123456);
+	testMsg->length=htonl(sizeof(mo_msg));
+	char* p_user =(char*)&mo_msg;
+	memcpy(buf+sizeof(NIF_MSG_UNIT2)-8, p_user, sizeof(mo_msg));
 	
-		memcpy(buffer, buf, sizeof(buf));
-		/* 发消息给服务器 */
-		len = send(sockfd, buffer, sizeof(NIF_MSG_UNIT2)-8, 0);
-		if(len < 0) {
-			printf("send fail! error code is %d   error info is '%s'\n", errno, strerror(errno));
-		}
-		else{
-			printf("send success, sent %d Bytes  \n", len);
-			print_hex(buffer, len);
-		}
-			
-		sleep(1);	
+	
+
+	printf("server connected\n");
+	bzero(buffer, MAXBUF + 1);
+
+	memcpy(buffer, buf, sizeof(buf));
+	/* 发消息给服务器 */
+
+	len = send(sockfd, buffer, sizeof(NIF_MSG_UNIT2)-8+sizeof(mo_msg), 0);
+	if(len < 0) {
+		printf("send fail!  error code is %d,  error info is '%s'\n", errno, strerror(errno));
+	}
+	else{
+		printf("send success,  sent %d Bytes  \n", len);
+		print_hex(buffer, len);
+	}
 		
-	}	
+	sleep(1);	
+		
 	/* 关闭连接 */
 	close(sockfd);
 
 	return 0;
 }
+
