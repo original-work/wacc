@@ -113,6 +113,7 @@ int main(int argc, char **argv)
 	char buf[1000]={0};
 	NIF_MSG_UNIT2* testMsg=(NIF_MSG_UNIT2*)buf;
 	MO mo_msg;
+	memset(mo_msg,0,sizeof(mo_msg));
 	unsigned char data[]="this is a test mo msg!";
 	strcpy(mo_msg.cg, "13816154202");
 	strcpy(mo_msg.cg, "18019398639");
