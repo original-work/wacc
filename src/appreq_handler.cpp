@@ -251,7 +251,7 @@ int AppReqHandler::deal_user_active(char *data)
 	memcpy(record->msisdn, re->mdn, sizeof(record->msisdn));
 	record->user_info = user;
 	info_mgr_->add_tid_msisdn(record->tid, record->msisdn);
-	//CommonLogger::instance().log_debug("record  msg %u", record->tid);
+	CommonLogger::instance().log_debug("record  tid %u", record->tid);
 
 	app_req_queue_->insert_record((char*)&red_msg, sizeof(ReqMsg));
 	app_req_queue_->advance_widx();
@@ -301,7 +301,7 @@ int AppReqHandler::deal_user_deactive(char *data)
 		memcpy(record->msisdn, re->mdn, strlen(re->mdn));
 		record->tid = generate_tid();
 		info_mgr_->add_tid_msisdn(record->tid, record->msisdn);
-		//CommonLogger::instance().log_debug("record  msg %u", record->tid);
+		CommonLogger::instance().log_debug("record  tid %u", record->tid);
 
 		app_req_queue_->insert_record((char*)&red_msg, sizeof(ReqMsg));
 		app_req_queue_->advance_widx();
@@ -369,6 +369,8 @@ int AppReqHandler::deal_MO(char *data)
 		record->sms_code = re->sms_code;
 		record->tid = generate_tid();
 		record->content_len = strlen(re->content);
+		info_mgr_->add_tid_msisdn(record->tid, record->cg);
+		CommonLogger::instance().log_debug("record  tid %u", record->tid);
 		app_req_queue_->insert_record((char*)&red_msg, sizeof(ReqMsg));
 		app_req_queue_->advance_widx();
 		CommonLogger::instance().log_info("deal_MO: tid is %d sms_code is %u",record->tid,record->sms_code);
