@@ -10,7 +10,7 @@
  *       Revision:  none
  *       Compiler:  gcc
  *
- *         Author:  Zhang Huanli (zhanghl@liangjiang.com)
+ *         Author:  wangxx
  *   Organization:  lj
  *
  * ==========================================================

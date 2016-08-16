@@ -6,11 +6,11 @@
 *    Description:  
 *
 *        Version:  1.0
-*        Created:  2013.11.1
+*        Created:  2016.8.16
 *       Revision:  none
 *       Compiler:  gcc
 *
-*         Author:  Zhang Huanli (zhanghl@liangjiang.com)
+*         Author:  wangxx
 *   Organization:  lj
 *
 * ==========================================================
