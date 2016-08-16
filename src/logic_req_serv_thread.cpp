@@ -607,8 +607,8 @@ int LogicReqServThread::deal_locreq_ack(unsigned char *data, unsigned int len)
 					unit->length = htonl(sizeof(LocreqData));
 					
 					LocreqData body;
-					body.tid=ack->tid;
-					body.mod_id=ActReq->mod_id;
+					body.tid=htonl(ack->tid);
+					body.mod_id=htonl(ActReq->mod_id);
 					memcpy(body.msisdn, ack->mdn, strlen(ack->mdn));
 					
 					memcpy((send_buf + sizeof(NIF_MSG_UNIT) - sizeof(unsigned char*)), (char*)&body, sizeof(LocreqData));
