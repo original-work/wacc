@@ -357,7 +357,7 @@ int AppReqHandler::deal_MO(char *data)
 		{
 			memcpy(record->cd, re->cd, strlen(re->cd));
 		}
-		memcpy(record->sms_content, re->content, strlen(re->content));
+		
 
 		CommonLogger::instance().log_info("deal_MO: cd:%s",re->cd);
 		CommonLogger::instance().log_info("deal_MO: re cg len:%d, num:%s",strlen(re->cg),re->cg);
@@ -367,6 +367,7 @@ int AppReqHandler::deal_MO(char *data)
 		record->sms_code = re->sms_code;
 		record->tid = generate_tid();
 		record->content_len = ntohl(re->content_len);
+		memcpy(record->sms_content, re->content, record->content_len);
 		info_mgr_->add_tid_msisdn(record->tid, record->cg);
 		CommonLogger::instance().log_debug("record  tid %u", record->tid);
 		app_req_queue_->insert_record((char*)&red_msg, sizeof(ReqMsg));
