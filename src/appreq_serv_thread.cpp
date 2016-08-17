@@ -267,18 +267,18 @@ int AppReqServThread::deal_logic_resp_queue()
 	if (logic_resp_queue_->get_front_record(pmsg, len))
 	{
 		RespMsg *resp = (RespMsg*)pmsg;
-		MTMsg *mt = NULL;
+		MTMsg *mt = (MTMsg*)resp->msg;
 		ActiveUser *user = NULL;
 		NIF_MSG_UNIT2 *unit = NULL;
 		MTData *data = NULL;
 		AckMsg *ack = NULL;
 		string msisdn;
+
 		//CommonLogger::instance().log_debug("deal_logic_resp_queue### %u", resp->msg_type);
 		switch (resp->msg_type)
 		{
 			case 4:	// MT
 				memset(send_buf,0,sizeof(send_buf));
-				mt = (MTMsg*)resp->msg;
                          	CommonLogger::instance().log_info("deal_logic_resp_queue: Deal MT mag, len=%d",len);
 				CommonLogger::instance().log_info("deal_logic_resp_queue: cd %s, tid %d", mt->cd,mt->tid);
 				memset(bcd_buf_,0,sizeof(bcd_buf_));
