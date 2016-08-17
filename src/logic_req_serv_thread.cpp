@@ -317,8 +317,10 @@ int LogicReqServThread::deal_app_req_queue()
 
 			int n = client_list_.size();
 			int i = 0;
+			#if 0
 			/* 新用户*/
 			if (active->actived == 0)
+			#endif
 			{
 				add_user_req_.insert(pair<unsigned int, char*>(active->tid, (char*)active));
 
@@ -347,6 +349,7 @@ int LogicReqServThread::deal_app_req_queue()
 					active->user_info->reconnect_cnt_list[n] = info[n].reconnect_cnt;
 				}
 			}
+			#if 0
 			else
 			{
 				/* 已存储激活用户，回复成功响应*/
@@ -366,6 +369,7 @@ int LogicReqServThread::deal_app_req_queue()
 				logic_resp_queue_->insert_record((char*)&resp, sizeof(RespMsg));
 				logic_resp_queue_->advance_widx();
 			}
+			#endif
 		}
 		else if (req->msg_type == 2)	//deactive
 		{
