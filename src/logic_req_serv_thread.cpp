@@ -783,7 +783,7 @@ int LogicReqServThread::deal_mt_req(unsigned char *data, unsigned int len)
 	mt->content_len = ntohl(logic_mt->content_len);
 	memcpy(mt->sms_content, logic_mt->sms_content, mt->content_len);
 
-	CommonLogger::instance().log_info("deal_mt_req: MT %s, len %d, tid %u, mod_id %u",
+	CommonLogger::instance().log_info("deal_mt_req: MT cd %s, len %d, tid %u, mod_id %u",
 		logic_mt->cd, mt->content_len, mt->tid, logic_mt->mod_id);
 	CommonLogger::instance().log_info("deal_mt_req: MT msg content is");
 	tools::print_hex((unsigned char*)mt->sms_content,256);
