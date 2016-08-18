@@ -309,8 +309,8 @@ int AppReqServThread::deal_logic_resp_queue()
 					{
 						CommonLogger::instance().log_info("deal_logic_resp_queue: send MT msg to %s 	FAIL!!! send length:%d", user->msisdn,len);
 					}
-                                   CommonLogger::instance().log_info("deal_logic_resp_queue: send MT msg to %s, Socket:%d, len:%d",
-                                	user->msisdn,user->fd,mt->content_len);
+                                   CommonLogger::instance().log_info("deal_logic_resp_queue: send MT msg to %s, Socket:%d, len:%d, sms_code is %u, seq is %u, tid is %u, cd is %s, cg is %s",
+                                	user->msisdn,user->fd,mt->content_len,data->sms_code,data->seq,data->tid,data->cd,data->cg);
 					tools::print_hex((unsigned char*)mt->sms_content,256);
 				}
 				else
