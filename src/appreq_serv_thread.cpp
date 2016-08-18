@@ -270,7 +270,6 @@ int AppReqServThread::deal_logic_resp_queue()
 		MTMsg *mt = (MTMsg*)resp->msg;
 		ActiveUser *user = NULL;
 		NIF_MSG_UNIT2 *unit = NULL;
-		MTData *data = NULL;
 		AckMsg *ack = NULL;
 		string msisdn;
 
@@ -278,6 +277,7 @@ int AppReqServThread::deal_logic_resp_queue()
 		switch (resp->msg_type)
 		{
 			case 4:	// MT
+				MTMsg *data = NULL;
 				memset(send_buf,0,sizeof(send_buf));
                          	CommonLogger::instance().log_info("deal_logic_resp_queue: Deal MT msg, len=%d",len);
 				CommonLogger::instance().log_info("deal_logic_resp_queue: cd %s, tid %d", mt->cd,mt->tid);
@@ -290,27 +290,29 @@ int AppReqServThread::deal_logic_resp_queue()
 					unit = (NIF_MSG_UNIT2*)send_buf;
 					unit->dialog = htonl(BEGIN);
 					unit->invoke = htonl(SMS_PUSH);
-					unit->length = htonl(sizeof(MTData));
-					data = (MTData*)(send_buf + sizeof(NIF_MSG_UNIT2) - sizeof(unsigned char*));
+					unit->length = htonl(sizeof(MTMsg));
+					data = (MTMsg*)(send_buf + sizeof(NIF_MSG_UNIT2) - sizeof(unsigned char*));
 					memset(data->content,0,sizeof(data->content));
 					CommonLogger::instance().log_info("deal_logic_resp_queue: sms len=%u",mt->content_len);
 					data->seq = mt->seq;
 					data->tid = htonl(mt->tid);
-					memcpy(data->sender, mt->cg, strlen(mt->cg));
-					memcpy(data->content, mt->sms_content, mt->content_len);
+					memcpy(data->cd, mt->cg, strlen(mt->cd));
+					memcpy(data->cg, mt->cg, strlen(mt->cg));
+					data->sms_code=mt->sms_code;
+					data->content_len=htonl(mt->content_len);
+					memcpy(data->sms_content, mt->sms_content, mt->content_len);
 					if (strcmp(user->msisdn,mt->cd))
 					{
 						CommonLogger::instance().log_error("deal_logic_resp_queue: Check App number fail, App=%s",user->msisdn);
 					}
-					sendlen = send_data(user->fd, send_buf, sizeof(NIF_MSG_UNIT2)-sizeof(unsigned char*)+sizeof(MTData));
-					if (sendlen != sizeof(NIF_MSG_UNIT2)-sizeof(unsigned char*)+sizeof(MTData))
+					sendlen = send_data(user->fd, send_buf, sizeof(NIF_MSG_UNIT2)-sizeof(unsigned char*)+sizeof(MTMsg));
+					if (sendlen != sizeof(NIF_MSG_UNIT2)-sizeof(unsigned char*)+sizeof(MTMsg))
 					{
 						CommonLogger::instance().log_info("deal_logic_resp_queue: send MT msg to %s 	FAIL!!! send length:%d", user->msisdn,len);
 					}
-                                CommonLogger::instance().log_info("deal_logic_resp_queue: send MT msg to %s, Socket:%d, len:%d",
-                                	user->msisdn,user->fd,strlen(data->content));
+                                   CommonLogger::instance().log_info("deal_logic_resp_queue: send MT msg to %s, Socket:%d, len:%d",
+                                	user->msisdn,user->fd,data->content_len);
 					tools::print_hex((unsigned char*)data->content,256);
-
 				}
 				else
 					CommonLogger::instance().log_info("deal_logic_resp_queue: Call find_num fail, user maybe not exist");

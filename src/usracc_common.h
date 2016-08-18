@@ -215,7 +215,7 @@ typedef struct {
 
 //MT短信消息结构
 typedef struct {
-	unsigned int seq;
+	unsigned char seq;
 	unsigned int tid;
 	char cd[32];
 	char cg[32];
@@ -364,12 +364,6 @@ typedef struct {
 	unsigned int tid;
 } UsrMTAckData;
 
-typedef struct {
-    char seq;
-	unsigned int tid;
-    char sender[32];
-    char content[256];
-} MTData;
 
 //================================================
 

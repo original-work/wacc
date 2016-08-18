@@ -389,18 +389,18 @@ int AppReqHandler::deal_mt_ack(char *data)
 	ReqMsg red_msg;
 
 	memset((char*)&red_msg,0,sizeof(red_msg));
-    red_msg.msg_type = 9;
-    MTAckMsg *record = (MTAckMsg*)red_msg.msg;
+	red_msg.msg_type = 9;
+	MTAckMsg *record = (MTAckMsg*)red_msg.msg;
 
-    NIF_MSG_UNIT2 *header = (NIF_MSG_UNIT2*)data;
-    unsigned int msg_length = ntohl(header->length);
+	NIF_MSG_UNIT2 *header = (NIF_MSG_UNIT2*)data;
+	unsigned int msg_length = ntohl(header->length);
 
 	if (msg_length % sizeof(UsrMTAckData) != 0)
 	{
 		return 0;
 	}
 
-    UsrMTAckData *re = (UsrMTAckData*)(data+sizeof(NIF_MSG_UNIT2)-sizeof(unsigned char*));
+	UsrMTAckData *re = (UsrMTAckData*)(data+sizeof(NIF_MSG_UNIT2)-sizeof(unsigned char*));
 
 	/*memcpy(record->cd, msisdn_, sizeof(record->cd));*/
 	memcpy(record->cd, msisdn_, strlen(msisdn_));
@@ -412,7 +412,7 @@ int AppReqHandler::deal_mt_ack(char *data)
 	app_req_queue_->insert_record((char*)&red_msg, sizeof(ReqMsg));
 	app_req_queue_->advance_widx();
 	CommonLogger::instance().log_info("deal_mt_ack: insert MT-ack Msg into app_req_queue_");
-    return 0;
+	return 0;
 }
 
 unsigned int AppReqHandler::generate_tid()
