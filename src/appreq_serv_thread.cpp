@@ -288,11 +288,11 @@ int AppReqServThread::deal_logic_resp_queue()
 				{
 					CommonLogger::instance().log_info("deal_logic_resp_queue: sms len=%d",mt->content_len);
 					unit = (NIF_MSG_UNIT2*)send_buf;
-					unit->dialog = htonl(BEGIN);
+					unit->head = htonl(0x1a2b3c4d);
 					unit->invoke = htonl(SMS_PUSH);
+					unit->dialog = htonl(BEGIN);
 					unit->length = htonl(sizeof(MTMsg));
 					data = (MTMsg*)(send_buf + sizeof(NIF_MSG_UNIT2) - sizeof(unsigned char*));
-					CommonLogger::instance().log_info("deal_logic_resp_queue: sms len=%u",mt->content_len);
 					data->seq = mt->seq;
 					data->tid = htonl(mt->tid);
 					memcpy(data->cd, mt->cg, strlen(mt->cd));
@@ -310,8 +310,8 @@ int AppReqServThread::deal_logic_resp_queue()
 						CommonLogger::instance().log_info("deal_logic_resp_queue: send MT msg to %s 	FAIL!!! send length:%d", user->msisdn,len);
 					}
                                    CommonLogger::instance().log_info("deal_logic_resp_queue: send MT msg to %s, Socket:%d, len:%d",
-                                	user->msisdn,user->fd,data->content_len);
-					tools::print_hex((unsigned char*)data->sms_content,256);
+                                	user->msisdn,user->fd,mt->content_len);
+					tools::print_hex((unsigned char*)mt->sms_content,256);
 				}
 				else
 					CommonLogger::instance().log_info("deal_logic_resp_queue: Call find_num fail, user maybe not exist");
