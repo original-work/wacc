@@ -842,7 +842,7 @@ int LogicReqServThread::deal_heartbeat()
 
 int LogicReqServThread::deal_recurrent_regnot()
 {
-	char send_buf[600] = {0};
+	//char send_buf[600] = {0};
 	unsigned int num=info_mgr_->active_usr_table_.get_used_num();
 	for(unsigned int i=0; i<num; i++){
 
