@@ -26,7 +26,7 @@
 #include "sig_analysis_info_shm_manager.h"
 #include "errno.h"
 #include "common_logger.h"
-
+#include "tools.h"
 
 /*
  *--------------------------------------------------------------------------------------
