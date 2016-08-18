@@ -378,7 +378,7 @@ int AppReqHandler::deal_MO(char *data)
 	}
 	else
 	{
-		CommonLogger::instance().log_error("deal_MO: Call find_num fail");
+		CommonLogger::instance().log_error("deal_MO: Call find_num fail, num is %s",re->cg);
 	}
 
 	return 0;
