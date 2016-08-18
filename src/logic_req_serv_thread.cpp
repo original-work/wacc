@@ -780,11 +780,11 @@ int LogicReqServThread::deal_mt_req(unsigned char *data, unsigned int len)
 	memcpy(mt->cd, logic_mt->cd, strlen(logic_mt->cd));
 	memcpy(mt->cg, logic_mt->cg, strlen(logic_mt->cg));
 	mt->sms_code = logic_mt->sms_code;
-	mt->content_len = logic_mt->content_len;
-	memcpy(mt->sms_content, logic_mt->sms_content, strlen(logic_mt->sms_content));
+	mt->content_len = ntohl(logic_mt->content_len);
+	memcpy(mt->sms_content, logic_mt->sms_content, mt->content_len);
 
 	CommonLogger::instance().log_info("deal_mt_req: MT %s, len %d, tid %u, mod_id %u",
-		logic_mt->cd, strlen(logic_mt->sms_content), mt->tid, logic_mt->mod_id);
+		logic_mt->cd, mt->content_len, mt->tid, logic_mt->mod_id);
 
 	logic_resp_queue_->insert_record((char*)&resp, sizeof(RespMsg));
 	logic_resp_queue_->advance_widx();
@@ -838,4 +838,17 @@ int LogicReqServThread::deal_heartbeat()
 	}
 	return 0;
 }
+
+
+int LogicReqServThread::deal_recurrent_regnot()
+{
+	char send_buf[600] = {0};
+	unsigned int num=info_mgr_.active_usr_table_.get_used_num();
+	for(unsigned int i=0; i<num; i++){
+
+		 
+	}
+	return 0;
+}
+
 

@@ -29,6 +29,8 @@ public:
 	ListTable();
 	~ListTable();
 	int init_list_block(unsigned int block_count, unsigned int block_len);
+	LIST_BLOCK_HEAD* get_specific_block(unsigned int id);
+	unsigned int get_used_num();
 	LIST_BLOCK_HEAD* get_block();
 	void free_block(LIST_BLOCK_HEAD* pblock);
 	void free_all_block();

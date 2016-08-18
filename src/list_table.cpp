@@ -59,6 +59,20 @@ int ListTable::init_list_block(unsigned int block_count, unsigned int block_len)
 	return 0;
 }
 
+LIST_BLOCK_HEAD* ListTable::get_specific_block(unsigned int id) {
+	LIST_HEAD lihead = (LIST_HEAD*)list_head_.block_buf;
+	LIST_BLOCK_HEAD *pblock_head = lihead.phead;
+
+	for(unsigned int i=0;i<id;i++) {
+		pblock_head = pblock_head.pnext;
+	}
+	return pblock_head;
+}
+
+unsigned int ListTable::get_used_num(){
+	return list_head_.used_count;
+}
+
 LIST_BLOCK_HEAD* ListTable::get_block() {
 
 	LIST_BLOCK_HEAD *pblock_head = NULL;

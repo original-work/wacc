@@ -41,6 +41,9 @@ public:
 	LIST_BLOCK_HEAD* add_num(char* number, 
 		unsigned int number_Len);
 
+	LIST_BLOCK_HEAD* get_specific_num_table(unsigned int id);
+	unsigned int  get_used_num();
+
 	int remove_num(char* number, unsigned int number_len);
 	int remove_all_num(void);
 	LIST_BLOCK_HEAD* find_num(char* number, unsigned int number_len);

@@ -279,7 +279,7 @@ int AppReqServThread::deal_logic_resp_queue()
 		{
 			case 4:	// MT
 				memset(send_buf,0,sizeof(send_buf));
-                         	CommonLogger::instance().log_info("deal_logic_resp_queue: Deal MT mag, len=%d",len);
+                         	CommonLogger::instance().log_info("deal_logic_resp_queue: Deal MT msg, len=%d",len);
 				CommonLogger::instance().log_info("deal_logic_resp_queue: cd %s, tid %d", mt->cd,mt->tid);
 				memset(bcd_buf_,0,sizeof(bcd_buf_));
 				StrToBCD(mt->cd, bcd_buf_, sizeof(bcd_buf_));

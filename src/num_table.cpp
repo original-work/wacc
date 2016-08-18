@@ -87,6 +87,14 @@ LIST_BLOCK_HEAD* NumTable::add_num(char* number,
 	return pblock;
 }
 
+LIST_BLOCK_HEAD* NumTable::get_specific_num_table(unsigned int id) {
+	return list_table_.get_specific_block(id);
+}
+
+unsigned int NumTable::get_used_num(){
+	return list_table_.get_used_num();
+}
+
 int NumTable::remove_num(char* number, unsigned int number_len) {
 
 	LIST_BLOCK_HEAD* pblock = NULL;
