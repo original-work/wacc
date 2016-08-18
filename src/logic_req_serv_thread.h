@@ -58,6 +58,7 @@ class LogicReqServThread : public CThread
 		int deal_mt_req(unsigned char *data, unsigned int len);
 		int deal_ack_req(unsigned int type, unsigned char *data, unsigned int len);
 		int deal_heartbeat();
+		int deal_recurrent_regnot();
 	private:
 		vector<TcpClient> client_list_;
 		map<unsigned int, char*> add_user_req_; 
