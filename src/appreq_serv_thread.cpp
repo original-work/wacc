@@ -271,13 +271,13 @@ int AppReqServThread::deal_logic_resp_queue()
 		ActiveUser *user = NULL;
 		NIF_MSG_UNIT2 *unit = NULL;
 		AckMsg *ack = NULL;
+		MTMsg *data = NULL;
 		string msisdn;
 
 		//CommonLogger::instance().log_debug("deal_logic_resp_queue### %u", resp->msg_type);
 		switch (resp->msg_type)
 		{
 			case 4:	// MT
-				MTMsg *data = NULL;
 				memset(send_buf,0,sizeof(send_buf));
                          	CommonLogger::instance().log_info("deal_logic_resp_queue: Deal MT msg, len=%d",len);
 				CommonLogger::instance().log_info("deal_logic_resp_queue: cd %s, tid %d", mt->cd,mt->tid);
