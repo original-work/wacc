@@ -311,7 +311,7 @@ int AppReqServThread::deal_logic_resp_queue()
 					}
                                    CommonLogger::instance().log_info("deal_logic_resp_queue: send MT msg to %s, Socket:%d, len:%d",
                                 	user->msisdn,user->fd,data->content_len);
-					tools::print_hex((unsigned char*)data->content,256);
+					tools::print_hex((unsigned char*)data->sms_content,256);
 				}
 				else
 					CommonLogger::instance().log_info("deal_logic_resp_queue: Call find_num fail, user maybe not exist");
