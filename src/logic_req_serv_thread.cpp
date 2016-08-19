@@ -577,7 +577,6 @@ int LogicReqServThread::deal_locreq_ack(unsigned char *data, unsigned int len)
 		{
 			ActivateMsg* ActReq = (ActivateMsg*)iter->second;
 			memcpy(body->cd,ActReq->msisdn,strlen(ActReq->msisdn));
-			add_user_req_->erase(ntohl(ack->tid));
 		}
 
 		logic_resp_queue_->insert_record((char*)&resp, sizeof(RespMsg));
@@ -665,7 +664,6 @@ int LogicReqServThread::deal_locreq_ack(unsigned char *data, unsigned int len)
 					{
 						ActReq->user_info->reconnect_cnt_list[n] = info[n].reconnect_cnt;
 					}
-					add_user_req_->erase(ntohl(ack->tid));
 					rsCode=0;
 					return rsCode;
 				}
@@ -687,7 +685,6 @@ int LogicReqServThread::deal_locreq_ack(unsigned char *data, unsigned int len)
 					logic_resp_queue_->insert_record((char*)&resp, sizeof(RespMsg));
 					logic_resp_queue_->advance_widx();
 
-					add_user_req_->erase(ntohl(ack->tid));
 					return rsCode;
 				}
 			}
