@@ -855,7 +855,7 @@ int LogicReqServThread::deal_recurrent_activate()
 		ReqMsg *req = (ReqMsg*)pmsg;
 		ActivateMsg *active = (ActivateMsg*)req->msg;
 		
-		add_user_req_->insert(pair<unsigned int, char*>(active->tid, (char*)active);
+		add_user_req_->insert(pair<unsigned int, char*>(active->tid, (char*)active));
 		CommonLogger::instance().log_debug("deal_recurrent_activate: 2222222222222222222");
 	}
 	return 0;
