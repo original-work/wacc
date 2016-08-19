@@ -781,10 +781,6 @@ int LogicReqServThread::deal_heartbeat()
 
 int LogicReqServThread::deal_recurrent_activate()
 {
-	//ReqMsg red_msg;
-	//red_msg.msg_type = 1;
-	//ActivateMsg *record = (ActivateMsg*)red_msg.msg;
-	
 	char send_buf[600] = {0};
 	unsigned int num=info_mgr_->active_usr_table_.get_used_num();
 	CommonLogger::instance().log_debug("[%s %d] deal_recurrent_activate: used_num=%u.", __FILE__,__LINE__,num);
@@ -831,33 +827,36 @@ int LogicReqServThread::deal_recurrent_activate()
 		}
 		char *pmsg=NULL;
 		unsigned int len;
-		ActivateMsg active;
 		
-		active.tid=ntohl(body.tid);
-		active.mod_id=body.mod_id;
-		
-		memset(active.imsi,0,sizeof(active.imsi));
-		memset(active.msisdn,0,sizeof(active.msisdn));
-		memset(active.esn,0,sizeof(active.esn));
-		
-		memcpy(active.imsi,user->imsi, strlen(user->imsi));
-		memcpy(active.msisdn,user->msisdn, strlen(user->msisdn));
-		memcpy(active.esn,user->esn, strlen(user->esn));
-		active.actived=1;
-		active.user_info=user;
-		active.recurrent_regnot_flag=true;
-		active.do_locreq_flag=true;
+		ReqMsg red_msg;
+		ActivateMsg *record = (ActivateMsg*)red_msg.msg;
 
-		CommonLogger::instance().log_debug("deal_recurrent_activate: 11111111111111111111111");
-		recurrent_regnot_queue_->insert_record((char*)&active, sizeof(ActivateMsg));
-		CommonLogger::instance().log_debug("deal_recurrent_activate: 22222222222222222222222");
-		recurrent_regnot_queue_->advance_widx();
-		CommonLogger::instance().log_debug("deal_recurrent_activate: 333333333333333333333333");
-		recurrent_regnot_queue_->get_front_record(pmsg,len);
-		CommonLogger::instance().log_debug("deal_recurrent_activate: 444444444444444444444444");
+		record->tid=ntohl(body.tid);
+		record->mod_id=body.mod_id;
+		memset(record->imsi,0,sizeof(record->imsi));
+		memset(record->msisdn,0,sizeof(record->msisdn));
+		memset(record->esn,0,sizeof(record->esn));
 		
-		add_user_req_->insert(pair<unsigned int, char*>(active.tid, pmsg));
-		 
+		memcpy(record->imsi,user->imsi, strlen(user->imsi));
+		memcpy(record->msisdn,user->msisdn, strlen(user->msisdn));
+		memcpy(record->esn,user->esn, strlen(user->esn));
+		record->actived=1;
+		record->user_info=user;
+		record->recurrent_regnot_flag=true;
+		record->do_locreq_flag=true;
+
+
+
+		recurrent_regnot_queue_->insert_record((char*)&red_msg, sizeof(ReqMsg));
+		recurrent_regnot_queue_->advance_widx();
+		recurrent_regnot_queue_->get_front_record(pmsg,len);
+		CommonLogger::instance().log_debug("deal_recurrent_activate: 1111111111111111111");
+
+		ReqMsg *req = (ReqMsg*)pmsg;
+		ActivateMsg *active = (ActivateMsg*)req->msg;
+		
+		add_user_req_->insert(pair<unsigned int, char*>(active->tid, (char*)active);
+		CommonLogger::instance().log_debug("deal_recurrent_activate: 2222222222222222222");
 	}
 	return 0;
 }
