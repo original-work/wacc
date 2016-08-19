@@ -334,15 +334,16 @@ int AppReqServThread::deal_logic_resp_queue()
 				memset(send_buf,0,sizeof(send_buf));
 				ack = (AckMsg*)resp->msg;
 				CommonLogger::instance().log_info("deal_logic_resp_queue: Deal ACTIVATE ACK msg, tid=%u", ack->tid);
-				CommonLogger::instance().log_info("deal_logic_resp_queue: num %s, result %u", msisdn.c_str(), ack->result);
 				CommonLogger::instance().log_info("[%s %d] deal_logic_resp_queue: msg_type 0x%08x", __FILE__,__LINE__,ack->msg_type);
 
 				map<unsigned int, char*>::iterator  iter = add_user_req_->find(ack->tid);
 				if(iter != add_user_req_->end())
 				{
+					ActivateMsg* regnot = (ActivateMsg*)iter->second;	
+					CommonLogger::instance().log_info("[%s %d] deal_logic_resp_queue: tid %u found mdn %s",__FILE__,__LINE__,ack->tid,regnot->msisdn);
 					memset(bcd_buf_,0,sizeof(bcd_buf_));
-					StrToBCD(msisdn.c_str(), bcd_buf_, sizeof(bcd_buf_));
-					user = (ActiveUser*)info_mgr_->active_usr_table_.find_num((char*)bcd_buf_, msisdn.length());
+					StrToBCD(regnot->msisdn, bcd_buf_, sizeof(bcd_buf_));
+					user = (ActiveUser*)info_mgr_->active_usr_table_.find_num((char*)bcd_buf_, strlen(regnot->msisdn));
 					if (user != NULL)
 					{
 						unit = (NIF_MSG_UNIT2*)send_buf;
@@ -350,8 +351,7 @@ int AppReqServThread::deal_logic_resp_queue()
 						unit->dialog = htonl(END);
 						unit->invoke = htonl(ack->msg_type);
 
-						ActivateMsg* regnot = (ActivateMsg*)iter->second;	
-						CommonLogger::instance().log_info("[%s %d] deal_logic_resp_queue: tid %u found",__FILE__,__LINE__,ack->tid);
+						
 						if(regnot->recurrent_regnot_flag){/*如果是周期性位置更新*/
 							CommonLogger::instance().log_info("[%s %d] deal_logic_resp_queue: deal_recurrent_regnot_ack",__FILE__,__LINE__);
 							deal_recurrent_regnot_ack(ack, regnot, user);//added by wangxx 20160818
@@ -369,7 +369,7 @@ int AppReqServThread::deal_logic_resp_queue()
 
 					}
 					else{
-						CommonLogger::instance().log_info("deal_logic_resp_queue: Call find_num fail");
+						CommonLogger::instance().log_info("deal_logic_resp_queue: Call find_num fail %s", msisdn.c_str());
 					}
 				}
 				else{
