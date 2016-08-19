@@ -551,35 +551,33 @@ int AppReqServThread::deal_recurrent_regnot_ack(AckMsg* ack, ActivateMsg* recurr
 	if(0==ack->result){/*位置登记成功*/
 		CommonLogger::instance().log_info("[%s %d] deal_recurrent_regnot: SERVLOGIC_ACTIVATE_REQ return ok.  tid %u ",__FILE__,__LINE__,ack->tid);
 		add_user_req_->erase(ack->tid);
-		return 0;
 	}
 	else{
-			if(recurrent_regnot->do_locreq_flag){/*位置登记失败的时候要不要发送LOCREQ，此处是要*/
-				
-				ReqMsg red_msg;
-				red_msg.msg_type = 1;
-				ActivateMsg *record = (ActivateMsg*)red_msg.msg;
-				record->tid = TidGenerator::instance().generator_tid();
-				record->mod_id = UsrAccConfig::instance().module_id();
-				memcpy(record->msisdn, recurrent_regnot->msisdn, sizeof(record->msisdn));
-				record->actived=1;
-				record->user_info = user;
-				record->recurrent_regnot_flag=true;
-				record->do_locreq_flag=false;
-				info_mgr_->add_tid_msisdn(record->tid, record->msisdn);
-				CommonLogger::instance().log_debug("[%s %d] send LOCREQ, record  tid %u mod_id %u",__FILE__,__LINE__,record->tid, record->mod_id);
+		if(recurrent_regnot->do_locreq_flag){/*位置登记失败的时候要不要发送LOCREQ，此处是要*/
+			
+			ReqMsg red_msg;
+			red_msg.msg_type = 1;
+			ActivateMsg *record = (ActivateMsg*)red_msg.msg;
+			record->tid = TidGenerator::instance().generator_tid();
+			record->mod_id = UsrAccConfig::instance().module_id();
+			memcpy(record->msisdn, recurrent_regnot->msisdn, sizeof(record->msisdn));
+			record->actived=1;
+			record->user_info = user;
+			record->recurrent_regnot_flag=true;
+			record->do_locreq_flag=false;
+			info_mgr_->add_tid_msisdn(record->tid, record->msisdn);
+			CommonLogger::instance().log_debug("[%s %d] send LOCREQ, record  tid %u mod_id %u",__FILE__,__LINE__,record->tid, record->mod_id);
 
-				app_req_queue_->insert_record((char*)&red_msg, sizeof(ReqMsg));
-				app_req_queue_->advance_widx();
+			app_req_queue_->insert_record((char*)&red_msg, sizeof(ReqMsg));
+			app_req_queue_->advance_widx();
 
-				add_user_req_->erase(ack->tid);
-			}
-			else{
-				CommonLogger::instance().log_info("[%s %d] deal_recurrent_regnot: SERVLOGIC_ACTIVATE_REQ return fail.  not send LOCREQ, tid %u return ok",__FILE__,__LINE__,ack->tid);
-				add_user_req_->erase(ack->tid);
-				return 0;
-			}
+			add_user_req_->erase(ack->tid);
 		}
-
+		else{
+			CommonLogger::instance().log_info("[%s %d] deal_recurrent_regnot: SERVLOGIC_ACTIVATE_REQ return fail.  not send LOCREQ, tid %u return ok",__FILE__,__LINE__,ack->tid);
+			add_user_req_->erase(ack->tid);
+		}
+	}
+	return 0;
 }
 

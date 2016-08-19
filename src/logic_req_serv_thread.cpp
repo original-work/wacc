@@ -27,7 +27,7 @@
 #include "errno.h"
 #include "common_logger.h"
 #include "tools.h"
-
+#include "tid_generator.h"
 /*
  *--------------------------------------------------------------------------------------
  *       Class:  LogicReqServThread
@@ -115,7 +115,7 @@ int LogicReqServThread::stop()
 int LogicReqServThread::init(InfoMemMgr *info_mgr, MsgList* app_queue, MsgList* logic_queue, MsgList* recurrent_regnot_queue, map<unsigned int, char*>* add_user_req)
 {
 	timer_.time_interval(UsrAccConfig::instance().heartbeat_timeinterval());
-	recurrent_regnot_timer_.time_interval(UsrAccConfig::instance().heartbeat_timeinterval())
+	recurrent_regnot_timer_.time_interval(UsrAccConfig::instance().heartbeat_timeinterval());
 
 	TcpClient client;
 	vector<ServerInfo> server_list = UsrAccConfig::instance().serv_logic_server_list();
@@ -787,8 +787,8 @@ int LogicReqServThread::deal_recurrent_activate()
 	unsigned int num=info_mgr_->active_usr_table_.get_used_num();
 	CommonLogger::instance().log_debug("[%s %d] deal_recurrent_activate: used_num=%.", __FILE__,__LINE__,num);
 
-	for(unsigned int i=0; i<num; i++){
-		ActiveUser* user=(ActiveUser*)info_mgr_->active_usr_table_.get_specific_num_table(i);
+	for(unsigned int k=0; k<num; k++){
+		ActiveUser* user=(ActiveUser*)info_mgr_->active_usr_table_.get_specific_num_table(k);
 		NIF_MSG_UNIT *unit = (NIF_MSG_UNIT*)send_buf;
 		unit->dialog = htonl(BEGIN);
 		unit->invoke = htonl(SERVLOGIC_ACTIVATE_REQ);
@@ -806,8 +806,8 @@ int LogicReqServThread::deal_recurrent_activate()
 		memcpy((send_buf + sizeof(NIF_MSG_UNIT) - sizeof(unsigned char*)), (char*)&body, sizeof(PeriodData));
 		int send_len =  sizeof(NIF_MSG_UNIT) - sizeof(unsigned char*) + sizeof(PeriodData);
 
-		int n = client_list_.size();
-		int i = 0;
+		unsigned int n = client_list_.size();
+		unsigned int i = 0;
 
 		for (; i < n; ++i)
 		{
@@ -847,7 +847,7 @@ int LogicReqServThread::deal_recurrent_activate()
 		
 		recurrent_regnot_queue_->insert_record((char*)&active, sizeof(ActivateMsg));
 		recurrent_regnot_queue_->advance_widx();
-		recurrent_regnot_queue_.get_front_record(pmsg,len);
+		recurrent_regnot_queue_->get_front_record(pmsg,len);
 		
 		add_user_req_->insert(pair<unsigned int, char*>(active.tid, (char*)pmsg));
 		 
