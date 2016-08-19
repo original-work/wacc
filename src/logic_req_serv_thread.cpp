@@ -90,6 +90,8 @@ int LogicReqServThread::svc()
 				recurrent_regnot_timer_.reset();
 			}
 
+			CommonLogger::instance().log_debug("svc: 111111");
+
 			RunInfo *info = (RunInfo*)SigAnalysisInfoShmManager::instance().get_run_info();
 			info->app_req_queue_used = app_req_queue_->block_num() - app_req_queue_->unused_block_num();
 			info->logic_resp_queue_used = logic_resp_queue_->block_num() - logic_resp_queue_->unused_block_num();
@@ -825,6 +827,7 @@ int LogicReqServThread::deal_recurrent_activate()
 				break;
 			}
 		}
+		
 		char *pmsg=NULL;
 		unsigned int len;
 		
