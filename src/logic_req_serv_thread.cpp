@@ -115,7 +115,7 @@ int LogicReqServThread::stop()
 int LogicReqServThread::init(InfoMemMgr *info_mgr, MsgList* app_queue, MsgList* logic_queue, MsgList* recurrent_regnot_queue, map<unsigned int, char*>* add_user_req)
 {
 	timer_.time_interval(UsrAccConfig::instance().heartbeat_timeinterval());
-	recurrent_regnot_timer_.time_interval(UsrAccConfig::instance().heartbeat_timeinterval());
+	recurrent_regnot_timer_.time_interval(UsrAccConfig::instance().recurrent_regnot_timeinterval());
 
 	TcpClient client;
 	vector<ServerInfo> server_list = UsrAccConfig::instance().serv_logic_server_list();
