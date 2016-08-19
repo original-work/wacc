@@ -55,10 +55,11 @@ class LogicReqServThread : public CThread
 		int recv_msg(int fd, char *buf, const unsigned int &len);
 		int deal_locreq_ack(unsigned char *data, unsigned int len);
 		int deal_connack_msg(TcpClient *client, unsigned char *data);
-		int deal_mt_req(unsigned char *data, unsigned int len);
-		int deal_ack_req(unsigned int type, unsigned char *data, unsigned int len);
+		int deal_mtreq_ack(unsigned char *data, unsigned int len);
+		int deal_addreq_ack(unsigned int type, unsigned char *data, unsigned int len);
+		int deal_moreq_ack(unsigned int type, unsigned char *data, unsigned int len);
 		int deal_heartbeat();
-		int deal_recurrent_regnot();
+		int deal_recurrent_activate();
 	private:
 		vector<TcpClient> client_list_;
 		map<unsigned int, char*>* add_user_req_;
@@ -70,6 +71,7 @@ class LogicReqServThread : public CThread
 		fd_set fdset_;
 		unsigned char data_buf_[3000];
 		CTimer timer_;
+		CTimer recurrent_regnot_timer_;
 		bool all_stopped_;
 		unsigned char bcd_buf_[256];
 }; /* -----  end of class LogicReqServThread  ----- */

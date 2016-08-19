@@ -166,7 +166,7 @@ typedef struct {
 } ReqMsg;
 
 typedef struct {
-    unsigned char msg_type;   // 4:MT    5: PING    6: NOTIFY_ACTIVE    8: ACK£»
+    unsigned char msg_type;   // 1:ADD   4:MT    5: PING    6: NOTIFY_ACTIVE    8: ACK£»
     unsigned char msg[456];    // ÏûÏ¢
 } RespMsg;
 

@@ -40,8 +40,8 @@ class AppReqHandler : public BaseCollectionHandler
 	int handle_recv();
 	int process(char *pmsg);
 	int deal_ping(char *data);
-	int deal_user_active(char *data);
-	int deal_user_deactive(char *data);
+	int deal_add_user(char *data);
+	int deal_del_user(char *data);
 	int deal_MO(char *data);
 	int deal_mt_ack(char *data);
 	unsigned int generate_tid();
@@ -60,9 +60,7 @@ class AppReqHandler : public BaseCollectionHandler
 	unsigned int offset_;
 	InfoMemMgr *info_mgr_;
 	MsgList *app_req_queue_;
-	MsgList *recurrent_regnot_queue_;
 	map<int, BaseCollectionHandler*> *client_list_;	
-	map<unsigned int, char*>* add_user_req_;
 	char msisdn_[32];
 	unsigned char bcd_buf_[256];
 	char send_buf_[kBufferSize];

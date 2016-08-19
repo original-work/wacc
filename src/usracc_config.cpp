@@ -243,8 +243,12 @@ int UsrAccConfig::deal_serv_logic(const std::string &line, const int &pos) {
 				serv_logic_server_list_.push_back(server_info);
 			}
 		}
-	} else if (key == "heartbeat_timeinterval") {
+	} 
+	else if (key == "heartbeat_timeinterval") {
 		heartbeat_timeinterval_ = atoi(value.c_str());
+	}
+	else if(key == "recurrent_regnot_timeinterval"){
+		recurrent_regnot_timeinterval_=atoi(value.c_str());
 	} else {
 		printf("unknown key \" %s \" in section \" CecsInfo \".\n", key.c_str());
 		return -1;

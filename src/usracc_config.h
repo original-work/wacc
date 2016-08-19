@@ -41,6 +41,7 @@ public:
 
 	std::vector<ServerInfo> serv_logic_server_list() const {return serv_logic_server_list_;}
 	unsigned int heartbeat_timeinterval() const {return heartbeat_timeinterval_;}
+	unsigned int recurrent_regnot_timeinterval() const {return recurrent_regnot_timeinterval_;}
 
 	std::vector<TidParam> tid_num_seg_list() const {return tid_num_seg_list_;}
 	
@@ -91,6 +92,7 @@ private:
 
 	std::vector<ServerInfo> serv_logic_server_list_;
 	unsigned int heartbeat_timeinterval_;
+	unsigned int recurrent_regnot_timeinterval_;
 
 	std::vector<TidParam> tid_num_seg_list_;	//tid，每个tid段采用分号分隔，用冒号表示tid一个区段
 	

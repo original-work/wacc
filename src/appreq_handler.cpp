@@ -137,11 +137,11 @@ int AppReqHandler::process(char *pmsg)
     switch (msg_type) {
     case ADD_USER:
 	CommonLogger::instance().log_info("AppReqHandler: Recv a ADD_USER msg");
-        deal_user_active(pmsg);
+        deal_add_user(pmsg);
         break;
     case DEL_USER:
 	CommonLogger::instance().log_info("AppReqHandler: Recv a DEL_USER msg");
-        deal_user_deactive(pmsg);
+        deal_del_user(pmsg);
         break;
     case SMS_SEND:
 	CommonLogger::instance().log_info("AppReqHandler: Recv a SMS_SEND msg");
@@ -175,7 +175,7 @@ int AppReqHandler::deal_ping(char *data)
 }/* -----  end of method AppReqHandler::deal_ping(char *data)  ----- */
 
 
-int AppReqHandler::deal_user_active(char *data)
+int AppReqHandler::deal_add_user(char *data)
 {
 	ReqMsg red_msg;
 
@@ -188,7 +188,7 @@ int AppReqHandler::deal_user_active(char *data)
 
 	if (msg_length % sizeof(AddUser) != 0)
 	{
-		CommonLogger::instance().log_error("deal_user_active: length error");
+		CommonLogger::instance().log_error("deal_add_user: length error");
 		return 0;
 	}
 	/* 获取用户激活信息re*/
@@ -201,8 +201,8 @@ int AppReqHandler::deal_user_active(char *data)
 	if (user != NULL)
 	{
 		/* 用户已经激活/注册*/
-		CommonLogger::instance().log_debug("deal_user_active: user already exists %s", re->mdn);
-		CommonLogger::instance().log_debug("deal_user_active: msisdn %s",user->msisdn);
+		CommonLogger::instance().log_debug("deal_add_user: user already exists %s", re->mdn);
+		CommonLogger::instance().log_debug("deal_add_user: msisdn %s",user->msisdn);
 		record->actived = 1;
 
 		if (user->fd != sockfd())
@@ -214,24 +214,24 @@ int AppReqHandler::deal_user_active(char *data)
 				/* 存在相同FD 的用户信息，如果用户号码相同，则删除该记录*/
 				if (strcmp(msisdn_, ((AppReqHandler*)iter->second)->msisdn()) == 0)
 				{
-					CommonLogger::instance().log_debug("deal_user_active:	sockfd is different, but msisdn is same, so delete the record ");
+					CommonLogger::instance().log_debug("deal_add_user:	sockfd is different, but msisdn is same, so delete the record ");
 					delete iter->second;
 					close(iter->first);
 					client_list_->erase(iter);
 				}
 			}
-			CommonLogger::instance().log_debug("deal_user_active: Update sockfd ");
+			CommonLogger::instance().log_debug("deal_add_user: Update sockfd ");
 			user->fd = sockfd();
 		}
 	}
 	else
 	{
-		CommonLogger::instance().log_debug("deal_user_active: New active user is %s ", re->mdn);
+		CommonLogger::instance().log_debug("deal_add_user: New active user is %s ", re->mdn);
 
 		user = (ActiveUser*)info_mgr_->active_usr_table_.add_num((char*)bcd_buf_, strlen(re->mdn));
 		if (user == NULL)
 		{
-			CommonLogger::instance().log_error("deal_user_active: failed to add new active user %s", re->mdn);
+			CommonLogger::instance().log_error("deal_add_user: failed to add new active user %s", re->mdn);
 			return -1;
 		}
 
@@ -250,28 +250,16 @@ int AppReqHandler::deal_user_active(char *data)
 	record->user_info = user;
 	info_mgr_->add_tid_msisdn(record->tid, record->msisdn);
 	
-	char *pmsg;
-	unsigned int len;
-	ActivateMsg active;
-	active.recurrent_regnot_flag=false;
-	active.do_locreq_flag=false;
-	
-	recurrent_regnot_queue_->insert_record((char*)&active, sizeof(ActivateMsg));
-	recurrent_regnot_queue_->advance_widx();
-	recurrent_regnot_queue_.get_front_record(pmsg,len);
-	
-	add_user_req_->insert(pair<unsigned int, char*>(active.tid, (char*)pmsg));
-	
 	CommonLogger::instance().log_debug("record  tid %u mod_id %u", record->tid, record->mod_id);
 
 	app_req_queue_->insert_record((char*)&red_msg, sizeof(ReqMsg));
 	app_req_queue_->advance_widx();
 
 	return 0;
-}		/* -----  end of method AppReqHandler::deal_user_active  ----- */
+}		/* -----  end of method AppReqHandler::deal_add_user  ----- */
 
 
-int AppReqHandler::deal_user_deactive(char *data)
+int AppReqHandler::deal_del_user(char *data)
 {
 	ReqMsg red_msg;
 
@@ -292,20 +280,20 @@ int AppReqHandler::deal_user_deactive(char *data)
 		unsigned int *result = (unsigned int *)(send_buf_ + (sizeof(NIF_MSG_UNIT2) - sizeof(unsigned char*)));
 		*result = htonl(11);
 		sendn(send_buf_, sizeof(NIF_MSG_UNIT2) - sizeof(unsigned char*) + sizeof(unsigned int));
-		CommonLogger::instance().log_error("deal_user_deactive: length error");
+		CommonLogger::instance().log_error("deal_del_user: length error");
 		return -1;
 	}
 
 	DelUser *re = (DelUser*)(data+sizeof(NIF_MSG_UNIT2)-sizeof(unsigned char*));
 
-	CommonLogger::instance().log_debug("deal_user_deactive: deal deactive user %s, fd:%d", re->mdn,sockfd());
+	CommonLogger::instance().log_debug("deal_del_user: deal deactive user %s, fd:%d", re->mdn,sockfd());
 	memset(bcd_buf_,0,sizeof(bcd_buf_));
 	StrToBCD(re->mdn, bcd_buf_, sizeof(bcd_buf_));
 	ActiveUser* user = (ActiveUser*)info_mgr_->active_usr_table_.find_num((char*)bcd_buf_, strlen(re->mdn));
 	if (user != NULL)
 	{
 		/* luchq add for test */
-		CommonLogger::instance().log_debug("deal_user_deactive: user imsi:%s msisdn %s\n",user->imsi,user->msisdn);
+		CommonLogger::instance().log_debug("deal_del_user: user imsi:%s msisdn %s\n",user->imsi,user->msisdn);
 
 		info_mgr_->active_usr_table_.remove_num((char*)bcd_buf_, strlen(re->mdn));
 
@@ -341,7 +329,7 @@ int AppReqHandler::deal_user_deactive(char *data)
 	sendn(send_buf_, sizeof(NIF_MSG_UNIT2) - sizeof(unsigned char*) + sizeof(unsigned int));
 
 	return -1;
-}		/* -----  end of method AppReqHandler::deal_user_deactive  ----- */
+}		/* -----  end of method AppReqHandler::deal_del_user  ----- */
 
 
 int AppReqHandler::deal_MO(char *data)
@@ -458,18 +446,6 @@ void AppReqHandler::app_req_queue(MsgList *p)
 {
     app_req_queue_ = p;
 }
-
-void AppReqHandler::recurrent_regnot_queue(MsgList *p)
-{
-    recurrent_regnot_queue_= p;
-}
-
-void AppReqHandler::add_request_queue(map<unsigned int, char*> *p)
-{
-    add_user_req_= p;
-}
-
-
 
 void AppReqHandler::client_list(map<int, BaseCollectionHandler*> *list)
 {

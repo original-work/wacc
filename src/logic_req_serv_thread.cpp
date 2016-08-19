@@ -57,6 +57,7 @@ int LogicReqServThread::open(void *args)
 int LogicReqServThread::svc()
 {
 	timer_.begin_timer();
+	recurrent_regnot_timer_.begin_timer();
 
 	for (;;)
 	{
@@ -81,6 +82,12 @@ int LogicReqServThread::svc()
 			{
 				deal_heartbeat();
 				timer_.reset();
+			}
+
+			if(recurrent_regnot_timer_.expired())
+			{
+				deal_recurrent_activate();
+				recurrent_regnot_timer_.reset();
 			}
 
 			RunInfo *info = (RunInfo*)SigAnalysisInfoShmManager::instance().get_run_info();
@@ -108,6 +115,7 @@ int LogicReqServThread::stop()
 int LogicReqServThread::init(InfoMemMgr *info_mgr, MsgList* app_queue, MsgList* logic_queue, MsgList* recurrent_regnot_queue, map<unsigned int, char*>* add_user_req)
 {
 	timer_.time_interval(UsrAccConfig::instance().heartbeat_timeinterval());
+	recurrent_regnot_timer_.time_interval(UsrAccConfig::instance().heartbeat_timeinterval())
 
 	TcpClient client;
 	vector<ServerInfo> server_list = UsrAccConfig::instance().serv_logic_server_list();
@@ -247,9 +255,11 @@ int LogicReqServThread::loop_process()
 									deal_connack_msg(&client_list_[i], data_buf_ + sizeof(NIF_MSG_UNIT) - sizeof(unsigned char*));
 									break;
 								case SERVLOGIC_ACTIVATE_REQ:
+									CommonLogger::instance().log_info("[%s %d] LogicReqServThread: Recv a ACTIVATE ACK  msg 0x%08x", __FILE__,__LINE__,ntohl(unit->invoke));
+									deal_addreq_ack(ntohl(unit->invoke), (data_buf_ + sizeof(NIF_MSG_UNIT) - sizeof(unsigned char*)), ntohl(unit->length));
 								case SERVLOGIC_MO_REQ:
-									CommonLogger::instance().log_info("[%s %d] LogicReqServThread: Recv a ACK  msg 0x%08x", __FILE__,__LINE__,ntohl(unit->invoke));
-									deal_ack_req(ntohl(unit->invoke), (data_buf_ + sizeof(NIF_MSG_UNIT) - sizeof(unsigned char*)), ntohl(unit->length));
+									CommonLogger::instance().log_info("[%s %d] LogicReqServThread: Recv a MO ACK  msg 0x%08x", __FILE__,__LINE__,ntohl(unit->invoke));
+									deal_moreq_ack(ntohl(unit->invoke), (data_buf_ + sizeof(NIF_MSG_UNIT) - sizeof(unsigned char*)), ntohl(unit->length));
 									break;
 								case SERVLOGIC_USER_SYNC_REQ:
 								case SERVLOGIC_DEACTIVATE_REQ:
@@ -257,7 +267,7 @@ int LogicReqServThread::loop_process()
 									break;
 								case SERVLOGIC_MH_MT_REQ:
 									CommonLogger::instance().log_info("LogicReqServThread: Recv a MT req msg");
-									deal_mt_req((data_buf_ + sizeof(NIF_MSG_UNIT) - sizeof(unsigned char*)), ntohl(unit->length));
+									deal_mtreq_ack((data_buf_ + sizeof(NIF_MSG_UNIT) - sizeof(unsigned char*)), ntohl(unit->length));
 									break;
 								case SERVLOGIC_LOCREQ_REQ:
 									CommonLogger::instance().log_info("LogicReqServThread: Recv a locreq ACK msg");
@@ -554,7 +564,7 @@ int LogicReqServThread::deal_locreq_ack(unsigned char *data, unsigned int len)
 		/*虽然可能没有tid，还是假装删除下*/
 		info_mgr_->remove_tid_msisdn(ack->tid);
 		//todo 向logic_resp_queue_ 消息队列插入失败响应
-		
+
 		RespMsg resp;
 		resp.msg_type = 8;
 		AckMsg *body = (AckMsg*)resp.msg;
@@ -571,6 +581,7 @@ int LogicReqServThread::deal_locreq_ack(unsigned char *data, unsigned int len)
 
 		logic_resp_queue_->insert_record((char*)&resp, sizeof(RespMsg));
 		logic_resp_queue_->advance_widx();
+	
 		return rsCode;
 
 	}
@@ -582,43 +593,6 @@ int LogicReqServThread::deal_locreq_ack(unsigned char *data, unsigned int len)
 			{
 				ActivateMsg* ActReq = (ActivateMsg*)iter->second;
 			       CommonLogger::instance().log_debug("deal_locreq_ack: Find mdn %s.", ActReq->msisdn);
-
-				if(1==ack->nResult){
-/*当收到来自业务逻辑模块的周期性位置登记失败响应消息时，
-重新要求业务逻辑模块发起LOCREQ请求*/	
-
-					CommonLogger::instance().log_debug("deal_locreq_ack: locreq fail, ask ServiceLogic do LOCREQ again %s.", ActReq->msisdn);
-					
-					NIF_MSG_UNIT *unit = (NIF_MSG_UNIT*)send_buf;
-					unit->head = htonl(0x1a2b3c4d);
-					unit->dialog = htonl(BEGIN);
-					unit->invoke = htonl(SERVLOGIC_LOCREQ_REQ);
-					unit->length = htonl(sizeof(LocreqData));
-					
-					LocreqData body;
-					body.tid=htonl(ack->tid);
-					body.mod_id=ActReq->mod_id;
-					CommonLogger::instance().log_debug("deal_locreq_ack: locreq fail, ask ServiceLogic do LOCREQ again mod_id %u.", ActReq->msisdn, body.mod_id);
-					memcpy(body.msisdn, ActReq->msisdn, strlen(ActReq->msisdn));
-					
-					memcpy((send_buf + sizeof(NIF_MSG_UNIT) - sizeof(unsigned char*)), (char*)&body, sizeof(LocreqData));
-					int send_len =  sizeof(NIF_MSG_UNIT) - sizeof(unsigned char*) + sizeof(LocreqData);
-					
-					int n = client_list_.size();
-					for (int i = 0; i < n; ++i)
-					{
-						if (client_list_[i].connected())
-						{
-							int r = client_list_[i].send_data(send_buf, send_len);
-							if (r < send_len || r == -1)
-							{
-								client_list_[i].disconnect_to_server();
-							}
-						}
-					}
-					add_user_req_->erase(ntohl(ack->tid));
-					return rsCode;
-				}
 
 				memset(bcd_buf_,0,sizeof(bcd_buf_));
 				StrToBCD(ActReq->msisdn, bcd_buf_, sizeof(bcd_buf_));
@@ -711,6 +685,8 @@ int LogicReqServThread::deal_locreq_ack(unsigned char *data, unsigned int len)
 
 					logic_resp_queue_->insert_record((char*)&resp, sizeof(RespMsg));
 					logic_resp_queue_->advance_widx();
+
+					add_user_req_->erase(ntohl(ack->tid));
 					return rsCode;
 				}
 			}
@@ -722,7 +698,7 @@ int LogicReqServThread::deal_locreq_ack(unsigned char *data, unsigned int len)
 	}
 }
 
-int LogicReqServThread::deal_mt_req(unsigned char *data, unsigned int len)
+int LogicReqServThread::deal_mtreq_ack(unsigned char *data, unsigned int len)
 {
 	RespMsg resp;
 	resp.msg_type = 4;
@@ -747,24 +723,33 @@ int LogicReqServThread::deal_mt_req(unsigned char *data, unsigned int len)
 	return 0;
 }		/* -----  end of method LogicReqServThread::deal_mt_req  ----- */
 
-int LogicReqServThread::deal_ack_req(unsigned int type, unsigned char *data, unsigned int len)
+int LogicReqServThread::deal_addreq_ack(unsigned int type, unsigned char *data, unsigned int len)
+{
+	RespMsg resp;
+	resp.msg_type = 1;
+	AckMsg *ack = (AckMsg*)resp.msg;
+	ack->result = ntohl(*((unsigned int*)data));
+	ack->tid = ntohl(*((unsigned int*)(data+sizeof(unsigned int))));
+
+	ack->msg_type = ADD_USER;
+	CommonLogger::instance().log_debug("deal_ack_req: ADD_USER  result is %u tid is %u",ack->result,ack->tid);
+
+	logic_resp_queue_->insert_record((char*)&resp, sizeof(RespMsg));
+	logic_resp_queue_->advance_widx();
+	return 0;
+}		/* -----  end of method LogicReqServThread::deal_ack_req  ----- */
+
+
+int LogicReqServThread::deal_moreq_ack(unsigned int type, unsigned char *data, unsigned int len)
 {
 	RespMsg resp;
 	resp.msg_type = 8;
 	AckMsg *ack = (AckMsg*)resp.msg;
 	ack->result = ntohl(*((unsigned int*)data));
 	ack->tid = ntohl(*((unsigned int*)(data+sizeof(unsigned int))));
-	if (type == SERVLOGIC_ACTIVATE_REQ)
-	{
-		ack->msg_type = ADD_USER;
-		CommonLogger::instance().log_debug("deal_ack_req: ADD_USER  result is %u tid is %u",ack->result,ack->tid);
 
-	}
-	else
-	{
-		CommonLogger::instance().log_debug("deal_ack_req: MO  result is %u tid is %u",ack->result,ack->tid);
-		ack->msg_type = SMS_SEND;
-	}
+	CommonLogger::instance().log_debug("deal_ack_req: MO  result is %u tid is %u",ack->result,ack->tid);
+	ack->msg_type = SMS_SEND;
 
 	logic_resp_queue_->insert_record((char*)&resp, sizeof(RespMsg));
 	logic_resp_queue_->advance_widx();
@@ -796,10 +781,12 @@ int LogicReqServThread::deal_heartbeat()
 }
 
 
-int LogicReqServThread::deal_recurrent_regnot()
+int LogicReqServThread::deal_recurrent_activate()
 {
 	char send_buf[600] = {0};
 	unsigned int num=info_mgr_->active_usr_table_.get_used_num();
+	CommonLogger::instance().log_debug("[%s %d] deal_recurrent_activate: used_num=%.", __FILE__,__LINE__,num);
+
 	for(unsigned int i=0; i<num; i++){
 		ActiveUser* user=(ActiveUser*)info_mgr_->active_usr_table_.get_specific_num_table(i);
 		NIF_MSG_UNIT *unit = (NIF_MSG_UNIT*)send_buf;
@@ -812,7 +799,7 @@ int LogicReqServThread::deal_recurrent_regnot()
 		memset(body.esn,0,sizeof(body.esn));
 		body.tid=htonl(TidGenerator::instance().generator_tid());
 		body.mod_id=UsrAccConfig::instance().module_id();
-		CommonLogger::instance().log_debug("[%s %d] deal_recurrent_regnot: mod_id %u tid %u.", __FILE__,__LINE__,body.mod_id, body.tid);
+		CommonLogger::instance().log_debug("[%s %d] deal_recurrent_activate: i=%u mod_id %u tid %u.", __FILE__,__LINE__,i,body.mod_id, body.tid);
 		memcpy(body.imsi,user->imsi, strlen(user->imsi));
 		memcpy(body.msisdn,user->msisdn, strlen(user->msisdn));
 		memcpy(body.esn,user->esn, strlen(user->esn));
@@ -831,9 +818,9 @@ int LogicReqServThread::deal_recurrent_regnot()
 				{
 					client_list_[i].disconnect_to_server();
 				}
-				CommonLogger::instance().log_debug("deal_recurrent_regnot: Send Active Msg to first connected socket(servicelogic modle), index=%d",i);
+				CommonLogger::instance().log_debug("deal_recurrent_activate: Send Active Msg to first connected socket(servicelogic modle), index=%d",i);
 				/* luchq add for test */
-				CommonLogger::instance().log_debug("[%s %d] deal_recurrent_regnot: user msisdn %s  esn  %s  imsi  %s ",
+				CommonLogger::instance().log_debug("[%s %d] deal_recurrent_activate: user msisdn %s  esn  %s  imsi  %s ",
 					__FILE__,__LINE__,user->msisdn, user->esn, user->imsi);
 				++i;
 				break;
@@ -842,6 +829,19 @@ int LogicReqServThread::deal_recurrent_regnot()
 		char *pmsg;
 		unsigned int len;
 		ActivateMsg active;
+		
+		active.tid=ntohl(body.tid);
+		active.mod_id=body.mod_id;
+		
+		memset(active.imsi,0,sizeof(active.imsi));
+		memset(active.msisdn,0,sizeof(active.msisdn));
+		memset(active.esn,0,sizeof(active.esn));
+		
+		memcpy(active.imsi,user->imsi, strlen(user->imsi));
+		memcpy(active.msisdn,user->msisdn, strlen(user->msisdn));
+		memcpy(active.esn,user->esn, strlen(user->esn));
+		active.actived=1;
+		active.user_info=user;
 		active.recurrent_regnot_flag=true;
 		active.do_locreq_flag=true;
 		
