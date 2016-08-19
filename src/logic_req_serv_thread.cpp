@@ -89,9 +89,7 @@ int LogicReqServThread::svc()
 				deal_recurrent_activate();
 				recurrent_regnot_timer_.reset();
 			}
-
-			CommonLogger::instance().log_debug("svc: 111111");
-
+			
 			RunInfo *info = (RunInfo*)SigAnalysisInfoShmManager::instance().get_run_info();
 			info->app_req_queue_used = app_req_queue_->block_num() - app_req_queue_->unused_block_num();
 			info->logic_resp_queue_used = logic_resp_queue_->block_num() - logic_resp_queue_->unused_block_num();
@@ -848,8 +846,6 @@ int LogicReqServThread::deal_recurrent_activate()
 		record->recurrent_regnot_flag=true;
 		record->do_locreq_flag=true;
 
-
-
 		recurrent_regnot_queue_->insert_record((char*)&red_msg, sizeof(ReqMsg));
 		recurrent_regnot_queue_->advance_widx();
 		recurrent_regnot_queue_->get_front_record(pmsg,len);
@@ -862,6 +858,7 @@ int LogicReqServThread::deal_recurrent_activate()
 			active->do_locreq_flag);
 		
 		add_user_req_->insert(pair<unsigned int, char*>(active->tid, (char*)active));
+		
 		CommonLogger::instance().log_debug("deal_recurrent_activate: 2222222222222222222");
 	}
 	return 0;
