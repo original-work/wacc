@@ -63,8 +63,8 @@ int LogicReqServThread::svc()
 	{
 		if (test_cancel_thread() == 1)
 		{
-			int n = client_list_.size();
-			for (int i=0; i<n; ++i)
+			unsigned int n = client_list_.size();
+			for (unsigned int i=0; i<n; ++i)
 			{
 				if(client_list_[i].connected())
 				{
@@ -232,8 +232,8 @@ int LogicReqServThread::loop_process()
 	int ret;
 	if ((ret = select_check_fds()) > 0)
 	{
-		int n = client_list_.size();
-		for (int i = 0; i < n; ++i)
+		unsigned int n = client_list_.size();
+		for (unsigned int i = 0; i < n; ++i)
 		{
 			if (client_list_[i].connected())
 			{
@@ -327,8 +327,8 @@ int LogicReqServThread::deal_app_req_queue()
 			memcpy((send_buf + sizeof(NIF_MSG_UNIT) - sizeof(unsigned char*)), (char*)&body, sizeof(LocreqData));
 			int send_len =  sizeof(NIF_MSG_UNIT) - sizeof(unsigned char*) + sizeof(LocreqData);
 
-			int n = client_list_.size();
-			int i = 0;
+			unsigned int n = client_list_.size();
+			unsigned int i = 0;
 
 			active->recurrent_regnot_flag=false;
 			active->do_locreq_flag=false;
@@ -372,8 +372,8 @@ int LogicReqServThread::deal_app_req_queue()
 			memcpy((send_buf + sizeof(NIF_MSG_UNIT) - sizeof(unsigned char*)), req->msg, sizeof(DeactivateData));
 			int send_len =  sizeof(NIF_MSG_UNIT) - sizeof(unsigned char*) + sizeof(DeactivateData);
 
-			int n = client_list_.size();
-			for (int i = 0; i < n; ++i)
+			unsigned int n = client_list_.size();
+			for (unsigned int i = 0; i < n; ++i)
 			{
 				if (client_list_[i].connected())
 				{
@@ -621,8 +621,8 @@ int LogicReqServThread::deal_locreq_ack(unsigned char *data, unsigned int len)
 					memcpy((send_buf + sizeof(NIF_MSG_UNIT) - sizeof(unsigned char*)), (char*)&body, sizeof(PeriodData));
 					int send_len =  sizeof(NIF_MSG_UNIT) - sizeof(unsigned char*) + sizeof(PeriodData);
 
-					int n = client_list_.size();
-					int i = 0;
+					unsigned int n = client_list_.size();
+					unsigned int i = 0;
 
 					CommonLogger::instance().log_debug("deal_locreq_ack: New user.");
 					for (; i < n; ++i)
@@ -765,8 +765,8 @@ int LogicReqServThread::deal_heartbeat()
 	unit->length = 0;
 	int send_len =  sizeof(NIF_MSG_UNIT) - sizeof(unsigned char*);
 
-	int n = client_list_.size();
-	for (int i = 0; i < n; ++i)
+	unsigned int n = client_list_.size();
+	for (unsigned int i = 0; i < n; ++i)
 	{
 		if (client_list_[i].connected())
 		{
@@ -799,7 +799,7 @@ int LogicReqServThread::deal_recurrent_activate()
 		memset(body.esn,0,sizeof(body.esn));
 		body.tid=htonl(TidGenerator::instance().generator_tid());
 		body.mod_id=UsrAccConfig::instance().module_id();
-		CommonLogger::instance().log_debug("[%s %d] deal_recurrent_activate: i=%u mod_id %u tid %u.", __FILE__,__LINE__,i,body.mod_id, body.tid);
+		CommonLogger::instance().log_debug("[%s %d] deal_recurrent_activate: i=%u mod_id %u tid %u.", __FILE__,__LINE__,k,body.mod_id, body.tid);
 		memcpy(body.imsi,user->imsi, strlen(user->imsi));
 		memcpy(body.msisdn,user->msisdn, strlen(user->msisdn));
 		memcpy(body.esn,user->esn, strlen(user->esn));
