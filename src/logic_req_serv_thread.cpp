@@ -105,7 +105,7 @@ int LogicReqServThread::stop()
 	return 0;
 }		/* -----  end of method LogicReqServThread::stop  ----- */
 
-int LogicReqServThread::init(InfoMemMgr *info_mgr, MsgList *app_queue, MsgList *logic_queue)
+int LogicReqServThread::init(InfoMemMgr *info_mgr, MsgList* app_queue, MsgList* logic_queue, MsgList* recurrent_regnot_queue, map<unsigned int, char*>* add_user_req)
 {
 	timer_.time_interval(UsrAccConfig::instance().heartbeat_timeinterval());
 
@@ -121,6 +121,8 @@ int LogicReqServThread::init(InfoMemMgr *info_mgr, MsgList *app_queue, MsgList *
 	info_mgr_ = info_mgr;
 	app_req_queue_ = app_queue;
 	logic_resp_queue_ = logic_queue;
+	recurrent_regnot_queue_ = recurrent_regnot_queue;
+	add_user_req_=add_user_req;
 
 	memset(data_buf_, 0, sizeof(data_buf_));
 
@@ -317,59 +319,35 @@ int LogicReqServThread::deal_app_req_queue()
 
 			int n = client_list_.size();
 			int i = 0;
-			#if 0
-			/* 新用户*/
-			if (active->actived == 0)
-			#endif
-			{
-				add_user_req_.insert(pair<unsigned int, char*>(active->tid, (char*)active));
 
-				for (; i < n; ++i)
+			active->recurrent_regnot_flag=false;
+			active->do_locreq_flag=false;
+			add_user_req_->insert(pair<unsigned int, char*>(active->tid, (char*)active));
+
+			for (; i < n; ++i)
+			{
+				if (client_list_[i].connected())
 				{
-					if (client_list_[i].connected())
+					int r = client_list_[i].send_data(send_buf, send_len);
+					if (r < send_len || r == -1)
 					{
-						int r = client_list_[i].send_data(send_buf, send_len);
-						if (r < send_len || r == -1)
-						{
-							client_list_[i].disconnect_to_server();
-						}
-						CommonLogger::instance().log_debug("deal_app_req_queue: Send Active Msg to first connected socket(servicelogic modle), index=%d",i);
-						/* luchq add for test */
-						CommonLogger::instance().log_debug("[%s %d] deal_app_req_queue: user msisdn 	%s",
-							__FILE__,__LINE__,active->msisdn);
-						++i;
-						break;
+						client_list_[i].disconnect_to_server();
 					}
-				}
-
-				LogicConnInfo *info = info_mgr_->logic_conns_mgr_.logic_conns();
-				int info_cnt = info_mgr_->logic_conns_mgr_.conns_counts();
-				for (int n = 0; n < info_cnt; ++n)
-				{
-					active->user_info->reconnect_cnt_list[n] = info[n].reconnect_cnt;
+					CommonLogger::instance().log_debug("deal_app_req_queue: Send Active Msg to first connected socket(servicelogic modle), index=%d",i);
+					/* luchq add for test */
+					CommonLogger::instance().log_debug("[%s %d] deal_app_req_queue: user msisdn 	%s",
+						__FILE__,__LINE__,active->msisdn);
+					++i;
+					break;
 				}
 			}
-			#if 0
-			else
+
+			LogicConnInfo *info = info_mgr_->logic_conns_mgr_.logic_conns();
+			int info_cnt = info_mgr_->logic_conns_mgr_.conns_counts();
+			for (int n = 0; n < info_cnt; ++n)
 			{
-				/* 已存储激活用户，回复成功响应*/
-
-				//todo 向logic_resp_queue_ 消息队列插入成功响应
-				RespMsg resp;
-				resp.msg_type = 8;
-				AckMsg *ack = (AckMsg*)resp.msg;
-				ReqMsg* p = (ReqMsg*)pmsg;
-				ActivateMsg* record = (ActivateMsg*)p->msg;
-				
-				ack->tid = record->tid;
-				CommonLogger::instance().log_debug("deal_app_req_queue: Deal ACTIVE MSG, already activated, tid=%u.",ack->tid);
-				ack->msg_type = ADD_USER;
-				ack->result= 2;/*0,success   1,fail   2,already activated*/
-
-				logic_resp_queue_->insert_record((char*)&resp, sizeof(RespMsg));
-				logic_resp_queue_->advance_widx();
+				active->user_info->reconnect_cnt_list[n] = info[n].reconnect_cnt;
 			}
-			#endif
 		}
 		else if (req->msg_type == 2)	//deactive
 		{
@@ -580,14 +558,15 @@ int LogicReqServThread::deal_locreq_ack(unsigned char *data, unsigned int len)
 		RespMsg resp;
 		resp.msg_type = 8;
 		AckMsg *body = (AckMsg*)resp.msg;
-		body->tid=ack->tid;
+		body->tid=ntohl(ack->tid);
 		body->msg_type=ADD_USER;
 		body->result=1;
-		map<unsigned int, char*>::iterator  iter = add_user_req_.find(ack->tid);
-		if(iter != add_user_req_.end())
+		map<unsigned int, char*>::iterator  iter = add_user_req_->find(ntohl(ack->tid));
+		if(iter != add_user_req_->end())
 		{
 			ActivateMsg* ActReq = (ActivateMsg*)iter->second;
 			memcpy(body->cd,ActReq->msisdn,strlen(ActReq->msisdn));
+			add_user_req_->erase(ntohl(ack->tid));
 		}
 
 		logic_resp_queue_->insert_record((char*)&resp, sizeof(RespMsg));
@@ -598,8 +577,8 @@ int LogicReqServThread::deal_locreq_ack(unsigned char *data, unsigned int len)
 	else{
 			char send_buf[3000] = {0};
 			CommonLogger::instance().log_debug("deal_locreq_ack: Deal ACTIVE MSG. tid=%u", ntohl(ack->tid));
-			map<unsigned int, char*>::iterator  iter = add_user_req_.find(ntohl(ack->tid));
-			if(iter != add_user_req_.end())
+			map<unsigned int, char*>::iterator  iter = add_user_req_->find(ntohl(ack->tid));
+			if(iter != add_user_req_->end())
 			{
 				ActivateMsg* ActReq = (ActivateMsg*)iter->second;
 			       CommonLogger::instance().log_debug("deal_locreq_ack: Find mdn %s.", ActReq->msisdn);
@@ -637,7 +616,7 @@ int LogicReqServThread::deal_locreq_ack(unsigned char *data, unsigned int len)
 							}
 						}
 					}
-					
+					add_user_req_->erase(ntohl(ack->tid));
 					return rsCode;
 				}
 
@@ -711,21 +690,7 @@ int LogicReqServThread::deal_locreq_ack(unsigned char *data, unsigned int len)
 					{
 						ActReq->user_info->reconnect_cnt_list[n] = info[n].reconnect_cnt;
 					}
-#if 0
-					/*todo 向logic_resp_queue_ 消息队列插入成功响应*/
-					
-					RespMsg resp;
-					resp.msg_type = 8;
-					AckMsg *ack = (AckMsg*)resp.msg;
-
-					ack->tid = ntohl(*((unsigned int*)(data+sizeof(unsigned int))));
-					ack->msg_type = ADD_USER;
-					ack->result= 0;
-
-					logic_resp_queue_->insert_record((char*)&resp, sizeof(RespMsg));
-					logic_resp_queue_->advance_widx();
-#endif						
-					
+					add_user_req_->erase(ntohl(ack->tid));
 					rsCode=0;
 					return rsCode;
 				}
@@ -751,7 +716,7 @@ int LogicReqServThread::deal_locreq_ack(unsigned char *data, unsigned int len)
 			}
 			else
 			{
-			       CommonLogger::instance().log_debug("deal_locreq_ack: Not find mdn %s.", ack->mdn);
+			        CommonLogger::instance().log_debug("deal_locreq_ack: Not find mdn %s.", ack->mdn);
 				 return rsCode;
 			}
 	}
@@ -833,10 +798,58 @@ int LogicReqServThread::deal_heartbeat()
 
 int LogicReqServThread::deal_recurrent_regnot()
 {
-	//char send_buf[600] = {0};
+	char send_buf[600] = {0};
 	unsigned int num=info_mgr_->active_usr_table_.get_used_num();
 	for(unsigned int i=0; i<num; i++){
+		ActiveUser* user=(ActiveUser*)info_mgr_->active_usr_table_.get_specific_num_table(i);
+		NIF_MSG_UNIT *unit = (NIF_MSG_UNIT*)send_buf;
+		unit->dialog = htonl(BEGIN);
+		unit->invoke = htonl(SERVLOGIC_ACTIVATE_REQ);
+		unit->length = htonl(sizeof(PeriodData));
+		PeriodData body;
+		memset(body.imsi,0,sizeof(body.imsi));
+		memset(body.msisdn,0,sizeof(body.msisdn));
+		memset(body.esn,0,sizeof(body.esn));
+		body.tid=htonl(TidGenerator::instance().generator_tid());
+		body.mod_id=UsrAccConfig::instance().module_id();
+		CommonLogger::instance().log_debug("[%s %d] deal_recurrent_regnot: mod_id %u tid %u.", __FILE__,__LINE__,body.mod_id, body.tid);
+		memcpy(body.imsi,user->imsi, strlen(user->imsi));
+		memcpy(body.msisdn,user->msisdn, strlen(user->msisdn));
+		memcpy(body.esn,user->esn, strlen(user->esn));
+		memcpy((send_buf + sizeof(NIF_MSG_UNIT) - sizeof(unsigned char*)), (char*)&body, sizeof(PeriodData));
+		int send_len =  sizeof(NIF_MSG_UNIT) - sizeof(unsigned char*) + sizeof(PeriodData);
 
+		int n = client_list_.size();
+		int i = 0;
+
+		for (; i < n; ++i)
+		{
+			if (client_list_[i].connected())
+			{
+				int r = client_list_[i].send_data(send_buf, send_len);
+				if (r < send_len || r == -1)
+				{
+					client_list_[i].disconnect_to_server();
+				}
+				CommonLogger::instance().log_debug("deal_recurrent_regnot: Send Active Msg to first connected socket(servicelogic modle), index=%d",i);
+				/* luchq add for test */
+				CommonLogger::instance().log_debug("[%s %d] deal_recurrent_regnot: user msisdn %s  esn  %s  imsi  %s ",
+					__FILE__,__LINE__,user->msisdn, user->esn, user->imsi);
+				++i;
+				break;
+			}
+		}
+		char *pmsg;
+		unsigned int len;
+		ActivateMsg active;
+		active.recurrent_regnot_flag=true;
+		active.do_locreq_flag=true;
+		
+		recurrent_regnot_queue_->insert_record((char*)&active, sizeof(ActivateMsg));
+		recurrent_regnot_queue_->advance_widx();
+		recurrent_regnot_queue_.get_front_record(pmsg,len);
+		
+		add_user_req_->insert(pair<unsigned int, char*>(active.tid, (char*)pmsg));
 		 
 	}
 	return 0;

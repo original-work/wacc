@@ -48,6 +48,8 @@ public:
 	unsigned int usr_hash_count() const {return usr_hash_count_;}
 	unsigned int app_req_queue_block_num() const {return app_req_queue_block_num_;}
 	unsigned int app_req_queue_block_size() const {return app_req_queue_block_size_;}
+	unsigned int recurrent_regnot_queue_block_num() const {return recurrent_regnot_queue_block_num_;}
+	unsigned int recurrent_regnot_queue_block_size() const {return recurrent_regnot_queue_block_size_;}
 	unsigned int servlogic_req_queue_block_num() const {return servlogic_req_queue_block_num_;}
 	unsigned int servlogic_req_queue_block_size() const {return servlogic_req_queue_block_size_;}
 	unsigned int user_op_queue_block_num() const {return user_op_queue_block_num_;}
@@ -100,6 +102,8 @@ private:
 	unsigned int servlogic_req_queue_block_size_;		//业务逻辑请求消息队列块大小
 	unsigned int user_op_queue_block_num_;		//用户操作消息队列数量
 	unsigned int user_op_queue_block_size_;		//用户操作消息队列块大小
+	unsigned int recurrent_regnot_queue_block_num_;   //周期性位置登记消息队列数量
+	unsigned int recurrent_regnot_queue_block_size_;   //周期性位置登记消息队列块大小
 
 	unsigned int call_record_write_switch_;
 	unsigned int call_record_write_periodic_;		// 语音话单写文件周期

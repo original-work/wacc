@@ -196,6 +196,10 @@ int UsrAccConfig::deal_mem(const std::string &line, const int &pos) {
 		app_req_queue_block_num_ = atoi(value.c_str());
 	} else if (key == "app_req_queue_block_size") {
 		app_req_queue_block_size_ = atoi(value.c_str());
+	} else if (key == "recurrent_regnot_queue_block_num") {
+		recurrent_regnot_queue_block_num_ = atoi(value.c_str());
+	} else if (key == "recurrent_regnot_queue_block_size") {
+		recurrent_regnot_queue_block_size_ = atoi(value.c_str());
 	} else if (key == "servlogic_req_queue_block_num") {
 		servlogic_req_queue_block_num_ = atoi(value.c_str());
 	} else if (key == "servlogic_req_queue_block_size") {

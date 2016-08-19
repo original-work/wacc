@@ -93,7 +93,7 @@ int AppReqServThread::svc()
 }		/* -----  end of method AppReqServThread::svc  ----- */
 
 
-int AppReqServThread::init(InfoMemMgr *info_mem, MsgList *app_queue, MsgList *logic_queue)
+int AppReqServThread::init(InfoMemMgr *info_mem, MsgList* app_queue, MsgList* logic_queue, MsgList* recurrent_regnot_queue, map<unsigned int, char*>* add_user_req)
 {
 	/* 获取服务端监听端口*/
 	collection_server_.port(UsrAccConfig::instance().app_serv_port());
@@ -103,6 +103,8 @@ int AppReqServThread::init(InfoMemMgr *info_mem, MsgList *app_queue, MsgList *lo
 	info_mgr_ = info_mem;
 	app_req_queue_ = app_queue;
 	logic_resp_queue_ = logic_queue;
+	recurrent_regnot_queue_ = recurrent_regnot_queue;
+	add_user_req_ = add_user_req;
 
 	current_connection_count_ = 0;
 	connection_count_limits_ = UsrAccConfig::instance().app_max_connection_count();
@@ -195,8 +197,7 @@ int AppReqServThread::handle_request(int fd)
 
 int AppReqServThread::deal_new_connection()
 {
-	if (current_connection_count_ >= connection_count_limits_ &&
-			connection_count_limits_ > 0) {
+	if (current_connection_count_ >= connection_count_limits_ && connection_count_limits_ > 0) {
 
 		CommonLogger::instance().log_error("connection limited, cur %u, max %u",
 				current_connection_count_,
@@ -222,21 +223,14 @@ int AppReqServThread::deal_new_connection()
 			   map<int,BaseCollectionHandler*>::iterator it = client_list_.find(handler->sockfd());
 			   if (it != client_list_.end())
 			   {
-			     close(it->first);
-			     delete it->second;
+			        close(it->first);
+			        delete it->second;
                              client_list_.erase(handler->sockfd());
 			   }
 
-			//pair<map<int,BaseCollectionHandler*>::iterator,bool> ret;
-			//ret = client_list_.insert(map<int,BaseCollectionHandler*>::value_type(handler->sockfd(), handler));
+
 			client_list_.insert(map<int,BaseCollectionHandler*>::value_type(handler->sockfd(), handler));
-			/*
-			if (ret.second == false)
-			{
-				CommonLogger::instance().log_debug("clients fd %d, %d",handler->sockfd(), client_list_.size());
-				return -1;
-			}
-			*/
+
 
 			if (connection_count_limits_>0) {
 				++current_connection_count_;
@@ -246,6 +240,8 @@ int AppReqServThread::deal_new_connection()
 			h->info_mgr(info_mgr_);
 			h->app_req_queue(app_req_queue_);
 			h->client_list(&client_list_);
+			h->add_request_queue(add_user_req_);
+			h->recurrent_regnot_queue(recurrent_regnot_queue_);
 
 			handler = collection_server_.deal_accept();
 		} while (handler != NULL);
@@ -350,18 +346,29 @@ int AppReqServThread::deal_logic_resp_queue()
 						unit->head = htonl(0x1a2b3c4d);
 						unit->dialog = htonl(END);
 						unit->invoke = htonl(ack->msg_type);
-						unit->length = htonl(sizeof(unsigned int));
-						*((unsigned int*)(send_buf + sizeof(NIF_MSG_UNIT2) - sizeof(unsigned char*))) = htonl(ack->result);
-						sendlen = send_data(user->fd, send_buf, sizeof(NIF_MSG_UNIT2)-sizeof(unsigned char*)+sizeof(unsigned int));
-						if (sendlen != sizeof(NIF_MSG_UNIT2)-sizeof(unsigned char*)+sizeof(unsigned int))
+
+						map<unsigned int, char*>::iterator  iter = add_user_req_->find(ack->tid);
+						if(iter != add_user_req_->end())
 						{
-							CommonLogger::instance().log_error("deal_logic_resp_queue: send ACK msg to %s FAIL!!!", mt->cd);
+							ActivateMsg* recurrent_regnot = (ActivateMsg*)iter->second;
+							
+							CommonLogger::instance().log_info("[%s %d] deal_recurrent_regnot: tid %u found",__FILE__,__LINE__,ack->tid);
+							deal_recurrent_regnot_ack(ack);//added by wangxx 20160818
+						}else{
+							unit->length = htonl(sizeof(unsigned int));
+							*((unsigned int*)(send_buf + sizeof(NIF_MSG_UNIT2) - sizeof(unsigned char*))) = htonl(ack->result);
+							sendlen = send_data(user->fd, send_buf, sizeof(NIF_MSG_UNIT2)-sizeof(unsigned char*)+sizeof(unsigned int));
+							if (sendlen != sizeof(NIF_MSG_UNIT2)-sizeof(unsigned char*)+sizeof(unsigned int))
+							{
+								CommonLogger::instance().log_error("deal_logic_resp_queue: send ACK msg to %s FAIL!!!", mt->cd);
+							}
+							CommonLogger::instance().log_info("deal_logic_resp_queue: send ACK msg to APP");
 						}
-						CommonLogger::instance().log_info("deal_logic_resp_queue: send ACK msg to APP");
 					}
-					else
+					else{
 						CommonLogger::instance().log_info("deal_logic_resp_queue: Call find_num fail");
                               		info_mgr_->remove_tid_msisdn(ack->tid);
+					}
 				}
 				else{
 					CommonLogger::instance().log_info("deal_logic_resp_queue: tid %u not found",ack->tid);
@@ -380,6 +387,47 @@ int AppReqServThread::deal_logic_resp_queue()
 	}
 	return 0;
 }		/* -----  end of method AppReqServThread::deal_logic_resp_queue  ----- */
+
+int AppReqServThread::deal_recurrent_regnot_ack(AckMsg* ack)
+{
+	if(0==ack->result){/*位置登记成功*/
+		CommonLogger::instance().log_info("[%s %d] deal_recurrent_regnot: SERVLOGIC_ACTIVATE_REQ return ok.  tid %u ",__FILE__,__LINE__,ack->tid);
+		add_user_req_->erase(ack->tid);
+		return 0;
+	}
+	else{
+		map<unsigned int, char*>::iterator  iter = add_user_req_->find(ack->tid);
+		if(iter != add_user_req_->end())
+		{
+			CommonLogger::instance().log_info("[%s %d] deal_recurrent_regnot: tid %u found",__FILE__,__LINE__,ack->tid);
+			ActivateMsg* recurrent_regnot = (ActivateMsg*)iter->second;
+			if(recurrent_regnot->do_locreq_flag)/*位置登记失败的时候要不要发送LOCREQ，此处是要*/
+			{
+				ReqMsg red_msg;
+				red_msg.msg_type = 1;
+				ActivateMsg *record = (ActivateMsg*)red_msg.msg;
+				record->tid = TidGenerator::instance().generator_tid();
+				record->mod_id = UsrAccConfig::instance().module_id();
+				memcpy(record->msisdn, recurrent_regnot->msisdn, sizeof(record->msisdn));
+				record->actived=1;
+				record->user_info = recurrent_regnot->user_info;
+				record->recurrent_regnot_flag=true;
+				record->do_locreq_flag=false;
+				info_mgr_->add_tid_msisdn(record->tid, record->msisdn);
+				CommonLogger::instance().log_debug("[%s %d] send LOCREQ, record  tid %u mod_id %u",__FILE__,__LINE__,record->tid, record->mod_id);
+
+				app_req_queue_->insert_record((char*)&red_msg, sizeof(ReqMsg));
+				app_req_queue_->advance_widx();
+			}
+			else{
+				CommonLogger::instance().log_info("[%s %d] deal_recurrent_regnot: SERVLOGIC_ACTIVATE_REQ return fail.  not send LOCREQ, tid %u return ok",__FILE__,__LINE__,ack->tid);
+				add_user_req_->erase(ack->tid);
+				return 0;
+			}
+		}
+
+	}
+}
 
 
 int AppReqServThread::send_data(int fd, char *buf, unsigned int send_size)

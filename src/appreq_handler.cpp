@@ -249,6 +249,19 @@ int AppReqHandler::deal_user_active(char *data)
 	memcpy(record->msisdn, re->mdn, sizeof(record->msisdn));
 	record->user_info = user;
 	info_mgr_->add_tid_msisdn(record->tid, record->msisdn);
+	
+	char *pmsg;
+	unsigned int len;
+	ActivateMsg active;
+	active.recurrent_regnot_flag=false;
+	active.do_locreq_flag=false;
+	
+	recurrent_regnot_queue_->insert_record((char*)&active, sizeof(ActivateMsg));
+	recurrent_regnot_queue_->advance_widx();
+	recurrent_regnot_queue_.get_front_record(pmsg,len);
+	
+	add_user_req_->insert(pair<unsigned int, char*>(active.tid, (char*)pmsg));
+	
 	CommonLogger::instance().log_debug("record  tid %u mod_id %u", record->tid, record->mod_id);
 
 	app_req_queue_->insert_record((char*)&red_msg, sizeof(ReqMsg));
@@ -444,6 +457,16 @@ void AppReqHandler::info_mgr(InfoMemMgr *p)
 void AppReqHandler::app_req_queue(MsgList *p)
 {
     app_req_queue_ = p;
+}
+
+void AppReqHandler::recurrent_regnot_queue(MsgList *p)
+{
+    recurrent_regnot_queue_= p;
+}
+
+void AppReqHandler::add_request_queue(map<unsigned int, char*> *p)
+{
+    add_user_req_= p;
 }
 
 

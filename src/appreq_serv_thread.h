@@ -44,7 +44,7 @@ class AppReqServThread : public CThread
 	public:
 		AppReqServThread();                             /* constructor */
 		~AppReqServThread();                            /* destructor       */
-		int init(InfoMemMgr *info_mem, MsgList *app_queue, MsgList *logic_queue);
+		int init(InfoMemMgr *info_mem, MsgList* app_queue, MsgList* logic_queue, MsgList* recurrent_regnot_queue, map<unsigned int, char*>* p_map_recurrent_regnot);
 		int open(void *args = 0);
 		int svc();
 		int loop_process();
@@ -62,6 +62,7 @@ class AppReqServThread : public CThread
 	private:
 		CollectionServer<AppReqHandler> collection_server_;
 		map<int, BaseCollectionHandler*> client_list_;
+		map<unsigned int, char*>* add_user_req_;
 		int efd_;
 		int mihao_fd_;//added by wangxx 20160811 因为发给我的ping 消息里面不带mdn,所以只好这样使用
 		struct epoll_event *events_;
@@ -71,6 +72,7 @@ class AppReqServThread : public CThread
 		InfoMemMgr *info_mgr_;
 		MsgList *app_req_queue_;
 		MsgList *logic_resp_queue_;
+		MsgList* recurrent_regnot_queue_;
 		unsigned int current_connection_count_;
 		unsigned int connection_count_limits_;
 		unsigned char bcd_buf_[256];
