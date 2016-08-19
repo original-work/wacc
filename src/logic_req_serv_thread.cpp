@@ -799,7 +799,7 @@ int LogicReqServThread::deal_recurrent_activate()
 		memset(body.esn,0,sizeof(body.esn));
 		body.tid=htonl(TidGenerator::instance().generator_tid());
 		body.mod_id=UsrAccConfig::instance().module_id();
-		CommonLogger::instance().log_debug("[%s %d] deal_recurrent_activate: k=%u imsi %s msisdn %s esn %s.", __FILE__,__LINE__,k,user->imsi,user->msisdn,user->esn);
+		//CommonLogger::instance().log_debug("[%s %d] deal_recurrent_activate: k=%u imsi %s msisdn %s esn %s.", __FILE__,__LINE__,k,user->imsi,user->msisdn,user->esn);
 		memcpy(body.imsi,user->imsi, strlen(user->imsi));
 		memcpy(body.msisdn,user->msisdn, strlen(user->msisdn));
 		memcpy(body.esn,user->esn, strlen(user->esn));
