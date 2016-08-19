@@ -785,7 +785,8 @@ int LogicReqServThread::deal_recurrent_activate()
 {
 	char send_buf[600] = {0};
 	unsigned int num=info_mgr_->active_usr_table_.get_used_num();
-	CommonLogger::instance().log_debug("[%s %d] deal_recurrent_activate: used_num=%u.", __FILE__,__LINE__,num);
+	CommonLogger::instance().log_debug("[%s %d] deal_recurrent_activate: 111111111111.", __FILE__,__LINE__);
+	//CommonLogger::instance().log_debug("[%s %d] deal_recurrent_activate: used_num=%u.", __FILE__,__LINE__,num);
 
 	for(unsigned int k=0; k<num; k++){
 		ActiveUser* user=(ActiveUser*)info_mgr_->active_usr_table_.get_specific_num_table(k);
@@ -799,6 +800,7 @@ int LogicReqServThread::deal_recurrent_activate()
 		memset(body.esn,0,sizeof(body.esn));
 		body.tid=htonl(TidGenerator::instance().generator_tid());
 		body.mod_id=UsrAccConfig::instance().module_id();
+		CommonLogger::instance().log_debug("[%s %d] deal_recurrent_activate: 2222222222222.", __FILE__,__LINE__);
 		//CommonLogger::instance().log_debug("[%s %d] deal_recurrent_activate: k=%u imsi %s msisdn %s esn %s.", __FILE__,__LINE__,k,user->imsi,user->msisdn,user->esn);
 		memcpy(body.imsi,user->imsi, strlen(user->imsi));
 		memcpy(body.msisdn,user->msisdn, strlen(user->msisdn));
