@@ -801,14 +801,12 @@ int LogicReqServThread::deal_recurrent_activate()
 		body.tid=htonl(TidGenerator::instance().generator_tid());
 		body.mod_id=UsrAccConfig::instance().module_id();
 		CommonLogger::instance().log_debug("deal_recurrent_activate: strlen(user->imsi) %u  strlen(user->msisdn) %u  strlen(user->esn) %u", strlen(user->imsi),strlen(user->msisdn),strlen(user->esn));
-		//CommonLogger::instance().log_debug("[%s %d] deal_recurrent_activate: k=%u imsi %s msisdn %s esn %s.", __FILE__,__LINE__,k,user->imsi,user->msisdn,user->esn);
+		CommonLogger::instance().log_debug("[%s %d] deal_recurrent_activate: k=%u imsi %s msisdn %s esn %s.", __FILE__,__LINE__,k,user->imsi,user->msisdn,user->esn);
 		memcpy(body.imsi,user->imsi, strlen(user->imsi));
 		memcpy(body.msisdn,user->msisdn, strlen(user->msisdn));
 		memcpy(body.esn,user->esn, strlen(user->esn));
-		CommonLogger::instance().log_debug("[%s %d] deal_recurrent_activate: 33333333333.", __FILE__,__LINE__);
 		memcpy((send_buf + sizeof(NIF_MSG_UNIT) - sizeof(unsigned char*)), (char*)&body, sizeof(PeriodData));
 		int send_len =  sizeof(NIF_MSG_UNIT) - sizeof(unsigned char*) + sizeof(PeriodData);
-		CommonLogger::instance().log_debug("[%s %d] deal_recurrent_activate: 44444444444.", __FILE__,__LINE__);
 		unsigned int n = client_list_.size();
 		unsigned int i = 0;
 
@@ -823,8 +821,8 @@ int LogicReqServThread::deal_recurrent_activate()
 				}
 				CommonLogger::instance().log_debug("deal_recurrent_activate: Send Active Msg to first connected socket(servicelogic modle), index=%u",i);
 				/* luchq add for test */
-				CommonLogger::instance().log_debug("[%s %d] deal_recurrent_activate: user msisdn %s  esn  %s  imsi  %s ",
-					__FILE__,__LINE__,user->msisdn, user->esn, user->imsi);
+				CommonLogger::instance().log_debug("[%s %d] deal_recurrent_activate: No.%u user, user msisdn %s  esn  %s  imsi  %s ",
+					__FILE__,__LINE__,k,user->msisdn,user->esn,user->imsi);
 				++i;
 				break;
 			}
