@@ -299,7 +299,7 @@ int LogicReqServThread::loop_process()
 
 int LogicReqServThread::deal_app_req_queue()
 {
-	char *pmsg;
+	char *pmsg=NULL;
 	unsigned int len;
 	char send_buf[3000] = {0};
 	CommonLogger::instance().log_info("Enter into LogicReqServThread deal_app_req_queue process");
@@ -817,7 +817,7 @@ int LogicReqServThread::deal_recurrent_activate()
 				{
 					client_list_[i].disconnect_to_server();
 				}
-				CommonLogger::instance().log_debug("deal_recurrent_activate: Send Active Msg to first connected socket(servicelogic modle), index=%u",i);
+				CommonLogger::instance().log_debug("deal_recurrent_activate: Send Active Msg to first connected socket(servicelogic modle), index=%u n=%u",i,n);
 				/* luchq add for test */
 				CommonLogger::instance().log_debug("[%s %d] deal_recurrent_activate: No.%u user, user msisdn %s  esn  %s  imsi  %s ",
 					__FILE__,__LINE__,k,user->msisdn,user->esn,user->imsi);
@@ -825,7 +825,7 @@ int LogicReqServThread::deal_recurrent_activate()
 				break;
 			}
 		}
-		char *pmsg;
+		char *pmsg=NULL;
 		unsigned int len;
 		ActivateMsg active;
 		
