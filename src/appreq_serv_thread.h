@@ -56,6 +56,7 @@ class AppReqServThread : public CThread
 		int stop();
 		int close_connection(int fd);
 		int close_all_connection();
+		int deal_recurrent_regnot_ack(AckMsg* ack, ActivateMsg* recurrent_regnot , ActiveUser* user);
 	protected:
 		BaseCollectionHandler* collection_handler(int fd);
 		bool StrToBCD(const char *Src,unsigned char *Des,int iDesLen);

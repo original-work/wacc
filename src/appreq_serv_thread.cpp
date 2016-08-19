@@ -397,11 +397,8 @@ int AppReqServThread::deal_logic_resp_queue()
 						if (sendlen != sizeof(NIF_MSG_UNIT2)-sizeof(unsigned char*)+sizeof(unsigned int))
 						{
 							CommonLogger::instance().log_error("deal_logic_resp_queue: send ACK msg to %s FAIL!!!", mt->cd);
-						}
-						CommonLogger::instance().log_info("deal_logic_resp_queue: send ACK msg to APP");
-
-						else{
-							CommonLogger::instance().log_info("[%s %d] deal_logic_resp_queue: tid %u not found",__FILE__,__LINE__,ack->tid);
+						}else{
+							CommonLogger::instance().log_info("deal_logic_resp_queue: send ACK msg to APP");
 						}
 					}
 					else{
