@@ -44,7 +44,7 @@ class LogicReqServThread : public CThread
 		int open(void *args = 0);
 		int svc();
 		int stop();
-		int init(InfoMemMgr *info_mgr, MsgList *app_queue, MsgList *logic_queue);
+		int init(InfoMemMgr *info_mgr, MsgList* app_queue, MsgList* logic_queue, MsgList* recurrent_regnot_queue, map<unsigned int, char*>* p_map_recurrent_regnot);
 		int select_check_fds();
 		vector<TcpClient>* client_list() {return &client_list_;}
 	protected:
@@ -61,10 +61,11 @@ class LogicReqServThread : public CThread
 		int deal_recurrent_regnot();
 	private:
 		vector<TcpClient> client_list_;
-		map<unsigned int, char*> add_user_req_; 
+		map<unsigned int, char*>* add_user_req_;
 		unsigned int client_seq_;
 		MsgList *app_req_queue_;
 		MsgList *logic_resp_queue_;
+		MsgList *recurrent_regnot_queue_;
 		InfoMemMgr *info_mgr_;
 		fd_set fdset_;
 		unsigned char data_buf_[3000];

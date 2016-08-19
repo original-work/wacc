@@ -61,19 +61,26 @@ int main(int argc, char *argv[])
 	logic_resp_queue.init(UsrAccConfig::instance().servlogic_req_queue_block_num(), 
 			UsrAccConfig::instance().servlogic_req_queue_block_size());
 
+	MsgList recurrent_regnot_queue;
+	recurrent_regnot_queue.init(UsrAccConfig::instance().recurrent_regnot_queue_block_num(), 
+			UsrAccConfig::instance().recurrent_regnot_queue_block_size());
+
+	map<unsigned int, char*> map_add_user_req;
+
+
 	InfoMemMgr info_mem_mgr;
 	info_mem_mgr.init();
 
 
 	LogicReqServThread logic_req_serv_thread;
-	logic_req_serv_thread.init(&info_mem_mgr, &app_req_queue, &logic_resp_queue);
+	logic_req_serv_thread.init(&info_mem_mgr, &app_req_queue, &logic_resp_queue, &recurrent_regnot_queue, &map_add_user_req);
 	TcpClientMgrThread tcp_client_mgr_thread;
 	tcp_client_mgr_thread.init(logic_req_serv_thread.client_list());
 	tcp_client_mgr_thread.open();
 	logic_req_serv_thread.open();
 
 	AppReqServThread app_req_serv_thread;
-	app_req_serv_thread.init(&info_mem_mgr, &app_req_queue, &logic_resp_queue);
+	app_req_serv_thread.init(&info_mem_mgr, &app_req_queue, &logic_resp_queue, &recurrent_regnot_queue, &map_add_user_req);
 	app_req_serv_thread.open();
 
 	// loop

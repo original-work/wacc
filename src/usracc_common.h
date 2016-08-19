@@ -195,6 +195,8 @@ typedef struct {
 	char esn[32];
 	unsigned char actived;	//0：表示新增激活用户 1：表示已存在激活用户
 	ActiveUser *user_info;	
+	char recurrent_regnot_flag;/*周期性位置登记falg*/
+	char do_locreq_flag;/*SERVLOGIC_ACTIVATE_REQ 收到失败响应消息的时候要不不要发送LOCREQ 消息给业务逻辑标志位*/
 } ActivateMsg ;
 
 //用户去激活消息结构
