@@ -271,6 +271,7 @@ int AppReqServThread::deal_logic_resp_queue()
 		switch (resp->msg_type)
 		{
 			case 4:	// MT
+			{
 				memset(send_buf,0,sizeof(send_buf));
                          	CommonLogger::instance().log_info("deal_logic_resp_queue: Deal MT msg, len=%d",len);
 				CommonLogger::instance().log_info("deal_logic_resp_queue: cd %s, tid %d", mt->cd,mt->tid);
@@ -309,7 +310,9 @@ int AppReqServThread::deal_logic_resp_queue()
 				else
 					CommonLogger::instance().log_info("deal_logic_resp_queue: Call find_num fail, user maybe not exist");
 				break;
+			}
 			case 5: //PING ACK
+			{
 				memset(send_buf,0,sizeof(send_buf));
 				ack = (AckMsg*)resp->msg;
 				CommonLogger::instance().log_info("deal_logic_resp_queue: PING ACK");
@@ -325,7 +328,9 @@ int AppReqServThread::deal_logic_resp_queue()
 				}
 				CommonLogger::instance().log_info("deal_logic_resp_queue: send PING msg to APP");
 				break;
+			}
 			case 1: // ACTIVATE ACK
+			{
 				memset(send_buf,0,sizeof(send_buf));
 				ack = (AckMsg*)resp->msg;
 				CommonLogger::instance().log_info("deal_logic_resp_queue: Deal ACTIVATE ACK msg, tid=%u", ack->tid);
@@ -372,8 +377,9 @@ int AppReqServThread::deal_logic_resp_queue()
 				}
 				info_mgr_->remove_tid_msisdn(ack->tid);
 				break;
-				
+			}
 			case 8:	// MO ACK
+			{
 				memset(send_buf,0,sizeof(send_buf));
 				ack = (AckMsg*)resp->msg;
 				msisdn = info_mgr_->find_msisdn_by_tid(ack->tid);
@@ -410,6 +416,7 @@ int AppReqServThread::deal_logic_resp_queue()
 					CommonLogger::instance().log_info("deal_logic_resp_queue: tid %u not found",ack->tid);
 				}
 				break;
+			}
 			default:
 				break;
 		}
