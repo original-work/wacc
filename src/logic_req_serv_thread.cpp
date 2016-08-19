@@ -257,6 +257,7 @@ int LogicReqServThread::loop_process()
 								case SERVLOGIC_ACTIVATE_REQ:
 									CommonLogger::instance().log_info("[%s %d] LogicReqServThread: Recv a ACTIVATE ACK  msg 0x%08x", __FILE__,__LINE__,ntohl(unit->invoke));
 									deal_addreq_ack(ntohl(unit->invoke), (data_buf_ + sizeof(NIF_MSG_UNIT) - sizeof(unsigned char*)), ntohl(unit->length));
+									break;
 								case SERVLOGIC_MO_REQ:
 									CommonLogger::instance().log_info("[%s %d] LogicReqServThread: Recv a MO ACK  msg 0x%08x", __FILE__,__LINE__,ntohl(unit->invoke));
 									deal_moreq_ack(ntohl(unit->invoke), (data_buf_ + sizeof(NIF_MSG_UNIT) - sizeof(unsigned char*)), ntohl(unit->length));
@@ -587,7 +588,7 @@ int LogicReqServThread::deal_locreq_ack(unsigned char *data, unsigned int len)
 	}
 	else{
 			char send_buf[3000] = {0};
-			CommonLogger::instance().log_debug("deal_locreq_ack: Deal ACTIVE MSG. tid=%u", ntohl(ack->tid));
+			CommonLogger::instance().log_debug("deal_locreq_ack: tid=%u", ntohl(ack->tid));
 			map<unsigned int, char*>::iterator  iter = add_user_req_->find(ntohl(ack->tid));
 			if(iter != add_user_req_->end())
 			{
