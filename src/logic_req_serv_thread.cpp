@@ -785,11 +785,11 @@ int LogicReqServThread::deal_recurrent_activate()
 {
 	char send_buf[600] = {0};
 	unsigned int num=info_mgr_->active_usr_table_.get_used_num();
-	CommonLogger::instance().log_debug("[%s %d] deal_recurrent_activate: 111111111111.", __FILE__,__LINE__);
-	//CommonLogger::instance().log_debug("[%s %d] deal_recurrent_activate: used_num=%u.", __FILE__,__LINE__,num);
+	CommonLogger::instance().log_debug("[%s %d] deal_recurrent_activate: used_num=%u.", __FILE__,__LINE__,num);
 
 	for(unsigned int k=0; k<num; k++){
 		ActiveUser* user=(ActiveUser*)info_mgr_->active_usr_table_.get_specific_num_table(k);
+		
 		NIF_MSG_UNIT *unit = (NIF_MSG_UNIT*)send_buf;
 		unit->dialog = htonl(BEGIN);
 		unit->invoke = htonl(SERVLOGIC_ACTIVATE_REQ);
