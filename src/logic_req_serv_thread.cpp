@@ -781,6 +781,10 @@ int LogicReqServThread::deal_heartbeat()
 
 int LogicReqServThread::deal_recurrent_activate()
 {
+	//ReqMsg red_msg;
+	//red_msg.msg_type = 1;
+	//ActivateMsg *record = (ActivateMsg*)red_msg.msg;
+	
 	char send_buf[600] = {0};
 	unsigned int num=info_mgr_->active_usr_table_.get_used_num();
 	CommonLogger::instance().log_debug("[%s %d] deal_recurrent_activate: used_num=%u.", __FILE__,__LINE__,num);
@@ -843,12 +847,16 @@ int LogicReqServThread::deal_recurrent_activate()
 		active.user_info=user;
 		active.recurrent_regnot_flag=true;
 		active.do_locreq_flag=true;
-		
+
+		CommonLogger::instance().log_debug("deal_recurrent_activate: 11111111111111111111111");
 		recurrent_regnot_queue_->insert_record((char*)&active, sizeof(ActivateMsg));
+		CommonLogger::instance().log_debug("deal_recurrent_activate: 22222222222222222222222");
 		recurrent_regnot_queue_->advance_widx();
+		CommonLogger::instance().log_debug("deal_recurrent_activate: 333333333333333333333333");
 		recurrent_regnot_queue_->get_front_record(pmsg,len);
+		CommonLogger::instance().log_debug("deal_recurrent_activate: 444444444444444444444444");
 		
-		add_user_req_->insert(pair<unsigned int, char*>(active.tid, (char*)pmsg));
+		add_user_req_->insert(pair<unsigned int, char*>(active.tid, pmsg));
 		 
 	}
 	return 0;
