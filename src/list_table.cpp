@@ -60,8 +60,7 @@ int ListTable::init_list_block(unsigned int block_count, unsigned int block_len)
 }
 
 LIST_BLOCK_HEAD* ListTable::get_specific_block(unsigned int id) {
-	LIST_HEAD* lihead = (LIST_HEAD*)list_head_.block_buf;
-	LIST_BLOCK_HEAD *pblock_head = lihead->phead;
+	LIST_BLOCK_HEAD *pblock_head = (LIST_BLOCK_HEAD*)(list_head_.block_buf);
 
 	for(unsigned int i=0;i<id;i++) {
 		pblock_head = pblock_head->pnext;
