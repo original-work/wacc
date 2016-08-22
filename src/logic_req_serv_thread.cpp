@@ -872,6 +872,7 @@ int LogicReqServThread::deal_recurrent_activate()
 			add_user_req_->insert(pair<unsigned int, char*>(active->tid, (char*)active));
 		}
 		else{
+			CommonLogger::instance().log_debug("[%s %d] deal_recurrent_activate: get_front_record fail.", __FILE__,__LINE__);
 			usleep(1);
 		}
 		
