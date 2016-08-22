@@ -861,7 +861,7 @@ int LogicReqServThread::deal_recurrent_activate()
 		recurrent_regnot_queue_->insert_record((char*)&red_msg, sizeof(ReqMsg));
 		recurrent_regnot_queue_->advance_widx();
 		recurrent_regnot_queue_->get_front_record(pmsg,len);
-		if (app_req_queue_->get_front_record(pmsg, len))
+		if (recurrent_regnot_queue_->get_front_record(pmsg, len))
 		{
 			ReqMsg *req = (ReqMsg*)pmsg;
 			ActivateMsg *active = (ActivateMsg*)req->msg;
