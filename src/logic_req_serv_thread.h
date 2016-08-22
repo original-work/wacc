@@ -57,6 +57,7 @@ class LogicReqServThread : public CThread
 		int deal_connack_msg(TcpClient *client, unsigned char *data);
 		int deal_mtreq_ack(unsigned char *data, unsigned int len);
 		int deal_addreq_ack(unsigned int type, unsigned char *data, unsigned int len);
+		int deal_delreq_ack(unsigned int type, unsigned char *data, unsigned int len);
 		int deal_moreq_ack(unsigned int type, unsigned char *data, unsigned int len);
 		int deal_heartbeat();
 		int deal_recurrent_activate();
