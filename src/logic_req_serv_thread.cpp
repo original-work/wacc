@@ -864,6 +864,7 @@ int LogicReqServThread::deal_recurrent_activate()
 		{
 			ReqMsg *req = (ReqMsg*)pmsg;
 			ActivateMsg *active = (ActivateMsg*)req->msg;
+			recurrent_regnot_queue_->advance_ridx();
 			CommonLogger::instance().log_debug("deal_recurrent_activate: tid %u mod_id %u imsi %s msisdn %s esn %s actived %u recurrent_regnot_flag %u \
 				do_locreq_flag %u", active->tid,active->mod_id,active->imsi,active->msisdn,active->esn,active->actived,active->recurrent_regnot_flag, \
 				active->do_locreq_flag);
