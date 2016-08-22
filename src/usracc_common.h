@@ -162,7 +162,7 @@ typedef struct {
 
 typedef struct {
     unsigned char msg_type;    // 1:ADD    2:DEL   3:MO   4:MT   5: PING    6: NOTIFY_ACTIVE    9: MT  ACK；
-    unsigned char msg[3000];    // 消息
+    unsigned char msg[600];    // 消息
 } ReqMsg;
 
 typedef struct {
