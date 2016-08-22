@@ -88,14 +88,13 @@ int AppReqHandler::handle_recv()
 
     offset_ = 0;
     while (offset_<buf_length) {
-        CommonLogger::instance().log_info("3ret=%u", ret);
         CommonLogger::instance().log_info("offset_=%u", offset_);
 
         process(recv_buf_+offset_);
         offset_ += (sizeof(NIF_MSG_UNIT2) - sizeof(unsigned char*));
         offset_ += msg_len;
 
-        if ((buf_length-offset_)<=(sizeof(NIF_MSG_UNIT2)-sizeof(unsigned char*))) {
+	 if ((buf_length-offset_)<(sizeof(NIF_MSG_UNIT2)-sizeof(unsigned char*))) {//modified by wangxx 20160822
             break;
         }
 
