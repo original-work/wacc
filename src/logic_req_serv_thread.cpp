@@ -861,14 +861,19 @@ int LogicReqServThread::deal_recurrent_activate()
 		recurrent_regnot_queue_->insert_record((char*)&red_msg, sizeof(ReqMsg));
 		recurrent_regnot_queue_->advance_widx();
 		recurrent_regnot_queue_->get_front_record(pmsg,len);
-
-		ReqMsg *req = (ReqMsg*)pmsg;
-		ActivateMsg *active = (ActivateMsg*)req->msg;
-		CommonLogger::instance().log_debug("deal_recurrent_activate: tid %u mod_id %u imsi %s msisdn %s esn %s actived %u recurrent_regnot_flag %u \
-			do_locreq_flag %u", active->tid,active->mod_id,active->imsi,active->msisdn,active->esn,active->actived,active->recurrent_regnot_flag, \
-			active->do_locreq_flag);
-		
-		add_user_req_->insert(pair<unsigned int, char*>(active->tid, (char*)active));
+		if (app_req_queue_->get_front_record(pmsg, len))
+		{
+			ReqMsg *req = (ReqMsg*)pmsg;
+			ActivateMsg *active = (ActivateMsg*)req->msg;
+			CommonLogger::instance().log_debug("deal_recurrent_activate: tid %u mod_id %u imsi %s msisdn %s esn %s actived %u recurrent_regnot_flag %u \
+				do_locreq_flag %u", active->tid,active->mod_id,active->imsi,active->msisdn,active->esn,active->actived,active->recurrent_regnot_flag, \
+				active->do_locreq_flag);
+			
+			add_user_req_->insert(pair<unsigned int, char*>(active->tid, (char*)active));
+		}
+		else{
+			usleep(1);
+		}
 		
 	}
 	return 0;
