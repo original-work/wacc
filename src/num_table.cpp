@@ -71,12 +71,6 @@ LIST_BLOCK_HEAD* NumTable::add_num(char* number,
 	//获取一个空的节点
 	LIST_BLOCK_HEAD* pblock = list_table_.get_block();
 
-#if 0
-	if (((int)number[0])==19) {
-		CommonLogger::instance().log_debug("%d,%d,%d,%d,%d,%d,%d,%d", ((int)number[0]),((int)number[1]),((int)number[2]),((int)number[3]),((int)number[4]),((int)number[5]),((int)number[6]),((int)number[7]));
-	}
-#endif
-
 	if (pblock) {
 		if (pindex_table_->add_number(index_table_id_, number, number_len, pblock) < 0) {
 			list_table_.free_block((LIST_BLOCK_HEAD*)pblock);
