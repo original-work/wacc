@@ -800,17 +800,17 @@ int LogicReqServThread::deal_recurrent_activate()
 		body.mod_id=UsrAccConfig::instance().module_id();
 		CommonLogger::instance().log_debug("deal_recurrent_activate: strlen(user->imsi) %u  strlen(user->msisdn) %u  strlen(user->esn) %u", strlen(user->imsi),strlen(user->msisdn),strlen(user->esn));
 		CommonLogger::instance().log_debug("[%s %d] deal_recurrent_activate: k=%u imsi %s msisdn %s esn %s.", __FILE__,__LINE__,k,user->imsi,user->msisdn,user->esn);
-		if(0<strlen(user->imsi)<sizeof(user->imsi)){
+		if(0<strlen(user->imsi) && strlen(user->imsi)<sizeof(user->imsi)){
 			memcpy(body.imsi,user->imsi, strlen(user->imsi));
 		}else{
 			CommonLogger::instance().log_debug("[%s %d] deal_recurrent_activate: strlen(user->imsi) %s out of range .", __FILE__,__LINE__,k,strlen(user->imsi));
 		}
-		if(0<strlen(user->msisdn)<sizeof(user->msisdn)){
+		if(0<strlen(user->msisdn) && strlen(user->msisdn)<sizeof(user->msisdn)){
 			memcpy(body.msisdn,user->msisdn, strlen(user->msisdn));
 		}else{
 			CommonLogger::instance().log_debug("[%s %d] deal_recurrent_activate: strlen(user->msisdn) %s out of range .", __FILE__,__LINE__,k,strlen(user->msisdn));
 		}
-		if(0<strlen(user->esn)<sizeof(user->esn)){
+		if(0<strlen(user->esn) && strlen(user->esn)<sizeof(user->esn)){
 			memcpy(body.esn,user->esn, strlen(user->esn));
 		}else{
 			CommonLogger::instance().log_debug("[%s %d] deal_recurrent_activate: strlen(user->esn) %s out of range .", __FILE__,__LINE__,k,strlen(user->esn));

@@ -242,8 +242,8 @@ int AppReqHandler::deal_add_user(char *data)
 		user->reconnect_cnt_list = (unsigned int*)(((char*)user)+sizeof(ActiveUser));
 		memset(user->reconnect_cnt_list, 0, user->conn_cnt*sizeof(unsigned int));
 		memcpy(user->msisdn, re->mdn, strlen(re->mdn));
-		memcpy(user->imsi,0,sizeof(user->imsi));
-		memcpy(user->esn,0,sizeof(user->esn));
+		memset(user->imsi,0,sizeof(user->imsi));
+		memset(user->esn,0,sizeof(user->esn));
 	}
 	
 	record->tid = generate_tid();
