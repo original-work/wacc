@@ -803,17 +803,17 @@ int LogicReqServThread::deal_recurrent_activate()
 		if(0<strlen(user->imsi) && strlen(user->imsi)<sizeof(user->imsi)){
 			memcpy(body.imsi,user->imsi, strlen(user->imsi));
 		}else{
-			CommonLogger::instance().log_debug("[%s %d] deal_recurrent_activate: strlen(user->imsi) %s out of range .", __FILE__,__LINE__,k,strlen(user->imsi));
+			CommonLogger::instance().log_debug("[%s %d] deal_recurrent_activate: strlen(user->imsi) %s out of range .", __FILE__,__LINE__,strlen(user->imsi));
 		}
 		if(0<strlen(user->msisdn) && strlen(user->msisdn)<sizeof(user->msisdn)){
 			memcpy(body.msisdn,user->msisdn, strlen(user->msisdn));
 		}else{
-			CommonLogger::instance().log_debug("[%s %d] deal_recurrent_activate: strlen(user->msisdn) %s out of range .", __FILE__,__LINE__,k,strlen(user->msisdn));
+			CommonLogger::instance().log_debug("[%s %d] deal_recurrent_activate: strlen(user->msisdn) %s out of range .", __FILE__,__LINE__,strlen(user->msisdn));
 		}
 		if(0<strlen(user->esn) && strlen(user->esn)<sizeof(user->esn)){
 			memcpy(body.esn,user->esn, strlen(user->esn));
 		}else{
-			CommonLogger::instance().log_debug("[%s %d] deal_recurrent_activate: strlen(user->esn) %s out of range .", __FILE__,__LINE__,k,strlen(user->esn));
+			CommonLogger::instance().log_debug("[%s %d] deal_recurrent_activate: strlen(user->esn) %s out of range .", __FILE__,__LINE__,strlen(user->esn));
 		}
 		memcpy((send_buf + sizeof(NIF_MSG_UNIT) - sizeof(unsigned char*)), (char*)&body, sizeof(PeriodData));
 		int send_len =  sizeof(NIF_MSG_UNIT) - sizeof(unsigned char*) + sizeof(PeriodData);
