@@ -263,8 +263,11 @@ int LogicReqServThread::loop_process()
 									deal_moreq_ack(ntohl(unit->invoke), (data_buf_ + sizeof(NIF_MSG_UNIT) - sizeof(unsigned char*)), ntohl(unit->length));
 									break;
 								case SERVLOGIC_USER_SYNC_REQ:
-								case SERVLOGIC_DEACTIVATE_REQ:
 									CommonLogger::instance().log_info("[%s %d] LogicReqServThread: Recv a ACK  msg 0x%08x", __FILE__,__LINE__,ntohl(unit->invoke));
+									break;
+								case SERVLOGIC_DEACTIVATE_REQ:
+									CommonLogger::instance().log_info("[%s %d] LogicReqServThread: Recv a DEACTIVATE ACK  msg 0x%08x", __FILE__,__LINE__,ntohl(unit->invoke));
+									deal_delreq_ack(ntohl(unit->invoke), (data_buf_ + sizeof(NIF_MSG_UNIT) - sizeof(unsigned char*)), ntohl(unit->length));
 									break;
 								case SERVLOGIC_MH_MT_REQ:
 									CommonLogger::instance().log_info("LogicReqServThread: Recv a MT req msg");
@@ -731,6 +734,23 @@ int LogicReqServThread::deal_addreq_ack(unsigned int type, unsigned char *data, 
 
 	ack->msg_type = ADD_USER;
 	CommonLogger::instance().log_debug("deal_ack_req: ADD_USER  result is %u tid is %u",ack->result,ack->tid);
+
+	logic_resp_queue_->insert_record((char*)&resp, sizeof(RespMsg));
+	logic_resp_queue_->advance_widx();
+	return 0;
+}		/* -----  end of method LogicReqServThread::deal_ack_req  ----- */
+
+
+int LogicReqServThread::deal_delreq_ack(unsigned int type, unsigned char *data, unsigned int len)
+{
+	RespMsg resp;
+	resp.msg_type = 2;
+	AckMsg *ack = (AckMsg*)resp.msg;
+	ack->result = ntohl(*((unsigned int*)data));
+	ack->tid = ntohl(*((unsigned int*)(data+sizeof(unsigned int))));
+
+	ack->msg_type = DEL_USER;
+	CommonLogger::instance().log_debug("deal_ack_req: DEL_USER  result is %u tid is %u",ack->result,ack->tid);
 
 	logic_resp_queue_->insert_record((char*)&resp, sizeof(RespMsg));
 	logic_resp_queue_->advance_widx();

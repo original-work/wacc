@@ -329,6 +329,26 @@ int AppReqServThread::deal_logic_resp_queue()
 				CommonLogger::instance().log_info("deal_logic_resp_queue: send PING msg to APP");
 				break;
 			}
+			case 2: //DEACTIVATE ACK
+			{
+				memset(send_buf,0,sizeof(send_buf));
+				ack = (AckMsg*)resp->msg;
+				CommonLogger::instance().log_info("deal_logic_resp_queue: DEACTIVATE ACK");
+				unit = (NIF_MSG_UNIT2*)send_buf;
+				unit->head = htonl(0x1a2b3c4d);
+				unit->dialog = htonl(END);
+				unit->invoke = htonl(ack->msg_type);
+				unit->length = htonl(sizeof(unsigned int));
+				*((unsigned int*)(send_buf + sizeof(NIF_MSG_UNIT2) - sizeof(unsigned char*))) = htonl(ack->result);
+				
+				sendlen = send_data(mihao_fd_, send_buf, sizeof(NIF_MSG_UNIT2)-sizeof(unsigned char*)+sizeof(unsigned int));
+				if (sendlen != sizeof(NIF_MSG_UNIT2)-sizeof(unsigned char*)+sizeof(unsigned int))
+				{
+					CommonLogger::instance().log_error("deal_logic_resp_queue: send DEACTIVATE msg to %s FAIL!!!", mt->cd);
+				}
+				CommonLogger::instance().log_info("deal_logic_resp_queue: send DEACTIVATE msg to APP");
+				break;
+			}
 			case 1: // ACTIVATE ACK
 			{
 				memset(send_buf,0,sizeof(send_buf));
