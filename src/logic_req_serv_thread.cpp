@@ -800,9 +800,21 @@ int LogicReqServThread::deal_recurrent_activate()
 		body.mod_id=UsrAccConfig::instance().module_id();
 		CommonLogger::instance().log_debug("deal_recurrent_activate: strlen(user->imsi) %u  strlen(user->msisdn) %u  strlen(user->esn) %u", strlen(user->imsi),strlen(user->msisdn),strlen(user->esn));
 		CommonLogger::instance().log_debug("[%s %d] deal_recurrent_activate: k=%u imsi %s msisdn %s esn %s.", __FILE__,__LINE__,k,user->imsi,user->msisdn,user->esn);
-		memcpy(body.imsi,user->imsi, strlen(user->imsi));
-		memcpy(body.msisdn,user->msisdn, strlen(user->msisdn));
-		memcpy(body.esn,user->esn, strlen(user->esn));
+		if(0<strlen(user->imsi)<sizeof(user->imsi)){
+			memcpy(body.imsi,user->imsi, strlen(user->imsi));
+		}else{
+			CommonLogger::instance().log_debug("[%s %d] deal_recurrent_activate: strlen(user->imsi) %s out of range .", __FILE__,__LINE__,k,strlen(user->imsi));
+		}
+		if(0<strlen(user->msisdn)<sizeof(user->msisdn)){
+			memcpy(body.msisdn,user->msisdn, strlen(user->msisdn));
+		}else{
+			CommonLogger::instance().log_debug("[%s %d] deal_recurrent_activate: strlen(user->msisdn) %s out of range .", __FILE__,__LINE__,k,strlen(user->msisdn));
+		}
+		if(0<strlen(user->esn)<sizeof(user->esn)){
+			memcpy(body.esn,user->esn, strlen(user->esn));
+		}else{
+			CommonLogger::instance().log_debug("[%s %d] deal_recurrent_activate: strlen(user->esn) %s out of range .", __FILE__,__LINE__,k,strlen(user->esn));
+		}
 		memcpy((send_buf + sizeof(NIF_MSG_UNIT) - sizeof(unsigned char*)), (char*)&body, sizeof(PeriodData));
 		int send_len =  sizeof(NIF_MSG_UNIT) - sizeof(unsigned char*) + sizeof(PeriodData);
 		unsigned int n = client_list_.size();
@@ -849,7 +861,6 @@ int LogicReqServThread::deal_recurrent_activate()
 		recurrent_regnot_queue_->insert_record((char*)&red_msg, sizeof(ReqMsg));
 		recurrent_regnot_queue_->advance_widx();
 		recurrent_regnot_queue_->get_front_record(pmsg,len);
-		CommonLogger::instance().log_debug("deal_recurrent_activate: 1111111111111111111");
 
 		ReqMsg *req = (ReqMsg*)pmsg;
 		ActivateMsg *active = (ActivateMsg*)req->msg;
@@ -859,7 +870,6 @@ int LogicReqServThread::deal_recurrent_activate()
 		
 		add_user_req_->insert(pair<unsigned int, char*>(active->tid, (char*)active));
 		
-		CommonLogger::instance().log_debug("deal_recurrent_activate: 2222222222222222222");
 	}
 	return 0;
 }
