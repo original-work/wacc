@@ -293,38 +293,21 @@ int AppReqHandler::deal_del_user(char *data)
 	if (user != NULL)
 	{
 		info_mgr_->active_usr_table_.remove_num((char*)bcd_buf_, strlen(re->mdn));
-
 		memcpy(record->msisdn, re->mdn, strlen(re->mdn));
-
 		CommonLogger::instance().log_debug("deal_del_user: mdn:%s\n",record->msisdn);
 
 		app_req_queue_->insert_record((char*)&red_msg, sizeof(ReqMsg));
 		app_req_queue_->advance_widx();
+		return 0;
 
-		map<int, BaseCollectionHandler*>::iterator iter = client_list_->find(user->fd);
-		if (iter != client_list_->end())
-		{
-			if (strcmp(msisdn_, ((AppReqHandler*)iter->second)->msisdn()) == 0)
-			{
-				//CommonLogger::instance().log_debug("deal deactive ### %d, %d", user->fd, this->sockfd());
-				unsigned int *result = (unsigned int *)(send_buf_ + (sizeof(NIF_MSG_UNIT2) - sizeof(unsigned char*)));
-				*result = htonl(0);
-				sendn(send_buf_, sizeof(NIF_MSG_UNIT2) - sizeof(unsigned char*) + sizeof(unsigned int));
-				close(iter->first);
-				delete iter->second;
-				client_list_->erase(iter);
+	}else{
 
-				return 0;
-			}
-		}
+		unsigned int *result = (unsigned int *)(send_buf_ + (sizeof(NIF_MSG_UNIT2) - sizeof(unsigned char*)));
+		*result = htonl(12);
+		sendn(send_buf_, sizeof(NIF_MSG_UNIT2) - sizeof(unsigned char*) + sizeof(unsigned int));
 
+		return -1;
 	}
-
-	unsigned int *result = (unsigned int *)(send_buf_ + (sizeof(NIF_MSG_UNIT2) - sizeof(unsigned char*)));
-	*result = htonl(11);
-	sendn(send_buf_, sizeof(NIF_MSG_UNIT2) - sizeof(unsigned char*) + sizeof(unsigned int));
-
-	return -1;
 }		/* -----  end of method AppReqHandler::deal_del_user  ----- */
 
 
@@ -416,21 +399,6 @@ unsigned int AppReqHandler::generate_tid()
 {
     return TidGenerator::instance().generator_tid();
 }		/* -----  end of method AppReqHandler::generate_tid  ----- */
-
-int AppReqHandler::logout_notification(int fd)
-{
-	char send_buf[256];
-	NIF_MSG_UNIT2 *unit = (NIF_MSG_UNIT2*)send_buf;
-	unit->invoke = htonl(NOTIFY_ACTIVE);
-	unit->length = 0;
-	unit->dialog = htonl(BEGIN);
-	if (-1 == sendn(send_buf, sizeof(NIF_MSG_UNIT2)-sizeof(unsigned char*)))
-	{
-		CommonLogger::instance().log_info("logout_notification: call sendn fail!");
-	}
-
-    	return 0;
-}		/* -----  end of method AppReqHandler::logout_notification  ----- */
 
 
 void AppReqHandler::info_mgr(InfoMemMgr *p)

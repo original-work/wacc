@@ -45,7 +45,6 @@ class AppReqHandler : public BaseCollectionHandler
 	int deal_MO(char *data);
 	int deal_mt_ack(char *data);
 	unsigned int generate_tid();
-	int logout_notification(int fd);
 
 	void info_mgr(InfoMemMgr *p);
 	void app_req_queue(MsgList *p);
