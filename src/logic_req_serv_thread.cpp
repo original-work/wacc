@@ -749,11 +749,9 @@ int LogicReqServThread::deal_delreq_ack(unsigned int type, unsigned char *data, 
 	ack->result = ntohl(*((unsigned int*)data));
 	ack->tid = ntohl(*((unsigned int*)(data+sizeof(unsigned int))));
 
-	ack->msg_type = DEL_USER;
 	CommonLogger::instance().log_debug("deal_ack_req: DEL_USER  result is %u tid is %u",ack->result,ack->tid);
 
-	logic_resp_queue_->insert_record((char*)&resp, sizeof(RespMsg));
-	logic_resp_queue_->advance_widx();
+	/*什么都不做，我是故意的，就是什么都不做*/
 	return 0;
 }		/* -----  end of method LogicReqServThread::deal_ack_req  ----- */
 

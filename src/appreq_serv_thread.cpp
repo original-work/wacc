@@ -329,26 +329,6 @@ int AppReqServThread::deal_logic_resp_queue()
 				CommonLogger::instance().log_info("deal_logic_resp_queue: send PING msg to APP");
 				break;
 			}
-			case 2: //DEACTIVATE ACK
-			{
-				memset(send_buf,0,sizeof(send_buf));
-				ack = (AckMsg*)resp->msg;
-				CommonLogger::instance().log_info("deal_logic_resp_queue: DEACTIVATE ACK");
-				unit = (NIF_MSG_UNIT2*)send_buf;
-				unit->head = htonl(0x1a2b3c4d);
-				unit->dialog = htonl(END);
-				unit->invoke = htonl(ack->msg_type);
-				unit->length = htonl(sizeof(unsigned int));
-				*((unsigned int*)(send_buf + sizeof(NIF_MSG_UNIT2) - sizeof(unsigned char*))) = htonl(ack->result);
-				
-				sendlen = send_data(mihao_fd_, send_buf, sizeof(NIF_MSG_UNIT2)-sizeof(unsigned char*)+sizeof(unsigned int));
-				if (sendlen != sizeof(NIF_MSG_UNIT2)-sizeof(unsigned char*)+sizeof(unsigned int))
-				{
-					CommonLogger::instance().log_error("deal_logic_resp_queue: send DEACTIVATE msg to %s FAIL!!!", mt->cd);
-				}
-				CommonLogger::instance().log_info("deal_logic_resp_queue: send DEACTIVATE msg to APP");
-				break;
-			}
 			case 1: // ACTIVATE ACK
 			{
 				memset(send_buf,0,sizeof(send_buf));
@@ -370,7 +350,7 @@ int AppReqServThread::deal_logic_resp_queue()
 						unit->head = htonl(0x1a2b3c4d);
 						unit->dialog = htonl(END);
 						unit->invoke = htonl(ack->msg_type);
-
+						unit->seq = htonl(regnot->seq);
 						
 						if(regnot->recurrent_regnot_flag){/*如果是周期性位置更新*/
 							CommonLogger::instance().log_info("[%s %d] deal_logic_resp_queue: deal_recurrent_regnot_ack",__FILE__,__LINE__);
@@ -418,6 +398,8 @@ int AppReqServThread::deal_logic_resp_queue()
 						unit->dialog = htonl(END);
 						unit->invoke = htonl(ack->msg_type);
 						unit->length = htonl(sizeof(unsigned int));
+						unit->seq = info_mgr_->find_seq_by_tid(ack->tid);
+						CommonLogger::instance().log_info("deal_logic_resp_queue: seq %u", unit->seq);
 						*((unsigned int*)(send_buf + sizeof(NIF_MSG_UNIT2) - sizeof(unsigned char*))) = htonl(ack->result);
 						sendlen = send_data(user->fd, send_buf, sizeof(NIF_MSG_UNIT2)-sizeof(unsigned char*)+sizeof(unsigned int));
 						if (sendlen != sizeof(NIF_MSG_UNIT2)-sizeof(unsigned char*)+sizeof(unsigned int))
@@ -429,12 +411,13 @@ int AppReqServThread::deal_logic_resp_queue()
 					}
 					else{
 						CommonLogger::instance().log_info("deal_logic_resp_queue: Call find_num fail");
-                              		info_mgr_->remove_tid_msisdn(ack->tid);
 					}
 				}
 				else{
 					CommonLogger::instance().log_info("deal_logic_resp_queue: tid %u not found",ack->tid);
 				}
+				info_mgr_->remove_tid_msisdn(ack->tid);
+				info_mgr_->remove_tid_seq(ack->tid);
 				break;
 			}
 			default:

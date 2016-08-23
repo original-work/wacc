@@ -38,12 +38,17 @@ public:
 	int add_tid_msisdn(int tid, string msisdn);
 	int remove_tid_msisdn(int tid);
 	string find_msisdn_by_tid(int tid);
+	int add_tid_seq(unsigned int tid, unsigned int seq);
+	int remove_tid_seq(unsigned int tid);
+	string find_seq_by_tid(int tid);
+	
 public:
 	NumTable active_usr_table_;
 	NumIndexTable index_;
 	LogicConnManager logic_conns_mgr_;
 private:
 	map<int, string> tid_msisdn_list_;
+	map<unsigned int, unsigned int> tid_seq_list_;
 };
 
 #endif  //_INFOMEMMGR_H

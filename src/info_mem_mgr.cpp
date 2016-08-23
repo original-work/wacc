@@ -77,3 +77,33 @@ string InfoMemMgr::find_msisdn_by_tid(int tid)
 	return "";
 }		/* -----  end of method InfoMemMgr::find_msisdn_by_tid  ----- */
 
+
+
+
+int InfoMemMgr::add_tid_seq(unsigned int tid, unsigned int seq)
+{
+	map<int, string>::iterator itr = tid_seq_list_.find(tid);
+	if (itr != tid_seq_list_.end())
+	{
+		tid_seq_list_.erase(itr);
+	}
+	tid_seq_list_.insert(pair<unsigned int, unsigned int>(tid, seq));
+	return 0;
+}
+
+int InfoMemMgr::remove_tid_seq(unsigned int tid)
+{
+	tid_seq_list_.erase(tid);
+	return 0;
+}
+
+string InfoMemMgr::find_seq_by_tid(int tid)
+{
+	map<int, string>::iterator itr = tid_seq_list_.find(tid);
+	if (itr != tid_seq_list_.end())
+	{
+		return itr->second;
+	}
+	return "";
+}
+

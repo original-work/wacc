@@ -249,6 +249,7 @@ int AppReqHandler::deal_add_user(char *data)
 	record->mod_id = UsrAccConfig::instance().module_id();
 	memcpy(record->msisdn, re->mdn, sizeof(record->msisdn));
 	record->user_info = user;
+	record->seq = ntohl(header->seq);
 	
 	CommonLogger::instance().log_debug("record  tid %u mod_id %u", record->tid, record->mod_id);
 
@@ -298,16 +299,14 @@ int AppReqHandler::deal_del_user(char *data)
 
 		app_req_queue_->insert_record((char*)&red_msg, sizeof(ReqMsg));
 		app_req_queue_->advance_widx();
-		return 0;
 
-	}else{
-
-		unsigned int *result = (unsigned int *)(send_buf_ + (sizeof(NIF_MSG_UNIT2) - sizeof(unsigned char*)));
-		*result = htonl(12);
-		sendn(send_buf_, sizeof(NIF_MSG_UNIT2) - sizeof(unsigned char*) + sizeof(unsigned int));
-
-		return -1;
 	}
+	
+	unsigned int *result = (unsigned int *)(send_buf_ + (sizeof(NIF_MSG_UNIT2) - sizeof(unsigned char*)));
+	*result = htonl(0);
+	sendn(send_buf_, sizeof(NIF_MSG_UNIT2) - sizeof(unsigned char*) + sizeof(unsigned int));
+
+	return 0;
 }		/* -----  end of method AppReqHandler::deal_del_user  ----- */
 
 
@@ -318,6 +317,7 @@ int AppReqHandler::deal_MO(char *data)
 	memset((char*)&red_msg,0,sizeof(red_msg));
 	red_msg.msg_type = 3;
 	SMSData *record = (SMSData*)red_msg.msg;
+	NIF_MSG_UNIT2 *header = (NIF_MSG_UNIT2*)data;
 
 	CommonLogger::instance().log_info("AppReqHandler: deal MO Msg");
 
@@ -343,12 +343,12 @@ int AppReqHandler::deal_MO(char *data)
 		record->content_len = ntohl(re->content_len);
 		memcpy(record->sms_content, re->content, record->content_len);
 
-		CommonLogger::instance().log_info("deal_MO: cd:%s",re->cd);
-		CommonLogger::instance().log_info("deal_MO: re cg len:%d, num:%s",strlen(re->cg),re->cg);
+		CommonLogger::instance().log_info("deal_MO: cd:%s cg :%s seq:%u",re->cd, re->cg, ntohl(header->seq));
 		CommonLogger::instance().log_info("sms len:%d,content:", ntohl(re->content_len));
 		tools::print_hex((unsigned char*)re->content,strlen(re->content));/* luchq add 2015-06-18 */		
 		
 		info_mgr_->add_tid_msisdn(record->tid, record->cg);
+		info_mgr_->add_tid_seq(record->tid, ntohl(header->seq));
 		CommonLogger::instance().log_debug("record  tid %u", record->tid);
 		app_req_queue_->insert_record((char*)&red_msg, sizeof(ReqMsg));
 		app_req_queue_->advance_widx();
