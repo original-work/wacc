@@ -97,13 +97,13 @@ int InfoMemMgr::remove_tid_seq(unsigned int tid)
 	return 0;
 }
 
-string InfoMemMgr::find_seq_by_tid(int tid)
+unsigned int InfoMemMgr::find_seq_by_tid(int tid)
 {
 	map<int, string>::iterator itr = tid_seq_list_.find(tid);
 	if (itr != tid_seq_list_.end())
 	{
 		return itr->second;
 	}
-	return "";
+	return 0;
 }
 
