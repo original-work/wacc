@@ -28,7 +28,7 @@
 #include <sys/epoll.h>
 #include "info_mem_mgr.h"
 #include "msg_list.h"
-
+#include "mysqlconn_wrapper.h"
 
 using namespace std;
 

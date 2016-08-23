@@ -27,6 +27,7 @@
 #include "ctimer.h"
 #include "info_mem_mgr.h"
 #include "cthread.h"
+#include "mysqlconn_wrapper.h"
 
 using namespace std;
 

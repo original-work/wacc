@@ -24,7 +24,7 @@
 #include "base_collection_handler.h"
 #include "msg_list.h"
 #include "info_mem_mgr.h"
-
+#include "mysqlconn_wrapper.h"
 
 /*
  * =====================================================================================
