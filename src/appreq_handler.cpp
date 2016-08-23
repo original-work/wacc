@@ -249,7 +249,6 @@ int AppReqHandler::deal_add_user(char *data)
 	record->mod_id = UsrAccConfig::instance().module_id();
 	memcpy(record->msisdn, re->mdn, sizeof(record->msisdn));
 	record->user_info = user;
-	info_mgr_->add_tid_msisdn(record->tid, record->msisdn);
 	
 	CommonLogger::instance().log_debug("record  tid %u mod_id %u", record->tid, record->mod_id);
 
@@ -266,7 +265,7 @@ int AppReqHandler::deal_del_user(char *data)
 
 	memset((char*)&red_msg,0,sizeof(red_msg));
 	red_msg.msg_type = 2;
-	DeactivateMsg *record = (DeactivateMsg*)red_msg.msg;
+	DeactivateData *record = (DeactivateData*)red_msg.msg;
 
 	NIF_MSG_UNIT2 *header = (NIF_MSG_UNIT2*)data;
 	unsigned int msg_length = ntohl(header->length);
@@ -293,15 +292,11 @@ int AppReqHandler::deal_del_user(char *data)
 	ActiveUser* user = (ActiveUser*)info_mgr_->active_usr_table_.find_num((char*)bcd_buf_, strlen(re->mdn));
 	if (user != NULL)
 	{
-		/* luchq add for test */
-		CommonLogger::instance().log_debug("deal_del_user: user imsi:%s msisdn %s\n",user->imsi,user->msisdn);
-
 		info_mgr_->active_usr_table_.remove_num((char*)bcd_buf_, strlen(re->mdn));
 
 		memcpy(record->msisdn, re->mdn, strlen(re->mdn));
-		record->tid = generate_tid();
-		info_mgr_->add_tid_msisdn(record->tid, record->msisdn);
-		CommonLogger::instance().log_debug("record  tid %u", record->tid);
+
+		CommonLogger::instance().log_debug("deal_del_user: mdn:%s\n",record->msisdn);
 
 		app_req_queue_->insert_record((char*)&red_msg, sizeof(ReqMsg));
 		app_req_queue_->advance_widx();

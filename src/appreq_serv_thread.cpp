@@ -585,7 +585,6 @@ int AppReqServThread::deal_recurrent_regnot_ack(AckMsg* ack, ActivateMsg* recurr
 			record->user_info = user;
 			record->recurrent_regnot_flag=true;
 			record->do_locreq_flag=false;
-			info_mgr_->add_tid_msisdn(record->tid, record->msisdn);
 			CommonLogger::instance().log_debug("[%s %d] send LOCREQ, record  tid %u mod_id %u",__FILE__,__LINE__,record->tid, record->mod_id);
 
 			app_req_queue_->insert_record((char*)&red_msg, sizeof(ReqMsg));
