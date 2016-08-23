@@ -251,7 +251,7 @@ int AppReqHandler::deal_add_user(char *data)
 	record->user_info = user;
 	record->seq = ntohl(header->seq);
 	
-	CommonLogger::instance().log_debug("record  tid %u mod_id %u", record->tid, record->mod_id);
+	CommonLogger::instance().log_debug("record  tid %u mod_id %u seq %u", record->tid, record->mod_id,record->seq);
 
 	app_req_queue_->insert_record((char*)&red_msg, sizeof(ReqMsg));
 	app_req_queue_->advance_widx();
@@ -287,7 +287,7 @@ int AppReqHandler::deal_del_user(char *data)
 
 	DelUser *re = (DelUser*)(data+sizeof(NIF_MSG_UNIT2)-sizeof(unsigned char*));
 
-	CommonLogger::instance().log_debug("deal_del_user: deal deactive user %s, fd:%d", re->mdn,sockfd());
+	CommonLogger::instance().log_debug("deal_del_user: deal deactive user %s, fd %d, seq %u", re->mdn,sockfd(),header->seq);
 	memset(bcd_buf_,0,sizeof(bcd_buf_));
 	StrToBCD(re->mdn, bcd_buf_, sizeof(bcd_buf_));
 	ActiveUser* user = (ActiveUser*)info_mgr_->active_usr_table_.find_num((char*)bcd_buf_, strlen(re->mdn));

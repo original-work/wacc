@@ -340,7 +340,7 @@ int AppReqServThread::deal_logic_resp_queue()
 				if(iter != add_user_req_->end())
 				{
 					ActivateMsg* regnot = (ActivateMsg*)iter->second;	
-					CommonLogger::instance().log_info("[%s %d] deal_logic_resp_queue: tid %u found mdn %s",__FILE__,__LINE__,ack->tid,regnot->msisdn);
+					CommonLogger::instance().log_info("[%s %d] deal_logic_resp_queue: ACTIVATE ACK tid %u found mdn %s seq %u",__FILE__,__LINE__,ack->tid,regnot->msisdn,regnot->seq);
 					memset(bcd_buf_,0,sizeof(bcd_buf_));
 					StrToBCD(regnot->msisdn, bcd_buf_, sizeof(bcd_buf_));
 					user = (ActiveUser*)info_mgr_->active_usr_table_.find_num((char*)bcd_buf_, strlen(regnot->msisdn));
@@ -399,7 +399,7 @@ int AppReqServThread::deal_logic_resp_queue()
 						unit->invoke = htonl(ack->msg_type);
 						unit->length = htonl(sizeof(unsigned int));
 						unit->seq = info_mgr_->find_seq_by_tid(ack->tid);
-						CommonLogger::instance().log_info("deal_logic_resp_queue: seq %u", unit->seq);
+						CommonLogger::instance().log_info("deal_logic_resp_queue: MO ACK seq %u", unit->seq);
 						*((unsigned int*)(send_buf + sizeof(NIF_MSG_UNIT2) - sizeof(unsigned char*))) = htonl(ack->result);
 						sendlen = send_data(user->fd, send_buf, sizeof(NIF_MSG_UNIT2)-sizeof(unsigned char*)+sizeof(unsigned int));
 						if (sendlen != sizeof(NIF_MSG_UNIT2)-sizeof(unsigned char*)+sizeof(unsigned int))
