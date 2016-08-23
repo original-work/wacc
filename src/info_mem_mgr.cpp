@@ -82,7 +82,7 @@ string InfoMemMgr::find_msisdn_by_tid(unsigned int tid)
 
 int InfoMemMgr::add_tid_seq(unsigned int tid, unsigned int seq)
 {
-	map<unsigned int, string>::iterator itr = tid_seq_list_.find(tid);
+	map<unsigned int, unsigned int>::iterator itr = tid_seq_list_.find(tid);
 	if (itr != tid_seq_list_.end())
 	{
 		tid_seq_list_.erase(itr);
@@ -99,7 +99,7 @@ int InfoMemMgr::remove_tid_seq(unsigned int tid)
 
 unsigned int InfoMemMgr::find_seq_by_tid(unsigned int tid)
 {
-	map<unsigned int, string>::iterator itr = tid_seq_list_.find(tid);
+	map<unsigned int, unsigned int>::iterator itr = tid_seq_list_.find(tid);
 	if (itr != tid_seq_list_.end())
 	{
 		return itr->second;
