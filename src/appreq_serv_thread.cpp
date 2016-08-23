@@ -311,6 +311,7 @@ int AppReqServThread::deal_logic_resp_queue()
 					CommonLogger::instance().log_info("deal_logic_resp_queue: Call find_num fail, user maybe not exist");
 				break;
 			}
+			#if 0
 			case 5: //PING ACK
 			{
 				memset(send_buf,0,sizeof(send_buf));
@@ -329,6 +330,7 @@ int AppReqServThread::deal_logic_resp_queue()
 				CommonLogger::instance().log_info("deal_logic_resp_queue: send PING msg to APP");
 				break;
 			}
+			#endif
 			case 1: // ACTIVATE ACK
 			{
 				memset(send_buf,0,sizeof(send_buf));

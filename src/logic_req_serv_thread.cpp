@@ -442,6 +442,7 @@ int LogicReqServThread::deal_app_req_queue()
 				client_seq_ = 0;
 			}
 		}
+		#if 0
 		else if (req->msg_type == 5) //PING
 		{
 			CommonLogger::instance().log_info("deal_app_req_queue: Deal PING MSG.");
@@ -454,6 +455,7 @@ int LogicReqServThread::deal_app_req_queue()
 			logic_resp_queue_->insert_record((char*)&resp, sizeof(RespMsg));
 			logic_resp_queue_->advance_widx();
 		}
+		#endif
 		else if (req->msg_type == 9) //mtack
 		{
 			CommonLogger::instance().log_info("deal_app_req_queue: Deal MT-ACK MSG.");
