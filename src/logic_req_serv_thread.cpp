@@ -324,7 +324,7 @@ int LogicReqServThread::deal_app_req_queue()
 			LocreqData body;
 			body.tid=htonl(active->tid);
 			body.mod_id=active->mod_id;
-			CommonLogger::instance().log_debug("deal_app_req_queue: Deal ACTIVE MSG. tid=%u mod_id=%u", active->tid,body.mod_id);
+			CommonLogger::instance().log_debug("deal_app_req_queue: Deal ACTIVE MSG. tid=%u mod_id=%u seq=%u", active->tid,body.mod_id,active->seq);
 			memset(body.msisdn,0,sizeof(body.msisdn));
 			memcpy(body.msisdn, active->msisdn, strlen(active->msisdn));
 			
@@ -353,6 +353,8 @@ int LogicReqServThread::deal_app_req_queue()
 						__FILE__,__LINE__,active->msisdn);
 					++i;
 					break;
+				}else{
+					CommonLogger::instance().log_debug("deal_app_req_queue: client_list_ not connected, index=%d",i);
 				}
 			}
 
