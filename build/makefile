@@ -2,7 +2,7 @@ TARGETS = $(BIN1)
 
 BIN1 = wangxx
 BIN1_OBJS = $(OBJS)
-BIN1_LIBS = pthread log4cplus
+BIN1_LIBS = pthread log4cplus mysqlcppconn
 BIN1_LFLAGS = -L$(LOG4CPLUS_ROOT)/lib
 INCS = -I../src -I$(LOG4CPLUS_ROOT)/include
 SOURCE := $(wildcard ../src/*.cpp)

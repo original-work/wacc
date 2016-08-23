@@ -68,6 +68,9 @@ public:
 	unsigned int user_op_write_periodic() const {return user_op_write_periodic_;}
 	std::string user_op_save_path() const {return user_op_save_path_;}
 	std::string user_op_file_prefix() const {return user_op_file_prefix_;}
+	std::string mysql_url() const {return url_;}
+	std::string mysql_user() const {return user_;}
+	std::string mysql_password() const {return password_;}
 protected:
 	int deal_system(const std::string &line, const int &pos);
 	int deal_logger_configuration(const std::string &line, const int &pos);
@@ -75,6 +78,7 @@ protected:
 	int deal_serv_logic(const std::string &line, const int &pos);
 	int deal_mem(const std::string &line, const int &pos);
 	int deal_file_manage(const std::string &line, const int &pos);
+	int deal_db(const std::string &line, const int &pos);
 	int get_key_value(const std::string &line, const int &pos, std::string &key, std::string &value);
 	int trim_str(std::string &str);
 	std::string split_first(std::string &strin, const std::string &split_key);
@@ -119,6 +123,9 @@ private:
 	unsigned int user_op_write_periodic_;	// 用户操作写文件周期
 	std::string user_op_save_path_;	// 用户操作写文件目录
 	std::string user_op_file_prefix_;	// 用户操作写文件前缀
+	std::string url_;
+	std::string user_;
+	std::string password_;
 
 };
 

@@ -75,6 +75,7 @@ class LogicReqServThread : public CThread
 		CTimer recurrent_regnot_timer_;
 		bool all_stopped_;
 		unsigned char bcd_buf_[256];
+		MySQLConnWrapper db_;
 }; /* -----  end of class LogicReqServThread  ----- */
 
 

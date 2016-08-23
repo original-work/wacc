@@ -367,6 +367,25 @@ int AppReqServThread::deal_logic_resp_queue()
 								CommonLogger::instance().log_error("deal_logic_resp_queue: send ACTIVATE ACK msg to %s FAIL!!!", mt->cd);
 							}
 							CommonLogger::instance().log_info("deal_logic_resp_queue: send ACTIVATE ACK msg to APP");
+
+							/*开户成功则插入mysql*/
+							if(0==ack->result){
+								db_.init(UsrAccConfig::instance().mysql_host(), UsrAccConfig::instance().mysql_user(), UsrAccConfig::instance().mysql_password());
+								db_.connect();
+								db_.switchDb("mihao");
+								db_.prepare("INSERT INTO active_user(create_time, mdn, imsi, esn) VALUES (?, ?, ?, ?)");
+								string now=tools::currentDateTime();
+								string Smdn(1,regnot->msisdn);
+								db_.setString(2,Smdn);
+								string Simsi(1,regnot->imsi);
+								db_.setString(3,Simsi);
+								string Sesn(1,regnot->esn);
+								db_.setString(4,Sesn);
+								db_.execute();
+								db_.closeCon();
+							}
+
+							
 						}
 
 					}

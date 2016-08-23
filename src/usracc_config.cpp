@@ -94,6 +94,10 @@ int  UsrAccConfig::init(const char* cfg) {
 						if (deal_file_manage(read_line,find_pos) == -1) {
 							return -1;
 						}
+					} else if (read_section == "DB") {
+						if (deal_db(read_line,find_pos) == -1) {
+							return -1;
+						}
 					} else {
 						printf("%s%s\n","unknown section name : ", read_section.c_str());
 						return -1;
@@ -284,7 +288,25 @@ int UsrAccConfig::deal_file_manage(const std::string &line, const int &pos) {
 		user_op_save_path_ = value.c_str();
 	} else if (key == "user_op_file_prefix") { 
 		user_op_file_prefix_ = value.c_str();
-	} else {
+	}else {
+		printf("unknown key \" %s \" in section \" BusinessInfo \".\n", key.c_str());
+		return -1;
+	}
+	return 0;
+}
+
+
+int UsrAccConfig::deal_db(const std::string &line, const int &pos) {
+	std::string key;
+	std::string value;
+	get_key_value(line,pos,key,value);
+	if (key == "url") { 
+		url_ = value.c_str();
+	} else if (key == "user") { 
+		user_ = value.c_str();
+	} else if (key == "password") { 
+		password_ = value.c_str();
+	}else {
 		printf("unknown key \" %s \" in section \" BusinessInfo \".\n", key.c_str());
 		return -1;
 	}

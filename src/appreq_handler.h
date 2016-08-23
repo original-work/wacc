@@ -64,6 +64,7 @@ class AppReqHandler : public BaseCollectionHandler
 	unsigned char bcd_buf_[256];
 	char send_buf_[kBufferSize];
 	unsigned int send_offset_;
+	MySQLConnWrapper db_;
 }; /* -----  end of class AppReqHandler  ----- */
 
 #endif

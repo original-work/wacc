@@ -78,6 +78,7 @@ class AppReqServThread : public CThread
 		unsigned int connection_count_limits_;
 		unsigned char bcd_buf_[256];
 		bool all_stopped_;
+		MySQLConnWrapper db_;
 }; /* -----  end of class AppReqServThread  ----- */
 
 #endif
