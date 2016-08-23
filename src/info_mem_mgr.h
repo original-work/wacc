@@ -47,7 +47,7 @@ public:
 	NumIndexTable index_;
 	LogicConnManager logic_conns_mgr_;
 private:
-	map<int, string> tid_msisdn_list_;
+	map<unsigned int, string> tid_msisdn_list_;
 	map<unsigned int, unsigned int> tid_seq_list_;
 };
 

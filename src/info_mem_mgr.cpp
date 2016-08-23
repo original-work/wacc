@@ -50,30 +50,30 @@ int InfoMemMgr::init() {
 }
 
 //map<int, string> tid_msisdn_list_
-int InfoMemMgr::add_tid_msisdn(int tid, string msisdn)
+int InfoMemMgr::add_tid_msisdn(unsigned int tid, string msisdn)
 {
-  map<int, string>::iterator itr = tid_msisdn_list_.find(tid);
-  if (itr != tid_msisdn_list_.end())
-  {
-    tid_msisdn_list_.erase(itr);
-  }
-  tid_msisdn_list_.insert(pair<int, string>(tid, msisdn));
+	map<unsigned int, string>::iterator itr = tid_msisdn_list_.find(tid);
+	if (itr != tid_msisdn_list_.end())
+	{
+		tid_msisdn_list_.erase(itr);
+	}
+	tid_msisdn_list_.insert(pair<unsigned int, string>(tid, msisdn));
 	return 0;
 }		/* -----  end of method InfoMemMgr::add_tid_msisdn  ----- */
 
-int InfoMemMgr::remove_tid_msisdn(int tid)
+int InfoMemMgr::remove_tid_msisdn(unsigned int tid)
 {
-      tid_msisdn_list_.erase(tid);
-  	return 0;
+	tid_msisdn_list_.erase(tid);
+	return 0;
 }		/* -----  end of method InfoMemMgr::remove_tid_msisdn  ----- */
 
-string InfoMemMgr::find_msisdn_by_tid(int tid)
+string InfoMemMgr::find_msisdn_by_tid(unsigned int tid)
 {
-  map<int, string>::iterator itr = tid_msisdn_list_.find(tid);
-  if (itr != tid_msisdn_list_.end())
-  {
-    return itr->second;
-  }
+	map<unsigned int, string>::iterator itr = tid_msisdn_list_.find(tid);
+	if (itr != tid_msisdn_list_.end())
+	{
+		return itr->second;
+	}
 	return "";
 }		/* -----  end of method InfoMemMgr::find_msisdn_by_tid  ----- */
 
@@ -82,7 +82,7 @@ string InfoMemMgr::find_msisdn_by_tid(int tid)
 
 int InfoMemMgr::add_tid_seq(unsigned int tid, unsigned int seq)
 {
-	map<int, string>::iterator itr = tid_seq_list_.find(tid);
+	map<unsigned int, string>::iterator itr = tid_seq_list_.find(tid);
 	if (itr != tid_seq_list_.end())
 	{
 		tid_seq_list_.erase(itr);
@@ -97,9 +97,9 @@ int InfoMemMgr::remove_tid_seq(unsigned int tid)
 	return 0;
 }
 
-unsigned int InfoMemMgr::find_seq_by_tid(int tid)
+unsigned int InfoMemMgr::find_seq_by_tid(unsigned int tid)
 {
-	map<int, string>::iterator itr = tid_seq_list_.find(tid);
+	map<unsigned int, string>::iterator itr = tid_seq_list_.find(tid);
 	if (itr != tid_seq_list_.end())
 	{
 		return itr->second;
