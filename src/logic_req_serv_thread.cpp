@@ -367,7 +367,7 @@ int LogicReqServThread::deal_app_req_queue()
 		{
 			CommonLogger::instance().log_debug("deal_app_req_queue: Deal DEACTIVE MSG.");
 			/* luchq add for test */
-			//CommonLogger::instance().log_debug("deal_app_req_queue: deactive user msisdn %s",req->msg);
+			CommonLogger::instance().log_debug("deal_app_req_queue: deactive user msisdn %s",req->msg);
 
 			NIF_MSG_UNIT *unit = (NIF_MSG_UNIT*)send_buf;
 			unit->dialog = htonl(BEGIN);
