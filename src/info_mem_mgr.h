@@ -35,12 +35,12 @@ public:
 	~InfoMemMgr();
 
 	int init();
-	int add_tid_msisdn(int tid, string msisdn);
-	int remove_tid_msisdn(int tid);
-	string find_msisdn_by_tid(int tid);
+	int add_tid_msisdn(unsigned int tid, string msisdn);
+	int remove_tid_msisdn(unsigned int tid);
+	string find_msisdn_by_tid(unsigned int tid);
 	int add_tid_seq(unsigned int tid, unsigned int seq);
 	int remove_tid_seq(unsigned int tid);
-	string find_seq_by_tid(int tid);
+	unsigned int find_seq_by_tid(unsigned int tid);
 	
 public:
 	NumTable active_usr_table_;
