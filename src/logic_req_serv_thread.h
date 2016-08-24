@@ -47,6 +47,7 @@ class LogicReqServThread : public CThread
 		int stop();
 		int init(InfoMemMgr *info_mgr, MsgList* app_queue, MsgList* logic_queue, MsgList* recurrent_regnot_queue, map<unsigned int, char*>* add_user_req, MySQLConnWrapper* db);
 		int select_check_fds();
+		int sync_data();
 		vector<TcpClient>* client_list() {return &client_list_;}
 	protected:
 		bool StrToBCD(const char *Src,unsigned char *Des,int iDesLen);

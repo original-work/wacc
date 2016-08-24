@@ -311,7 +311,6 @@ int AppReqHandler::deal_del_user(char *data)
 		char sql[100];	
 		sprintf(sql,"delete from active_user where mdn=%s",re->mdn);
 		db_->executeUpdate(sql);
-
 	}
 	
 	unsigned int *result = (unsigned int *)(send_buf_ + (sizeof(NIF_MSG_UNIT2) - sizeof(unsigned char*)));

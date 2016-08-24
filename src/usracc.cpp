@@ -67,13 +67,15 @@ int main(int argc, char *argv[])
 
 	map<unsigned int, char*> map_add_user_req;
 
+
+	InfoMemMgr info_mem_mgr;
+	info_mem_mgr.init();
+
+
 	MySQLConnWrapper db;
 	db.init(UsrAccConfig::instance().mysql_url(), UsrAccConfig::instance().mysql_user(), UsrAccConfig::instance().mysql_password());
 	db.connect();
 	db.switchDb("mihao");
-
-	InfoMemMgr info_mem_mgr;
-	info_mem_mgr.init();
 
 
 	LogicReqServThread logic_req_serv_thread;

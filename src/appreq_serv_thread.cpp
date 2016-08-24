@@ -372,12 +372,13 @@ int AppReqServThread::deal_logic_resp_queue()
 
 							/*开户成功则插入mysql*/
 							if(0==ack->result){
-								db_->prepare("INSERT INTO active_user(create_time, mdn, imsi, esn) VALUES (?, ?, ?, ?)");
+								db_->prepare("INSERT INTO active_user(create_time, mdn, imsi, esn, fd) VALUES (?, ?, ?, ?, ?)");
 								string now=tools::currentDateTime();
 								db_->setString(1,now);
 								db_->setString(2,user->msisdn);
 								db_->setString(3,user->imsi);
 								db_->setString(4,user->esn);
+								db_->setString(5,user->fd);
 								db_->executeUpdate();
 							}
 						}
