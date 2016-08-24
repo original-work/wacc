@@ -197,7 +197,7 @@ typedef struct {
 	ActiveUser *user_info;	
 	char recurrent_regnot_flag;/*周期性位置登记falg*/
 	char do_locreq_flag;/*SERVLOGIC_ACTIVATE_REQ 收到失败响应消息的时候要不不要发送LOCREQ 消息给业务逻辑标志位*/
-	unsigned seq;
+	unsigned int seq;
 } ActivateMsg ;
 
 //用户去激活消息结构

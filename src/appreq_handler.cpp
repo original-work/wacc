@@ -183,14 +183,28 @@ int AppReqHandler::deal_ping(char *data)
 	return 0;
 }/* -----  end of method AppReqHandler::deal_ping(char *data)  ----- */
 
-int AppReqHandler::deal_notify_active()
+int AppReqHandler::deal_notify_active(char *data)
 {
+	NIF_MSG_UNIT2 *header = (NIF_MSG_UNIT2*)data;
 	ReqMsg red_msg;
 	red_msg.msg_type = 6;
 	
 	app_req_queue_->insert_record((char*)&red_msg, sizeof(ReqMsg));
 	app_req_queue_->advance_widx();
-	CommonLogger::instance().log_info("deal_ping: insert PING Msg into app_req_queue_");
+	CommonLogger::instance().log_info("deal_ping: insert NOTIFY_ACTIVE Msg into app_req_queue_");
+
+
+	/*   向操作表中插入操作记录*/
+	db_->prepare("INSERT INTO op_record(create_time, mdn, imsi, esn, opt_code, opt_result, seq) VALUES (?, ?, ?, ?, ?, ?, ?)");
+	string now=tools::currentDateTime();
+	db_->setString(1,now);
+	db_->setString(2,"");
+	db_->setString(3,"");
+	db_->setString(4,"");
+	db_->setString(5,"NOTIFY_ACTIVE");
+	db_->setInt(6,0);
+	db_->setInt(7,ntohl(header->seq));
+	db_->executeUpdate();
 
 	return 0;
 }/* -----  end of method AppReqHandler::deal_ping(char *data)  ----- */
@@ -309,7 +323,7 @@ int AppReqHandler::deal_del_user(char *data)
 
 	DelUser *re = (DelUser*)(data+sizeof(NIF_MSG_UNIT2)-sizeof(unsigned char*));
 
-	CommonLogger::instance().log_debug("deal_del_user: deal deactive user %s, fd %d, seq %u", re->mdn,sockfd(),header->seq);
+	CommonLogger::instance().log_debug("deal_del_user: deal deactive user %s, fd %d, seq %u", re->mdn,sockfd(),ntohl(header->seq));
 	memset(bcd_buf_,0,sizeof(bcd_buf_));
 	StrToBCD(re->mdn, bcd_buf_, sizeof(bcd_buf_));
 	ActiveUser* user = (ActiveUser*)info_mgr_->active_usr_table_.find_num((char*)bcd_buf_, strlen(re->mdn));
@@ -328,6 +342,18 @@ int AppReqHandler::deal_del_user(char *data)
 		sprintf(sql,"delete from active_user where mdn=%s",re->mdn);
 		db_->executeUpdate(sql);
 	}
+
+	/*   向操作表中插入操作记录*/
+	db_->prepare("INSERT INTO op_record(create_time, mdn, imsi, esn, opt_code, opt_result, seq) VALUES (?, ?, ?, ?, ?, ?, ?)");
+	string now=tools::currentDateTime();
+	db_->setString(1,now);
+	db_->setString(2,user->msisdn);
+	db_->setString(3,user->imsi);
+	db_->setString(4,user->esn);
+	db_->setString(5,"DEL");
+	db_->setInt(6,0);
+	db_->setInt(7,ntohl(header->seq));
+	db_->executeUpdate();
 	
 	unsigned int *result = (unsigned int *)(send_buf_ + (sizeof(NIF_MSG_UNIT2) - sizeof(unsigned char*)));
 	*result = htonl(0);

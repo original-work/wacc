@@ -540,6 +540,13 @@ int LogicReqServThread::deal_app_req_queue()
 		{
 			CommonLogger::instance().log_info("deal_app_req_queue: Deal NOTIFY_ACTIVE MSG.");
 			sync_data();
+			RespMsg resp;
+			resp.msg_type = 6;
+			AckMsg *ack = (AckMsg*)resp.msg;
+			ack->msg_type = NOTIFY_ACTIVE;
+			
+			logic_resp_queue_->insert_record((char*)&resp, sizeof(RespMsg));
+			logic_resp_queue_->advance_widx();
 		}
 		else if (req->msg_type == 9) //mtack
 		{

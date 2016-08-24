@@ -220,18 +220,15 @@ int AppReqServThread::deal_new_connection()
 				return -1;
 			}
 
-
-			   map<int,BaseCollectionHandler*>::iterator it = client_list_.find(handler->sockfd());
-			   if (it != client_list_.end())
-			   {
-			        close(it->first);
-			        delete it->second;
-                             client_list_.erase(handler->sockfd());
-			   }
-
+			map<int,BaseCollectionHandler*>::iterator it = client_list_.find(handler->sockfd());
+			if (it != client_list_.end())
+			{
+				close(it->first);
+				delete it->second;
+				client_list_.erase(handler->sockfd());
+			}
 
 			client_list_.insert(map<int,BaseCollectionHandler*>::value_type(handler->sockfd(), handler));
-
 
 			if (connection_count_limits_>0) {
 				++current_connection_count_;
@@ -333,6 +330,24 @@ int AppReqServThread::deal_logic_resp_queue()
 				break;
 			}
 			#endif
+			case 6: //NOTIFY_ACTIVE ACK
+			{
+				memset(send_buf,0,sizeof(send_buf));
+				ack = (AckMsg*)resp->msg;
+				CommonLogger::instance().log_info("deal_logic_resp_queue: NOTIFY_ACTIVE ACK");
+				unit = (NIF_MSG_UNIT2*)send_buf;
+				unit->head = htonl(0x1a2b3c4d);
+				unit->dialog = htonl(END);
+				unit->invoke = htonl(ack->msg_type);
+
+				sendlen = send_data(mihao_fd_, send_buf, sizeof(NIF_MSG_UNIT2)-sizeof(unsigned char*)+sizeof(unsigned int));
+				if (sendlen != sizeof(NIF_MSG_UNIT2)-sizeof(unsigned char*)+sizeof(unsigned int))
+				{
+					CommonLogger::instance().log_error("deal_logic_resp_queue: send NOTIFY_ACTIVE msg to %s FAIL!!!", mt->cd);
+				}
+				CommonLogger::instance().log_info("deal_logic_resp_queue: send NOTIFY_ACTIVE msg to APP");
+				break;
+			}
 			case 1: // ACTIVATE ACK
 			{
 				memset(send_buf,0,sizeof(send_buf));
@@ -372,6 +387,7 @@ int AppReqServThread::deal_logic_resp_queue()
 
 							/*开户成功则插入mysql*/
 							if(0==ack->result){
+								/*  用户表*/
 								db_->prepare("INSERT INTO active_user(create_time, mdn, imsi, esn, fd) VALUES (?, ?, ?, ?, ?)");
 								string now=tools::currentDateTime();
 								db_->setString(1,now);
@@ -379,8 +395,19 @@ int AppReqServThread::deal_logic_resp_queue()
 								db_->setString(3,user->imsi);
 								db_->setString(4,user->esn);
 								db_->setInt(5,user->fd);
-								db_->executeUpdate();
+								db_->executeUpdate();								
 							}
+							/*   向操作表中插入操作记录*/
+							db_->prepare("INSERT INTO op_record(create_time, mdn, imsi, esn, opt_code, opt_result, seq) VALUES (?, ?, ?, ?, ?, ?, ?)");
+							string now=tools::currentDateTime();
+							db_->setString(1,now);
+							db_->setString(2,user->msisdn);
+							db_->setString(3,user->imsi);
+							db_->setString(4,user->esn);
+							db_->setString(5,"ADD");
+							db_->setInt(6,ack->result);
+							db_->setInt(7,regnot->seq);
+							db_->executeUpdate();
 						}
 
 					}
@@ -428,6 +455,18 @@ int AppReqServThread::deal_logic_resp_queue()
 					else{
 						CommonLogger::instance().log_info("deal_logic_resp_queue: Call find_num fail");
 					}
+
+					/*   向操作表中插入操作记录*/
+					db_->prepare("INSERT INTO op_record(create_time, mdn, imsi, esn, opt_code, opt_result, seq) VALUES (?, ?, ?, ?, ?, ?, ?)");
+					string now=tools::currentDateTime();
+					db_->setString(1,now);
+					db_->setString(2,ack->cd);
+					db_->setString(3,"");
+					db_->setString(4,"");
+					db_->setString(5,"MO");
+					db_->setInt(6,ack->result);
+					db_->setInt(7,unit->seq);
+					db_->executeUpdate();
 				}
 				else{
 					CommonLogger::instance().log_info("deal_logic_resp_queue: tid %u not found",ack->tid);
