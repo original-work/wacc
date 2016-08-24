@@ -135,25 +135,29 @@ int AppReqHandler::process(char *pmsg)
 
     switch (msg_type) {
     case ADD_USER:
-	CommonLogger::instance().log_info("AppReqHandler: Recv a ADD_USER msg");
+	 CommonLogger::instance().log_info("AppReqHandler: Recv a ADD_USER msg");
         deal_add_user(pmsg);
         break;
     case DEL_USER:
-	CommonLogger::instance().log_info("AppReqHandler: Recv a DEL_USER msg");
+	 CommonLogger::instance().log_info("AppReqHandler: Recv a DEL_USER msg");
         deal_del_user(pmsg);
         break;
     case SMS_SEND:
-	CommonLogger::instance().log_info("AppReqHandler: Recv a SMS_SEND msg");
+	 CommonLogger::instance().log_info("AppReqHandler: Recv a SMS_SEND msg");
         deal_MO(pmsg);
         break;		
     case SMS_PUSH:
-	CommonLogger::instance().log_info("AppReqHandler: Recv a SMS_PUSH msg");
+	 CommonLogger::instance().log_info("AppReqHandler: Recv a SMS_PUSH msg");
         deal_mt_ack(pmsg);
         break;
     case PING:
-	CommonLogger::instance().log_info("AppReqHandler: Recv a PING msg");
+	 CommonLogger::instance().log_info("AppReqHandler: Recv a PING msg");
         deal_ping(pmsg);
         break;
+    case NOTIFY_ACTIVE:
+	CommonLogger::instance().log_info("AppReqHandler: Recv a NOTIFY_ACTIVE msg");
+       deal_notify_active(pmsg);
+	break;
     default:
         break;
     }
@@ -175,6 +179,18 @@ int AppReqHandler::deal_ping(char *data)
 	memcpy(send_buf_, data, (sizeof(NIF_MSG_UNIT2)-sizeof(unsigned char*)));
 	sendn(send_buf_, sizeof(NIF_MSG_UNIT2) - sizeof(unsigned char*));
 	CommonLogger::instance().log_error("deal_ping: send ack, seq is %u",ntohl(header->seq));
+
+	return 0;
+}/* -----  end of method AppReqHandler::deal_ping(char *data)  ----- */
+
+int AppReqHandler::deal_notify_active(char *data)
+{
+	ReqMsg red_msg;
+	red_msg.msg_type = 6;
+	
+	app_req_queue_->insert_record((char*)&red_msg, sizeof(ReqMsg));
+	app_req_queue_->advance_widx();
+	CommonLogger::instance().log_info("deal_ping: insert PING Msg into app_req_queue_");
 
 	return 0;
 }/* -----  end of method AppReqHandler::deal_ping(char *data)  ----- */

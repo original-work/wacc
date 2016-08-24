@@ -132,6 +132,7 @@ int LogicReqServThread::init(InfoMemMgr *info_mgr, MsgList* app_queue, MsgList* 
 	recurrent_regnot_queue_ = recurrent_regnot_queue;
 	add_user_req_=add_user_req;
 	db_=db;
+	sync_data();
 
 	memset(data_buf_, 0, sizeof(data_buf_));
 	client_seq_ = 0;
@@ -139,13 +140,17 @@ int LogicReqServThread::init(InfoMemMgr *info_mgr, MsgList* app_queue, MsgList* 
 }		/* -----  end of method LogicReqServThread::init  ----- */
 
 
-
-int LogicReqServThread::sync_data()
+void LogicReqServThread::sync_data()
 {
 	char send_buf[3000] = {0};
 	
 	db_->executeQuery("select * from active_user");
 	while(db_->fetch()){
+		unsigned int count=0;
+		count++;
+		if (0==count % 100){
+			usleep(20);
+		}
 		string mdn=db_->getString("mdn");
 		printf("mdn=%s\n", mdn.c_str());
 		string imsi=db_->getString("imsi");
@@ -159,8 +164,7 @@ int LogicReqServThread::sync_data()
 		ActiveUser* user = (ActiveUser*)info_mgr_->active_usr_table_.add_num((char*)bcd_buf_, mdn.length());
 		if (user == NULL)
 		{
-			CommonLogger::instance().log_error("LogicReqServThread: sync_data, add user %s to mem db", mdn.c_str());
-			return -1;
+			CommonLogger::instance().log_error("LogicReqServThread: sync_data, add user %s to mem db fail", mdn.c_str());
 		}
 
 		user->fd = fd;
@@ -168,8 +172,8 @@ int LogicReqServThread::sync_data()
 		memset(user->imsi,0,sizeof(user->imsi));
 		memset(user->esn,0,sizeof(user->esn));
 		memcpy(user->msisdn, mdn.c_str(), mdn.length());
-		memset(user->imsi, imsi.c_str(), imsi.length());
-		memset(user->esn, esn, esn.length());
+		memcpy(user->imsi, imsi.c_str(), imsi.length());
+		memcpy(user->esn, esn.c_str(), esn.length());
 
 
 		/*  然后同步给业务逻辑模块*/
@@ -185,7 +189,7 @@ int LogicReqServThread::sync_data()
 		body.mod_id=UsrAccConfig::instance().module_id();
 		memcpy(body.imsi,imsi.c_str(), imsi.length());
 		memcpy(body.msisdn,mdn.c_str(), mdn.length());
-		memcpy(body.esn,esn, esn.length());
+		memcpy(body.esn,esn.c_str(), esn.length());
 		memcpy((send_buf + sizeof(NIF_MSG_UNIT) - sizeof(unsigned char*)), (char*)&body, sizeof(PeriodData));
 		int send_len =  sizeof(NIF_MSG_UNIT) - sizeof(unsigned char*) + sizeof(PeriodData);
 
@@ -209,7 +213,6 @@ int LogicReqServThread::sync_data()
 			}
 		}
 	}
-	return 0;
 }
 
 
@@ -535,6 +538,11 @@ int LogicReqServThread::deal_app_req_queue()
 			logic_resp_queue_->advance_widx();
 		}
 		#endif
+		else if (req->msg_type == 6) //NOTIFY_ACTIVE
+		{
+			CommonLogger::instance().log_info("deal_app_req_queue: Deal NOTIFY_ACTIVE MSG.");
+			sync_data();
+		}
 		else if (req->msg_type == 9) //mtack
 		{
 			CommonLogger::instance().log_info("deal_app_req_queue: Deal MT-ACK MSG.");

@@ -378,7 +378,7 @@ int AppReqServThread::deal_logic_resp_queue()
 								db_->setString(2,user->msisdn);
 								db_->setString(3,user->imsi);
 								db_->setString(4,user->esn);
-								db_->setString(5,user->fd);
+								db_->setInt(5,user->fd);
 								db_->executeUpdate();
 							}
 						}
