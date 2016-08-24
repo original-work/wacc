@@ -435,13 +435,14 @@ int LogicReqServThread::deal_app_req_queue()
 					CommonLogger::instance().log_debug("deal_app_req_queue: client_list_ not connected, index=%d",i);
 				}
 			}
-
+#if 0
 			LogicConnInfo *info = info_mgr_->logic_conns_mgr_.logic_conns();
 			int info_cnt = info_mgr_->logic_conns_mgr_.conns_counts();
 			for (int n = 0; n < info_cnt; ++n)
 			{
 				active->user_info->reconnect_cnt_list[n] = info[n].reconnect_cnt;
 			}
+#endif			
 		}
 		else if (req->msg_type == 2)	//deactive
 		{
@@ -759,13 +760,14 @@ int LogicReqServThread::deal_locreq_ack(unsigned char *data, unsigned int len)
 							}
 						}
 					}
-
+#if 0
 					LogicConnInfo *info = info_mgr_->logic_conns_mgr_.logic_conns();
 					int info_cnt = info_mgr_->logic_conns_mgr_.conns_counts();
 					for (int n = 0; n < info_cnt; ++n)
 					{
 						ActReq->user_info->reconnect_cnt_list[n] = info[n].reconnect_cnt;
 					}
+#endif					
 					rsCode=0;
 					return rsCode;
 				}
