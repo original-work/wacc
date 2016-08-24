@@ -51,8 +51,6 @@ int LogicReqServThread::open(void *args)
 	{
 		return -1;
 	}
-	sync_data();
-
 	return 0;
 }		/* -----  end of method LogicReqServThread::open  ----- */
 
@@ -639,6 +637,11 @@ int LogicReqServThread::deal_connack_msg(TcpClient *client, unsigned char *data)
 	CommonLogger::instance().log_debug("deal_connack_msg: service logic module id %d, result %d", conn->mod_id, ntohl(conn->result));
 
 	info_mgr_->logic_conns_mgr_.update_logic_conninfo(conn->mod_id, client);
+
+	/* 如果连接成功则向业务逻辑同步数据*/
+	if(0==ntohl(conn->result)){
+		sync_data();
+	}
 
 	return 0;
 }		/* -----  end of method LogicReqServThread::deal_connack_msg  ----- */
