@@ -160,6 +160,9 @@ void LogicReqServThread::sync_data()
 		int fd=db_->getInt("fd");
 		printf("fd=%d\n", fd);
 
+		memset(bcd_buf_,0,sizeof(bcd_buf_));
+		StrToBCD(mdn.c_str(), bcd_buf_, sizeof(bcd_buf_));
+
 		/*  首先添加到内存数据库*/
 		ActiveUser* user = (ActiveUser*)info_mgr_->active_usr_table_.add_num((char*)bcd_buf_, mdn.length());
 		if (user == NULL)
