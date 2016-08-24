@@ -156,7 +156,7 @@ int AppReqHandler::process(char *pmsg)
         break;
     case NOTIFY_ACTIVE:
 	CommonLogger::instance().log_info("AppReqHandler: Recv a NOTIFY_ACTIVE msg");
-       deal_notify_active();
+       deal_notify_active(pmsg);
 	break;
     default:
         break;
