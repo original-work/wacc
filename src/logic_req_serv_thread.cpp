@@ -213,7 +213,7 @@ void LogicReqServThread::sync_data()
 					client_list_[i].disconnect_to_server();
 				}
 				CommonLogger::instance().log_debug("[%s %d] LogicReqServThread: sync_data,  Send SERVLOGIC_USER_SYNC_REQ Msg, index=%d \
-				user mdn  %s  esn  %s  imsi  %s  fd %d  tid %u  mod_id %d",i,__FILE__,__LINE__,user->msisdn,user->esn,user->imsi,user->fd,tid_list[0].min_tid,body.mod_id);
+				user mdn  %s  esn  %s  imsi  %s  fd %d  tid %u  mod_id %d",__FILE__,__LINE__,i,user->msisdn,user->esn,user->imsi,user->fd,tid_list[0].min_tid,body.mod_id);
 			}
 		}
 	}
