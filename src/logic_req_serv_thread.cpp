@@ -142,8 +142,8 @@ int LogicReqServThread::init(InfoMemMgr *info_mgr, MsgList* app_queue, MsgList* 
 
 void LogicReqServThread::sync_data()
 {
-	char send_buf[3000] = {0};
-	
+	CommonLogger::instance().log_error("LogicReqServThread: sync_data begin");
+	char send_buf[3000] = {0};	
 	db_->executeQuery("select * from active_user");
 	while(db_->fetch()){
 		unsigned int count=0;
@@ -199,7 +199,7 @@ void LogicReqServThread::sync_data()
 		unsigned int n = client_list_.size();
 		unsigned int i = 0;
 
-		CommonLogger::instance().log_debug("deal_locreq_ack: New user.");
+		CommonLogger::instance().log_debug("LogicReqServThread: sync_data ");
 		for (; i < n; ++i)
 		{
 			if (client_list_[i].connected())
@@ -209,13 +209,14 @@ void LogicReqServThread::sync_data()
 				{
 					client_list_[i].disconnect_to_server();
 				}
-				CommonLogger::instance().log_debug("deal_locreq_ack: Send Active Msg to first connected socket(servicelogic modle), index=%d",i);
+				CommonLogger::instance().log_debug("LogicReqServThread: sync_data, Send SERVLOGIC_USER_SYNC_REQ Msg, index=%d",i);
 				/* luchq add for test */
-				CommonLogger::instance().log_debug("[%s %d] deal_locreq_ack: user msisdn 	%s  esn  %s  imsi  %s ",
+				CommonLogger::instance().log_debug("[%s %d] LogicReqServThread: sync_data,  user msisdn  %s  esn  %s  imsi  %s ",
 					__FILE__,__LINE__,user->msisdn, user->esn, user->imsi);
 			}
 		}
 	}
+	CommonLogger::instance().log_error("LogicReqServThread: sync_data end");
 }
 
 
@@ -432,8 +433,7 @@ int LogicReqServThread::deal_app_req_queue()
 					}
 					CommonLogger::instance().log_debug("deal_app_req_queue: Send Active Msg to first connected socket(servicelogic modle), index=%d",i);
 					/* luchq add for test */
-					CommonLogger::instance().log_debug("[%s %d] deal_app_req_queue: user msisdn 	%s",
-						__FILE__,__LINE__,active->msisdn);
+					CommonLogger::instance().log_debug("[%s %d] deal_app_req_queue: user msisdn 	%s",__FILE__,__LINE__,active->msisdn);
 					++i;
 					break;
 				}else{
