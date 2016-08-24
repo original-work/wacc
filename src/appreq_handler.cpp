@@ -306,6 +306,12 @@ int AppReqHandler::deal_del_user(char *data)
 		app_req_queue_->insert_record((char*)&red_msg, sizeof(ReqMsg));
 		app_req_queue_->advance_widx();
 
+		/*  ´Ómysql  ÖÐÉ¾³ý*/
+
+		char sql[100];	
+		sprintf(sql,"delete from active_user where mdn=%s",re->mdn);
+		db_->executeUpdate(sql);
+
 	}
 	
 	unsigned int *result = (unsigned int *)(send_buf_ + (sizeof(NIF_MSG_UNIT2) - sizeof(unsigned char*)));
@@ -420,6 +426,11 @@ void AppReqHandler::app_req_queue(MsgList *p)
 void AppReqHandler::client_list(map<int, BaseCollectionHandler*> *list)
 {
 	client_list_ = list;
+}
+
+void AppReqHandler::db(MySQLConnWrapper *p)
+{
+    db_ = p;
 }
 
 unsigned long long AppReqHandler::ntoh64(unsigned long long inval)

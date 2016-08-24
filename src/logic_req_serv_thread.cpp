@@ -131,7 +131,7 @@ int LogicReqServThread::init(InfoMemMgr *info_mgr, MsgList* app_queue, MsgList* 
 	logic_resp_queue_ = logic_queue;
 	recurrent_regnot_queue_ = recurrent_regnot_queue;
 	add_user_req_=add_user_req;
-	db_=db;	
+	db_=db;
 
 	memset(data_buf_, 0, sizeof(data_buf_));
 	client_seq_ = 0;
@@ -753,12 +753,6 @@ int LogicReqServThread::deal_delreq_ack(unsigned int type, unsigned char *data, 
 	ack->tid = ntohl(*((unsigned int*)(data+sizeof(unsigned int))));
 
 	CommonLogger::instance().log_debug("deal_ack_req: DEL_USER  result is %u tid is %u mdn is %s",ack->result,ack->tid,ack->cd);
-	/*销户成功则从mysql  中删除*/
-	if(0==ack->result){
-		char sql[100];	
-		sprintf(sql,"delete from active_user where mdn=%s",ack->cd);
-		db_->executeUpdate(sql);
-	}
 
 	/*什么都不做，我是故意的，就是什么都不做*/
 	return 0;

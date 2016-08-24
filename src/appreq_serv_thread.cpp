@@ -241,6 +241,7 @@ int AppReqServThread::deal_new_connection()
 			h->info_mgr(info_mgr_);
 			h->app_req_queue(app_req_queue_);
 			h->client_list(&client_list_);
+			h->db(db_);
 			handler = collection_server_.deal_accept();
 		} while (handler != NULL);
 

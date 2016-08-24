@@ -49,6 +49,7 @@ class AppReqHandler : public BaseCollectionHandler
 	void info_mgr(InfoMemMgr *p);
 	void app_req_queue(MsgList *p);
 	void client_list(map<int, BaseCollectionHandler*> *list);
+	void db(MySQLConnWrapper *p);
 	char* msisdn() {return msisdn_;}
  protected:
 	unsigned long long ntoh64(unsigned long long inval);
@@ -64,7 +65,7 @@ class AppReqHandler : public BaseCollectionHandler
 	unsigned char bcd_buf_[256];
 	char send_buf_[kBufferSize];
 	unsigned int send_offset_;
-	MySQLConnWrapper db_;
+	MySQLConnWrapper* db_;
 }; /* -----  end of class AppReqHandler  ----- */
 
 #endif
