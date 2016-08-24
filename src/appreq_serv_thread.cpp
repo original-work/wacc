@@ -379,7 +379,7 @@ int AppReqServThread::deal_logic_resp_queue()
 								db_.setString(2,regnot->imsi);
 								db_.setString(3,regnot->esn);
 								db_.setString(4,now);
-								db_.execute();
+								db_.executeUpdate();
 								db_.closeCon();
 							}
 						}
