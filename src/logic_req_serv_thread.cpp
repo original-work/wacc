@@ -142,7 +142,7 @@ int LogicReqServThread::init(InfoMemMgr *info_mgr, MsgList* app_queue, MsgList* 
 
 void LogicReqServThread::sync_data()
 {
-	CommonLogger::instance().log_error("LogicReqServThread: sync_data begin");
+	CommonLogger::instance().log_debug("LogicReqServThread: sync_data begin");
 	char send_buf[3000] = {0};	
 	db_->executeQuery("select * from active_user");
 	while(db_->fetch()){
@@ -220,7 +220,7 @@ void LogicReqServThread::sync_data()
 			}
 		}
 	}
-	CommonLogger::instance().log_error("LogicReqServThread: sync_data end");
+	CommonLogger::instance().log_debug("LogicReqServThread: sync_data end");
 }
 
 
