@@ -380,7 +380,6 @@ int AppReqServThread::deal_logic_resp_queue()
 								db_.setString(3,regnot->esn);
 								db_.setString(4,now);
 								db_.executeUpdate();
-								db_.closeCon();
 							}
 						}
 

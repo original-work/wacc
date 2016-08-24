@@ -762,7 +762,6 @@ int LogicReqServThread::deal_delreq_ack(unsigned int type, unsigned char *data, 
 		db_.switchDb("mihao");		
 		sprintf(sql,"delete from active_user where mdn=%s",ack->cd);
 		db_.executeUpdate(sql);
-		db_.closeCon();
 	}
 
 	/*什么都不做，我是故意的，就是什么都不做*/
