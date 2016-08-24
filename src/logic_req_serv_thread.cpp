@@ -611,6 +611,13 @@ int LogicReqServThread::deal_locreq_ack(unsigned char *data, unsigned int len)
 					memcpy(user->imsi, ack->imsi, strlen(ack->imsi));
 					memcpy(user->esn, ack->esn, strlen(ack->esn));
 
+
+					ActiveUser* test_user = (ActiveUser*)info_mgr_->active_usr_table_.find_num((char*)bcd_buf_, strlen(ActReq->msisdn));
+					if (test_user != NULL)
+					{
+						log_debug("[%s %d] deal_locreq_ack: user msisdn 	%s  esn  %s  imsi  %s ",
+								__FILE__,__LINE__,test_user->msisdn, test_user->esn, test_user->imsi);
+					}
 					NIF_MSG_UNIT *unit = (NIF_MSG_UNIT*)send_buf;
 					unit->dialog = htonl(BEGIN);
 					unit->invoke = htonl(SERVLOGIC_ACTIVATE_REQ);
