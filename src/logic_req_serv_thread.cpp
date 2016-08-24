@@ -164,55 +164,64 @@ void LogicReqServThread::sync_data()
 		StrToBCD(mdn.c_str(), bcd_buf_, sizeof(bcd_buf_));
 
 		/*  首先添加到内存数据库*/
-		ActiveUser* user = (ActiveUser*)info_mgr_->active_usr_table_.add_num((char*)bcd_buf_, mdn.length());
-		if (user == NULL)
+		ActiveUser* user = (ActiveUser*)info_mgr_->active_usr_table_.find_num((char*)bcd_buf_, strlen(re->mdn));
+		if (user != NULL)
 		{
-			CommonLogger::instance().log_error("LogicReqServThread: sync_data, add user %s to mem db fail", mdn.c_str());
+			CommonLogger::instance().log_debug("deal_add_user: user already exists %s", re->mdn);
 		}
-
-		user->fd = fd;
-		memset(user->msisdn,0,sizeof(user->msisdn));
-		memset(user->imsi,0,sizeof(user->imsi));
-		memset(user->esn,0,sizeof(user->esn));
-		memcpy(user->msisdn, mdn.c_str(), mdn.length());
-		memcpy(user->imsi, imsi.c_str(), imsi.length());
-		memcpy(user->esn, esn.c_str(), esn.length());
-
-
-		/*  然后同步给业务逻辑模块*/
-		NIF_MSG_UNIT *unit = (NIF_MSG_UNIT*)send_buf;
-		unit->dialog = htonl(BEGIN);
-		unit->invoke = htonl(SERVLOGIC_USER_SYNC_REQ);
-		unit->length = htonl(sizeof(PeriodData));
-		PeriodData body;
-		memset(body.imsi,0,sizeof(body.imsi));
-		memset(body.msisdn,0,sizeof(body.msisdn));
-		memset(body.esn,0,sizeof(body.esn));
-
-		body.mod_id=UsrAccConfig::instance().module_id();
-		memcpy(body.imsi,imsi.c_str(), imsi.length());
-		memcpy(body.msisdn,mdn.c_str(), mdn.length());
-		memcpy(body.esn,esn.c_str(), esn.length());
-		memcpy((send_buf + sizeof(NIF_MSG_UNIT) - sizeof(unsigned char*)), (char*)&body, sizeof(PeriodData));
-		int send_len =  sizeof(NIF_MSG_UNIT) - sizeof(unsigned char*) + sizeof(PeriodData);
-
-		unsigned int n = client_list_.size();
-		unsigned int i = 0;
-
-		CommonLogger::instance().log_debug("LogicReqServThread: sync_data ");
-		for (; i < n; ++i)
+		else
 		{
-			if (client_list_[i].connected())
+			user = (ActiveUser*)info_mgr_->active_usr_table_.add_num((char*)bcd_buf_, mdn.length());
+			if (user == NULL)
 			{
-				int r = client_list_[i].send_data(send_buf, send_len);
-				if (r < send_len || r == -1)
+				CommonLogger::instance().log_error("LogicReqServThread: sync_data, add user %s to mem db fail", mdn.c_str());
+				continue;
+			}
+
+			user->fd = fd;
+			memset(user->msisdn,0,sizeof(user->msisdn));
+			memset(user->imsi,0,sizeof(user->imsi));
+			memset(user->esn,0,sizeof(user->esn));
+			memcpy(user->msisdn, mdn.c_str(), mdn.length());
+			memcpy(user->imsi, imsi.c_str(), imsi.length());
+			memcpy(user->esn, esn.c_str(), esn.length());
+
+
+			/*  然后同步给业务逻辑模块*/
+			NIF_MSG_UNIT *unit = (NIF_MSG_UNIT*)send_buf;
+			unit->dialog = htonl(BEGIN);
+			unit->invoke = htonl(SERVLOGIC_USER_SYNC_REQ);
+			unit->length = htonl(sizeof(PeriodData));
+			PeriodData body;
+			memset(body.imsi,0,sizeof(body.imsi));
+			memset(body.msisdn,0,sizeof(body.msisdn));
+			memset(body.esn,0,sizeof(body.esn));
+
+			body.mod_id=UsrAccConfig::instance().module_id();
+			memcpy(body.imsi,imsi.c_str(), imsi.length());
+			memcpy(body.msisdn,mdn.c_str(), mdn.length());
+			memcpy(body.esn,esn.c_str(), esn.length());
+			memcpy((send_buf + sizeof(NIF_MSG_UNIT) - sizeof(unsigned char*)), (char*)&body, sizeof(PeriodData));
+			int send_len =  sizeof(NIF_MSG_UNIT) - sizeof(unsigned char*) + sizeof(PeriodData);
+
+			unsigned int n = client_list_.size();
+			unsigned int i = 0;
+
+			CommonLogger::instance().log_debug("LogicReqServThread: sync_data ");
+			for (; i < n; ++i)
+			{
+				if (client_list_[i].connected())
 				{
-					client_list_[i].disconnect_to_server();
+					int r = client_list_[i].send_data(send_buf, send_len);
+					if (r < send_len || r == -1)
+					{
+						client_list_[i].disconnect_to_server();
+					}
+					CommonLogger::instance().log_debug("LogicReqServThread: sync_data, Send SERVLOGIC_USER_SYNC_REQ Msg, index=%d",i);
+					/* luchq add for test */
+					CommonLogger::instance().log_debug("[%s %d] LogicReqServThread: sync_data,  user msisdn  %s  esn  %s  imsi  %s ",
+						__FILE__,__LINE__,user->msisdn, user->esn, user->imsi);
 				}
-				CommonLogger::instance().log_debug("LogicReqServThread: sync_data, Send SERVLOGIC_USER_SYNC_REQ Msg, index=%d",i);
-				/* luchq add for test */
-				CommonLogger::instance().log_debug("[%s %d] LogicReqServThread: sync_data,  user msisdn  %s  esn  %s  imsi  %s ",
-					__FILE__,__LINE__,user->msisdn, user->esn, user->imsi);
 			}
 		}
 	}
