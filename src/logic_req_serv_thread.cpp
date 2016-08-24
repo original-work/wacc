@@ -132,7 +132,7 @@ int LogicReqServThread::init(InfoMemMgr *info_mgr, MsgList* app_queue, MsgList* 
 	recurrent_regnot_queue_ = recurrent_regnot_queue;
 	add_user_req_=add_user_req;
 	db_=db;
-	//sync_data();
+	sync_data();
 
 	memset(data_buf_, 0, sizeof(data_buf_));
 	client_seq_ = 0;
@@ -152,13 +152,9 @@ void LogicReqServThread::sync_data()
 			usleep(20);
 		}
 		string mdn=db_->getString("mdn");
-		printf("mdn=%s\n", mdn.c_str());
 		string imsi=db_->getString("imsi");
-		printf("imsi=%s\n", imsi.c_str());
 		string esn=db_->getString("esn");
-		printf("esn=%s\n", esn.c_str());
 		int fd=db_->getInt("fd");
-		printf("fd=%d\n", fd);
 
 		memset(bcd_buf_,0,sizeof(bcd_buf_));
 		StrToBCD(mdn.c_str(), bcd_buf_, sizeof(bcd_buf_));
@@ -198,6 +194,8 @@ void LogicReqServThread::sync_data()
 		memset(body.msisdn,0,sizeof(body.msisdn));
 		memset(body.esn,0,sizeof(body.esn));
 
+		vector<TidParam> tid_list = UsrAccConfig::instance().tid_num_seg_list();
+		body.tid=tid_list[0].min_tid;
 		body.mod_id=UsrAccConfig::instance().module_id();
 		memcpy(body.imsi,imsi.c_str(), imsi.length());
 		memcpy(body.msisdn,mdn.c_str(), mdn.length());
@@ -208,7 +206,6 @@ void LogicReqServThread::sync_data()
 		unsigned int n = client_list_.size();
 		unsigned int i = 0;
 
-		CommonLogger::instance().log_debug("LogicReqServThread: sync_data ");
 		for (; i < n; ++i)
 		{
 			if (client_list_[i].connected())
@@ -218,10 +215,8 @@ void LogicReqServThread::sync_data()
 				{
 					client_list_[i].disconnect_to_server();
 				}
-				CommonLogger::instance().log_debug("LogicReqServThread: sync_data, Send SERVLOGIC_USER_SYNC_REQ Msg, index=%d",i);
-				/* luchq add for test */
-				CommonLogger::instance().log_debug("[%s %d] LogicReqServThread: sync_data,  user msisdn  %s  esn  %s  imsi  %s ",
-					__FILE__,__LINE__,user->msisdn, user->esn, user->imsi);
+				CommonLogger::instance().log_debug("[%s %d] LogicReqServThread: sync_data,  Send SERVLOGIC_USER_SYNC_REQ Msg, index=%d \
+				user mdn  %s  esn  %s  imsi  %s  fd %d  tid %u  mod_id %d",i,__FILE__,__LINE__,user->msisdn,user->esn,user->imsi,user->fd,body.tid,body.mod_id);
 			}
 		}
 	}
