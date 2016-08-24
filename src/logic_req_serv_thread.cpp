@@ -192,7 +192,7 @@ void LogicReqServThread::sync_data()
 		memset(body.esn,0,sizeof(body.esn));
 
 		vector<TidParam> tid_list = UsrAccConfig::instance().tid_num_seg_list();
-		body.tid=tid_list[0].min_tid;
+		body.tid=htonl(tid_list[0].min_tid);
 		body.mod_id=UsrAccConfig::instance().module_id();
 		memcpy(body.imsi,imsi.c_str(), imsi.length());
 		memcpy(body.msisdn,mdn.c_str(), mdn.length());
