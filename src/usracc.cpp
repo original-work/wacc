@@ -67,20 +67,24 @@ int main(int argc, char *argv[])
 
 	map<unsigned int, char*> map_add_user_req;
 
+	MySQLConnWrapper db;
+	db.init(UsrAccConfig::instance().mysql_url(), UsrAccConfig::instance().mysql_user(), UsrAccConfig::instance().mysql_password());
+	db.connect();
+	db.switchDb("mihao");
 
 	InfoMemMgr info_mem_mgr;
 	info_mem_mgr.init();
 
 
 	LogicReqServThread logic_req_serv_thread;
-	logic_req_serv_thread.init(&info_mem_mgr, &app_req_queue, &logic_resp_queue, &recurrent_regnot_queue, &map_add_user_req);
+	logic_req_serv_thread.init(&info_mem_mgr, &app_req_queue, &logic_resp_queue, &recurrent_regnot_queue, &map_add_user_req, &db);
 	TcpClientMgrThread tcp_client_mgr_thread;
 	tcp_client_mgr_thread.init(logic_req_serv_thread.client_list());
 	tcp_client_mgr_thread.open();
 	logic_req_serv_thread.open();
 
 	AppReqServThread app_req_serv_thread;
-	app_req_serv_thread.init(&info_mem_mgr, &app_req_queue, &logic_resp_queue, &recurrent_regnot_queue, &map_add_user_req);
+	app_req_serv_thread.init(&info_mem_mgr, &app_req_queue, &logic_resp_queue, &recurrent_regnot_queue, &map_add_user_req, &db);
 	app_req_serv_thread.open();
 
 	// loop

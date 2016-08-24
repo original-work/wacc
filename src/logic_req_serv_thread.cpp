@@ -112,7 +112,7 @@ int LogicReqServThread::stop()
 	return 0;
 }		/* -----  end of method LogicReqServThread::stop  ----- */
 
-int LogicReqServThread::init(InfoMemMgr *info_mgr, MsgList* app_queue, MsgList* logic_queue, MsgList* recurrent_regnot_queue, map<unsigned int, char*>* add_user_req)
+int LogicReqServThread::init(InfoMemMgr *info_mgr, MsgList* app_queue, MsgList* logic_queue, MsgList* recurrent_regnot_queue, map<unsigned int, char*>* add_user_req, MySQLConnWrapper* db)
 {
 	timer_.time_interval(UsrAccConfig::instance().heartbeat_timeinterval());
 	recurrent_regnot_timer_.time_interval(UsrAccConfig::instance().recurrent_regnot_timeinterval());
@@ -131,12 +131,10 @@ int LogicReqServThread::init(InfoMemMgr *info_mgr, MsgList* app_queue, MsgList* 
 	logic_resp_queue_ = logic_queue;
 	recurrent_regnot_queue_ = recurrent_regnot_queue;
 	add_user_req_=add_user_req;
+	db_=db;	
 
 	memset(data_buf_, 0, sizeof(data_buf_));
 	client_seq_ = 0;
-	db_.init(UsrAccConfig::instance().mysql_url(), UsrAccConfig::instance().mysql_user(), UsrAccConfig::instance().mysql_password());
-	db_.connect();
-	db_.switchDb("mihao");	
 	return 0;
 }		/* -----  end of method LogicReqServThread::init  ----- */
 
@@ -759,7 +757,7 @@ int LogicReqServThread::deal_delreq_ack(unsigned int type, unsigned char *data, 
 	if(0==ack->result){
 		char sql[100];	
 		sprintf(sql,"delete from active_user where mdn=%s",ack->cd);
-		db_.executeUpdate(sql);
+		db_->executeUpdate(sql);
 	}
 
 	/*什么都不做，我是故意的，就是什么都不做*/

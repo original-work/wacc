@@ -44,7 +44,7 @@ class AppReqServThread : public CThread
 	public:
 		AppReqServThread();                             /* constructor */
 		~AppReqServThread();                            /* destructor       */
-		int init(InfoMemMgr *info_mem, MsgList* app_queue, MsgList* logic_queue, MsgList* recurrent_regnot_queue, map<unsigned int, char*>* p_map_recurrent_regnot);
+		int init(InfoMemMgr *info_mem, MsgList* app_queue, MsgList* logic_queue, MsgList* recurrent_regnot_queue, map<unsigned int, char*>* add_user_req, MySQLConnWrapper* db);
 		int open(void *args = 0);
 		int svc();
 		int loop_process();
@@ -78,7 +78,7 @@ class AppReqServThread : public CThread
 		unsigned int connection_count_limits_;
 		unsigned char bcd_buf_[256];
 		bool all_stopped_;
-		MySQLConnWrapper db_;
+		MySQLConnWrapper* db_;
 }; /* -----  end of class AppReqServThread  ----- */
 
 #endif

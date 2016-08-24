@@ -45,7 +45,7 @@ class LogicReqServThread : public CThread
 		int open(void *args = 0);
 		int svc();
 		int stop();
-		int init(InfoMemMgr *info_mgr, MsgList* app_queue, MsgList* logic_queue, MsgList* recurrent_regnot_queue, map<unsigned int, char*>* p_map_recurrent_regnot);
+		int init(InfoMemMgr *info_mgr, MsgList* app_queue, MsgList* logic_queue, MsgList* recurrent_regnot_queue, map<unsigned int, char*>* add_user_req, MySQLConnWrapper* db);
 		int select_check_fds();
 		vector<TcpClient>* client_list() {return &client_list_;}
 	protected:
@@ -76,7 +76,7 @@ class LogicReqServThread : public CThread
 		CTimer recurrent_regnot_timer_;
 		bool all_stopped_;
 		unsigned char bcd_buf_[256];
-		MySQLConnWrapper db_;
+		MySQLConnWrapper* db_;
 }; /* -----  end of class LogicReqServThread  ----- */
 
 

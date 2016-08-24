@@ -93,7 +93,7 @@ int AppReqServThread::svc()
 }		/* -----  end of method AppReqServThread::svc  ----- */
 
 
-int AppReqServThread::init(InfoMemMgr *info_mem, MsgList* app_queue, MsgList* logic_queue, MsgList* recurrent_regnot_queue, map<unsigned int, char*>* add_user_req)
+int AppReqServThread::init(InfoMemMgr *info_mem, MsgList* app_queue, MsgList* logic_queue, MsgList* recurrent_regnot_queue, map<unsigned int, char*>* add_user_req, MySQLConnWrapper* db)
 {
 	/* 获取服务端监听端口*/
 	collection_server_.port(UsrAccConfig::instance().app_serv_port());
@@ -105,14 +105,11 @@ int AppReqServThread::init(InfoMemMgr *info_mem, MsgList* app_queue, MsgList* lo
 	logic_resp_queue_ = logic_queue;
 	recurrent_regnot_queue_ = recurrent_regnot_queue;
 	add_user_req_ = add_user_req;
-
+	db_=db;
 	current_connection_count_ = 0;
 	connection_count_limits_ = UsrAccConfig::instance().app_max_connection_count();
 	TidGenerator::instance().init();
-
-	db_.init(UsrAccConfig::instance().mysql_url(), UsrAccConfig::instance().mysql_user(), UsrAccConfig::instance().mysql_password());
-	db_.connect();
-	db_.switchDb("mihao");
+	
 	return 0;
 }		/* -----  end of method AppReqServThread::init  ----- */
 
@@ -374,13 +371,13 @@ int AppReqServThread::deal_logic_resp_queue()
 
 							/*开户成功则插入mysql*/
 							if(0==ack->result){
-								db_.prepare("INSERT INTO active_user(create_time, mdn, imsi, esn) VALUES (?, ?, ?, ?)");
+								db_->prepare("INSERT INTO active_user(create_time, mdn, imsi, esn) VALUES (?, ?, ?, ?)");
 								string now=tools::currentDateTime();
-								db_.setString(1,now);
-								db_.setString(2,user->msisdn);
-								db_.setString(3,user->imsi);
-								db_.setString(4,user->esn);
-								db_.executeUpdate();
+								db_->setString(1,now);
+								db_->setString(2,user->msisdn);
+								db_->setString(3,user->imsi);
+								db_->setString(4,user->esn);
+								db_->executeUpdate();
 							}
 						}
 
