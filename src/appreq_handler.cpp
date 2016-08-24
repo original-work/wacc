@@ -329,6 +329,19 @@ int AppReqHandler::deal_del_user(char *data)
 	ActiveUser* user = (ActiveUser*)info_mgr_->active_usr_table_.find_num((char*)bcd_buf_, strlen(re->mdn));
 	if (user != NULL)
 	{
+		/*   向操作表中插入操作记录*/
+		db_->prepare("INSERT INTO op_record(create_time, mdn, imsi, esn, opt_code, opt_result, seq) VALUES (?, ?, ?, ?, ?, ?, ?)");
+		string now=tools::currentDateTime();
+		db_->setString(1,now);
+		db_->setString(2,user->msisdn);
+		db_->setString(3,user->imsi);
+		db_->setString(4,user->esn);
+		db_->setString(5,"DEL");
+		db_->setInt(6,0);
+		db_->setInt(7,ntohl(header->seq));
+		db_->executeUpdate();
+
+	
 		info_mgr_->active_usr_table_.remove_num((char*)bcd_buf_, strlen(re->mdn));
 		memcpy(record->msisdn, re->mdn, strlen(re->mdn));
 		CommonLogger::instance().log_debug("deal_del_user: mdn:%s\n",record->msisdn);
@@ -342,18 +355,6 @@ int AppReqHandler::deal_del_user(char *data)
 		sprintf(sql,"delete from active_user where mdn=%s",re->mdn);
 		db_->executeUpdate(sql);
 	}
-
-	/*   向操作表中插入操作记录*/
-	db_->prepare("INSERT INTO op_record(create_time, mdn, imsi, esn, opt_code, opt_result, seq) VALUES (?, ?, ?, ?, ?, ?, ?)");
-	string now=tools::currentDateTime();
-	db_->setString(1,now);
-	db_->setString(2,user->msisdn);
-	db_->setString(3,user->imsi);
-	db_->setString(4,user->esn);
-	db_->setString(5,"DEL");
-	db_->setInt(6,0);
-	db_->setInt(7,ntohl(header->seq));
-	db_->executeUpdate();
 	
 	unsigned int *result = (unsigned int *)(send_buf_ + (sizeof(NIF_MSG_UNIT2) - sizeof(unsigned char*)));
 	*result = htonl(0);
