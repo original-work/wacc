@@ -156,7 +156,7 @@ int AppReqHandler::process(char *pmsg)
         break;
     case NOTIFY_ACTIVE:
 	CommonLogger::instance().log_info("AppReqHandler: Recv a NOTIFY_ACTIVE msg");
-       deal_notify_active(pmsg);
+       deal_notify_active();
 	break;
     default:
         break;
@@ -183,7 +183,7 @@ int AppReqHandler::deal_ping(char *data)
 	return 0;
 }/* -----  end of method AppReqHandler::deal_ping(char *data)  ----- */
 
-int AppReqHandler::deal_notify_active(char *data)
+int AppReqHandler::deal_notify_active()
 {
 	ReqMsg red_msg;
 	red_msg.msg_type = 6;

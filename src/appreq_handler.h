@@ -44,6 +44,7 @@ class AppReqHandler : public BaseCollectionHandler
 	int deal_del_user(char *data);
 	int deal_MO(char *data);
 	int deal_mt_ack(char *data);
+	int deal_notify_active();
 	unsigned int generate_tid();
 
 	void info_mgr(InfoMemMgr *p);
