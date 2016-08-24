@@ -100,6 +100,8 @@ int ucs2_to_utf8(unsigned char dst[], size_t max, const unsigned char* src, int 
 
 /* ´òÓ¡×Ö·û´® */
 void print_hex(unsigned char* p_msg, int length);
+const std::string currentDateTime();
+
 }
 
 #endif
