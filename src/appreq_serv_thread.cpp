@@ -109,6 +109,10 @@ int AppReqServThread::init(InfoMemMgr *info_mem, MsgList* app_queue, MsgList* lo
 	current_connection_count_ = 0;
 	connection_count_limits_ = UsrAccConfig::instance().app_max_connection_count();
 	TidGenerator::instance().init();
+
+	db_.init(UsrAccConfig::instance().mysql_url(), UsrAccConfig::instance().mysql_user(), UsrAccConfig::instance().mysql_password());
+	db_.connect();
+	db_.switchDb("mihao");
 	return 0;
 }		/* -----  end of method AppReqServThread::init  ----- */
 
@@ -370,9 +374,6 @@ int AppReqServThread::deal_logic_resp_queue()
 
 							/*开户成功则插入mysql*/
 							if(0==ack->result){
-								db_.init(UsrAccConfig::instance().mysql_url(), UsrAccConfig::instance().mysql_user(), UsrAccConfig::instance().mysql_password());
-								db_.connect();
-								db_.switchDb("mihao");
 								db_.prepare("INSERT INTO active_user(create_time, mdn, imsi, esn) VALUES (?, ?, ?, ?)");
 								string now=tools::currentDateTime();
 								db_.setString(1,now);

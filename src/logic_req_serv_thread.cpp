@@ -133,9 +133,10 @@ int LogicReqServThread::init(InfoMemMgr *info_mgr, MsgList* app_queue, MsgList* 
 	add_user_req_=add_user_req;
 
 	memset(data_buf_, 0, sizeof(data_buf_));
-
 	client_seq_ = 0;
-
+	db_.init(UsrAccConfig::instance().mysql_url(), UsrAccConfig::instance().mysql_user(), UsrAccConfig::instance().mysql_password());
+	db_.connect();
+	db_.switchDb("mihao");	
 	return 0;
 }		/* -----  end of method LogicReqServThread::init  ----- */
 
@@ -756,10 +757,7 @@ int LogicReqServThread::deal_delreq_ack(unsigned int type, unsigned char *data, 
 	CommonLogger::instance().log_debug("deal_ack_req: DEL_USER  result is %u tid is %u mdn is %s",ack->result,ack->tid,ack->cd);
 	/*销户成功则从mysql  中删除*/
 	if(0==ack->result){
-		char sql[100];
-		db_.init(UsrAccConfig::instance().mysql_url(), UsrAccConfig::instance().mysql_user(), UsrAccConfig::instance().mysql_password());
-		db_.connect();
-		db_.switchDb("mihao");		
+		char sql[100];	
 		sprintf(sql,"delete from active_user where mdn=%s",ack->cd);
 		db_.executeUpdate(sql);
 	}
