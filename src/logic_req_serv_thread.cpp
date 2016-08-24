@@ -132,7 +132,7 @@ int LogicReqServThread::init(InfoMemMgr *info_mgr, MsgList* app_queue, MsgList* 
 	recurrent_regnot_queue_ = recurrent_regnot_queue;
 	add_user_req_=add_user_req;
 	db_=db;
-	sync_data();
+	//sync_data();
 
 	memset(data_buf_, 0, sizeof(data_buf_));
 	client_seq_ = 0;
