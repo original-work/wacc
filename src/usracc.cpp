@@ -77,8 +77,6 @@ int main(int argc, char *argv[])
 	db.connect();
 	db.switchDb("mihao");
 
-	sleep(3);
-
 	LogicReqServThread logic_req_serv_thread;
 	logic_req_serv_thread.init(&info_mem_mgr, &app_req_queue, &logic_resp_queue, &recurrent_regnot_queue, &map_add_user_req, &db);
 	TcpClientMgrThread tcp_client_mgr_thread;
@@ -89,6 +87,8 @@ int main(int argc, char *argv[])
 	AppReqServThread app_req_serv_thread;
 	app_req_serv_thread.init(&info_mem_mgr, &app_req_queue, &logic_resp_queue, &recurrent_regnot_queue, &map_add_user_req, &db);
 	app_req_serv_thread.open();
+
+	
 
 	// loop
 	LoopStopper loop_stopper;

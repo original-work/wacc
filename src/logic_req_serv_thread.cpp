@@ -51,6 +51,8 @@ int LogicReqServThread::open(void *args)
 	{
 		return -1;
 	}
+	sync_data();
+
 	return 0;
 }		/* -----  end of method LogicReqServThread::open  ----- */
 
@@ -100,7 +102,6 @@ int LogicReqServThread::svc()
 	return 0;
 }		/* -----  end of method LogicReqServThread::svc  ----- */
 
-
 int LogicReqServThread::stop()
 {
 	cancel_thread();
@@ -132,13 +133,11 @@ int LogicReqServThread::init(InfoMemMgr *info_mgr, MsgList* app_queue, MsgList* 
 	recurrent_regnot_queue_ = recurrent_regnot_queue;
 	add_user_req_=add_user_req;
 	db_=db;
-	sync_data();
 
 	memset(data_buf_, 0, sizeof(data_buf_));
-	client_seq_ = 0;
+	client_seq_ = 0;	
 	return 0;
 }		/* -----  end of method LogicReqServThread::init  ----- */
-
 
 void LogicReqServThread::sync_data()
 {
@@ -223,10 +222,6 @@ void LogicReqServThread::sync_data()
 	CommonLogger::instance().log_debug("LogicReqServThread: sync_data end");
 }
 
-
-
-
-
 int LogicReqServThread::select_check_fds()
 {
 	FD_ZERO(&fdset_);
@@ -264,7 +259,6 @@ int LogicReqServThread::select_check_fds()
 
 	return 0;
 }		/* -----  end of method LogicReqServThread::select_check_fds  ----- */
-
 
 bool LogicReqServThread::StrToBCD(const char *Src,unsigned char *Des,int iDesLen)
 {
@@ -310,7 +304,6 @@ bool LogicReqServThread::StrToBCD(const char *Src,unsigned char *Des,int iDesLen
 	}
 	return true;
 }
-
 
 int LogicReqServThread::loop_process()
 {
