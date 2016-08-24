@@ -167,7 +167,7 @@ void LogicReqServThread::sync_data()
 		ActiveUser* user = (ActiveUser*)info_mgr_->active_usr_table_.find_num((char*)bcd_buf_, mdn.length());
 		if (user != NULL)
 		{
-			CommonLogger::instance().log_debug("deal_add_user: user already exists %s", re->mdn);
+			CommonLogger::instance().log_debug("deal_add_user: user already exists %s", mdn.c_str());
 		}
 		else
 		{
