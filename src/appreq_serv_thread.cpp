@@ -375,17 +375,13 @@ int AppReqServThread::deal_logic_resp_queue()
 								db_.switchDb("mihao");
 								db_.prepare("INSERT INTO active_user(create_time, mdn, imsi, esn) VALUES (?, ?, ?, ?)");
 								string now=tools::currentDateTime();
-								string Smdn(1,regnot->msisdn);
-								db_.setString(2,Smdn);
-								string Simsi(1,regnot->imsi);
-								db_.setString(3,Simsi);
-								string Sesn(1,regnot->esn);
-								db_.setString(4,Sesn);
+								db_.setString(1,now);
+								db_.setString(2,regnot->msisdn);
+								db_.setString(3,regnot->imsi);
+								db_.setString(4,regnot->esn);
 								db_.execute();
 								db_.closeCon();
 							}
-
-							
 						}
 
 					}
