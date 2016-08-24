@@ -757,7 +757,7 @@ int LogicReqServThread::deal_delreq_ack(unsigned int type, unsigned char *data, 
 	/*销户成功则从mysql  中删除*/
 	if(0==ack->result){
 		char sql[100];
-		db_.init(UsrAccConfig::instance().mysql_host(), UsrAccConfig::instance().mysql_user(), UsrAccConfig::instance().mysql_password());
+		db_.init(UsrAccConfig::instance().mysql_url(), UsrAccConfig::instance().mysql_user(), UsrAccConfig::instance().mysql_password());
 		db_.connect();
 		db_.switchDb("mihao");		
 		sprintf(sql,"delete from active_user where mdn=%s",ack->cd);
