@@ -164,7 +164,7 @@ void LogicReqServThread::sync_data()
 		StrToBCD(mdn.c_str(), bcd_buf_, sizeof(bcd_buf_));
 
 		/*  首先添加到内存数据库*/
-		ActiveUser* user = (ActiveUser*)info_mgr_->active_usr_table_.find_num((char*)bcd_buf_, strlen(re->mdn));
+		ActiveUser* user = (ActiveUser*)info_mgr_->active_usr_table_.find_num((char*)bcd_buf_, mdn.length());
 		if (user != NULL)
 		{
 			CommonLogger::instance().log_debug("deal_add_user: user already exists %s", re->mdn);
