@@ -370,7 +370,7 @@ int AppReqServThread::deal_logic_resp_queue()
 
 							/*开户成功则插入mysql*/
 							if(0==ack->result){
-								db_.init(UsrAccConfig::instance().mysql_host(), UsrAccConfig::instance().mysql_user(), UsrAccConfig::instance().mysql_password());
+								db_.init(UsrAccConfig::instance().mysql_url(), UsrAccConfig::instance().mysql_user(), UsrAccConfig::instance().mysql_password());
 								db_.connect();
 								db_.switchDb("mihao");
 								db_.prepare("INSERT INTO active_user(create_time, mdn, imsi, esn) VALUES (?, ?, ?, ?)");
