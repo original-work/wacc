@@ -753,7 +753,7 @@ int LogicReqServThread::deal_delreq_ack(unsigned int type, unsigned char *data, 
 	ack->result = ntohl(*((unsigned int*)data));
 	ack->tid = ntohl(*((unsigned int*)(data+sizeof(unsigned int))));
 
-	CommonLogger::instance().log_debug("deal_ack_req: DEL_USER  result is %u tid is %u",ack->result,ack->tid);
+	CommonLogger::instance().log_debug("deal_ack_req: DEL_USER  result is %u tid is %u mdn is %s",ack->result,ack->tid,ack->cd);
 	/*销户成功则从mysql  中删除*/
 	if(0==ack->result){
 		char sql[100];
