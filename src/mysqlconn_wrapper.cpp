@@ -80,8 +80,8 @@ string MySQLConnWrapper::getPassword()
 void MySQLConnWrapper::manageException(sql::SQLException& e)
 {
 	if (e.getErrorCode() != 0){
-		CommonLogger::instance().log_error("[%s %s %d] MySQLConnWrapper: SQLException ERR: %s  error code: %u SQLState: %s", __FILE__,__FUNCTION__,__LINE__,
-			e.what(),e.getErrorCode(),e.getSQLState());
+		CommonLogger::instance().log_error("[%s %s %d] MySQLConnWrapper: SQLException ERR: %s  error code: %s SQLState: %s", __FILE__,__FUNCTION__,__LINE__,
+			e.what().c_str(),e.getErrorCode().c_str(),e.getSQLState().c_str());
 	#if 0
 		cout << "# ERR: SQLException in " << __FILE__;
 		cout << "(" << __FUNCTION__ << ") on line " << __LINE__ << endl;
