@@ -88,8 +88,10 @@ int LogicReqServThread::svc()
 			{
 				deal_recurrent_activate();
 				recurrent_regnot_timer_.reset();
+				#if 0
 				/*因为mysql 存在wait_timeout连接超时，所以需要周期性给mysql  发送个指令激活下*/
 				db_->executeQuery("select * from active_user where mdn=18019398639");
+				#endif
 			}
 			
 			RunInfo *info = (RunInfo*)SigAnalysisInfoShmManager::instance().get_run_info();

@@ -85,13 +85,6 @@ void MySQLConnWrapper::manageException(sql::SQLException& e)
 		string sqlState=e.getSQLState();
 		CommonLogger::instance().log_error("[%s %s %d] MySQLConnWrapper: SQLException ERR: %s  error code: %d SQLState: %s", __FILE__,__FUNCTION__,__LINE__,
 			what.c_str(),errorCode,sqlState.c_str());
-	#if 0
-		cout << "# ERR: SQLException in " << __FILE__;
-		cout << "(" << __FUNCTION__ << ") on line " << __LINE__ << endl;
-		cout << "# ERR: " << e.what();
-		cout << " (MySQL error code: " << e.getErrorCode();
-		cout << ", SQLState: " << e.getSQLState() << " )" << endl;
-	#endif
 	}
 }
 
@@ -100,6 +93,9 @@ void MySQLConnWrapper::connect()
 	try{
 		driver = get_driver_instance();
 		con = driver->connect(host_port, user, password);
+		bool myTrue = true;  
+		/*  因为mysql 存在wait_timeout连接超时所以要这么做*/
+		con->setClientOption("OPT_RECONNECT", &myTrue); 
 	} catch (sql::SQLException &e){
 		manageException(e);
 	}
