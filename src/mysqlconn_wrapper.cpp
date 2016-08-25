@@ -81,10 +81,10 @@ void MySQLConnWrapper::manageException(sql::SQLException& e)
 {
 	if (e.getErrorCode() != 0){
 		string what=e.what();
-		string errorCode=e.getErrorCode();
+		int errorCode=e.getErrorCode();
 		string sqlState=e.getSQLState();
-		CommonLogger::instance().log_error("[%s %s %d] MySQLConnWrapper: SQLException ERR: %s  error code: %s SQLState: %s", __FILE__,__FUNCTION__,__LINE__,
-			what.c_str(),errorCode.c_str(),sqlState.c_str());
+		CommonLogger::instance().log_error("[%s %s %d] MySQLConnWrapper: SQLException ERR: %s  error code: %d SQLState: %s", __FILE__,__FUNCTION__,__LINE__,
+			what.c_str(),errorCode,sqlState.c_str());
 	#if 0
 		cout << "# ERR: SQLException in " << __FILE__;
 		cout << "(" << __FUNCTION__ << ") on line " << __LINE__ << endl;
