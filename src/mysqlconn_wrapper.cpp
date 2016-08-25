@@ -33,6 +33,7 @@ yum install -y boost boost-devel boost-doc
 #include <cppconn/prepared_statement.h>
 
 #include "mysqlconn_wrapper.h"
+#include "common_logger.h"
 
 using namespace std;
 
@@ -79,11 +80,15 @@ string MySQLConnWrapper::getPassword()
 void MySQLConnWrapper::manageException(sql::SQLException& e)
 {
 	if (e.getErrorCode() != 0){
+		CommonLogger::instance().log_error("[%s %s %d] MySQLConnWrapper: SQLException ERR: %s  error code: %u SQLState: %s", __FILE__,__FUNCTION__,__LINE__,
+			e.what(),e.getErrorCode(),e.getSQLState());
+	#if 0
 		cout << "# ERR: SQLException in " << __FILE__;
 		cout << "(" << __FUNCTION__ << ") on line " << __LINE__ << endl;
 		cout << "# ERR: " << e.what();
 		cout << " (MySQL error code: " << e.getErrorCode();
 		cout << ", SQLState: " << e.getSQLState() << " )" << endl;
+	#endif
 	}
 }
 

@@ -88,6 +88,7 @@ int LogicReqServThread::svc()
 			{
 				deal_recurrent_activate();
 				recurrent_regnot_timer_.reset();
+				db_->executeQuery("select * from active_user where mdn=18019398639");
 			}
 			
 			RunInfo *info = (RunInfo*)SigAnalysisInfoShmManager::instance().get_run_info();
@@ -140,7 +141,7 @@ int LogicReqServThread::init(InfoMemMgr *info_mgr, MsgList* app_queue, MsgList* 
 void LogicReqServThread::sync_data()
 {
 	CommonLogger::instance().log_debug("LogicReqServThread: sync_data begin");
-	char send_buf[3000] = {0};	
+	char send_buf[3000] = {0};
 	db_->executeQuery("select * from active_user");
 	while(db_->fetch()){
 		unsigned int count=0;
