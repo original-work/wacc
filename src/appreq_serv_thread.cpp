@@ -253,7 +253,7 @@ int AppReqServThread::deal_logic_resp_queue()
 	char *pmsg = NULL;
 	unsigned int len;
 	char send_buf[600]= {0};
-	int sendlen;
+	unsigned int sendlen;
 	//memset(send_buf,0,sizeof(send_buf));
 	//CommonLogger::instance().log_info("Enter into AppReqServThread 	deal_logic_resp_queue process");
 	if (logic_resp_queue_->get_front_record(pmsg, len))
