@@ -285,6 +285,7 @@ int AppReqServThread::deal_logic_resp_queue()
 					unit->invoke = htonl(SMS_PUSH);
 					unit->dialog = htonl(BEGIN);
 					unit->length = htonl(sizeof(MTMsg)-sizeof(mt->sms_content)+mt->content_len);
+					unit->seq=10086;
 					data = (MTMsg*)(send_buf + sizeof(NIF_MSG_UNIT2) - sizeof(unsigned char*));
 					data->seq = mt->seq;
 					data->tid = htonl(mt->tid);
@@ -315,7 +316,7 @@ int AppReqServThread::deal_logic_resp_queue()
 					db_->setString(4,user->esn);
 					db_->setString(5,"MT");
 					db_->setInt(6,ack->result);
-					db_->setInt(7,"");
+					db_->setInt(7,10086);
 					db_->executeUpdate();
 				}
 				else
