@@ -305,6 +305,18 @@ int AppReqServThread::deal_logic_resp_queue()
                                    CommonLogger::instance().log_info("deal_logic_resp_queue: send MT msg to %s, Socket:%d, len:%d, sms_code is %u, seq is %u, tid is %u, cd is %s, cg is %s",
                                 	user->msisdn,user->fd,mt->content_len,data->sms_code,data->seq,data->tid,data->cd,data->cg);
 					tools::print_hex((unsigned char*)mt->sms_content,mt->content_len);
+
+					/*   向操作表中插入操作记录*/
+					db_->prepare("INSERT INTO op_record(create_time, mdn, imsi, esn, opt_code, opt_result, seq) VALUES (?, ?, ?, ?, ?, ?, ?)");
+					string now=tools::currentDateTime();
+					db_->setString(1,now);
+					db_->setString(2,user->msisdn);
+					db_->setString(3,user->imsi);
+					db_->setString(4,user->esn);
+					db_->setString(5,"MT");
+					db_->setInt(6,ack->result);
+					db_->setInt(7,"");
+					db_->executeUpdate();
 				}
 				else
 					CommonLogger::instance().log_info("deal_logic_resp_queue: Call find_num fail, user maybe not exist");
