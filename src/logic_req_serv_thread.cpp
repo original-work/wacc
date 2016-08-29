@@ -88,10 +88,6 @@ int LogicReqServThread::svc()
 			{
 				deal_recurrent_activate();
 				recurrent_regnot_timer_.reset();
-				#if 0
-				/*因为mysql 存在wait_timeout连接超时，所以需要周期性给mysql  发送个指令激活下*/
-				db_->executeQuery("select * from active_user where mdn=18019398639");
-				#endif
 			}
 			
 			RunInfo *info = (RunInfo*)SigAnalysisInfoShmManager::instance().get_run_info();
@@ -439,14 +435,6 @@ int LogicReqServThread::deal_app_req_queue()
 					CommonLogger::instance().log_debug("deal_app_req_queue: client_list_ not connected, index=%d",i);
 				}
 			}
-#if 0
-			LogicConnInfo *info = info_mgr_->logic_conns_mgr_.logic_conns();
-			int info_cnt = info_mgr_->logic_conns_mgr_.conns_counts();
-			for (int n = 0; n < info_cnt; ++n)
-			{
-				active->user_info->reconnect_cnt_list[n] = info[n].reconnect_cnt;
-			}
-#endif			
 		}
 		else if (req->msg_type == 2)	//deactive
 		{
@@ -527,20 +515,6 @@ int LogicReqServThread::deal_app_req_queue()
 				client_seq_ = 0;
 			}
 		}
-		#if 0
-		else if (req->msg_type == 5) //PING
-		{
-			CommonLogger::instance().log_info("deal_app_req_queue: Deal PING MSG.");
-
-			RespMsg resp;
-			resp.msg_type = 5;
-			AckMsg *ack = (AckMsg*)resp.msg;
-			ack->msg_type = PING;
-			
-			logic_resp_queue_->insert_record((char*)&resp, sizeof(RespMsg));
-			logic_resp_queue_->advance_widx();
-		}
-		#endif
 		else if (req->msg_type == 6) //NOTIFY_ACTIVE
 		{
 			CommonLogger::instance().log_info("deal_app_req_queue: Deal NOTIFY_ACTIVE MSG.");
@@ -764,14 +738,6 @@ int LogicReqServThread::deal_locreq_ack(unsigned char *data, unsigned int len)
 							}
 						}
 					}
-#if 0
-					LogicConnInfo *info = info_mgr_->logic_conns_mgr_.logic_conns();
-					int info_cnt = info_mgr_->logic_conns_mgr_.conns_counts();
-					for (int n = 0; n < info_cnt; ++n)
-					{
-						ActReq->user_info->reconnect_cnt_list[n] = info[n].reconnect_cnt;
-					}
-#endif					
 					rsCode=0;
 					return rsCode;
 				}

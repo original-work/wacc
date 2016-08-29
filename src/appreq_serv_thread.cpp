@@ -272,7 +272,7 @@ int AppReqServThread::deal_logic_resp_queue()
 			case 4:	// MT
 			{
 				memset(send_buf,0,sizeof(send_buf));
-                         	CommonLogger::instance().log_info("deal_logic_resp_queue: Deal MT msg, len=%d",len);
+                         	CommonLogger::instance().log_info("deal_logic_resp_queue: Deal MT msg, record len=%d",len);
 				CommonLogger::instance().log_info("deal_logic_resp_queue: cd %s, tid %d", mt->cd,mt->tid);
 				memset(bcd_buf_,0,sizeof(bcd_buf_));
 				StrToBCD(mt->cd, bcd_buf_, sizeof(bcd_buf_));
@@ -284,7 +284,7 @@ int AppReqServThread::deal_logic_resp_queue()
 					unit->head = htonl(0x1a2b3c4d);
 					unit->invoke = htonl(SMS_PUSH);
 					unit->dialog = htonl(BEGIN);
-					unit->length = htonl(sizeof(MTMsg));
+					unit->length = htonl(sizeof(MTMsg)-sizeof(mt->sms_content)+mt->content_len);
 					data = (MTMsg*)(send_buf + sizeof(NIF_MSG_UNIT2) - sizeof(unsigned char*));
 					data->seq = mt->seq;
 					data->tid = htonl(mt->tid);
@@ -297,10 +297,10 @@ int AppReqServThread::deal_logic_resp_queue()
 					{
 						CommonLogger::instance().log_error("deal_logic_resp_queue: Check App number fail, App=%s",user->msisdn);
 					}
-					sendlen = send_data(user->fd, send_buf, sizeof(NIF_MSG_UNIT2)-sizeof(unsigned char*)+sizeof(MTMsg));
-					if (sendlen != sizeof(NIF_MSG_UNIT2)-sizeof(unsigned char*)+sizeof(MTMsg))
+					sendlen = send_data(user->fd, send_buf, sizeof(NIF_MSG_UNIT2)-sizeof(unsigned char*)+sizeof(MTMsg)-sizeof(mt->sms_content)+mt->content_len);
+					if (sendlen != sizeof(NIF_MSG_UNIT2)-sizeof(unsigned char*)+sizeof(MTMsg)-sizeof(mt->sms_content)+mt->content_len)
 					{
-						CommonLogger::instance().log_info("deal_logic_resp_queue: send MT msg to %s 	FAIL!!! send length:%d", user->msisdn,len);
+						CommonLogger::instance().log_info("deal_logic_resp_queue: send MT msg to %s 	FAIL!!! send length:%d", user->msisdn, sendlen);
 					}
                                    CommonLogger::instance().log_info("deal_logic_resp_queue: send MT msg to %s, Socket:%d, len:%d, sms_code is %u, seq is %u, tid is %u, cd is %s, cg is %s",
                                 	user->msisdn,user->fd,mt->content_len,data->sms_code,data->seq,data->tid,data->cd,data->cg);
@@ -310,26 +310,6 @@ int AppReqServThread::deal_logic_resp_queue()
 					CommonLogger::instance().log_info("deal_logic_resp_queue: Call find_num fail, user maybe not exist");
 				break;
 			}
-			#if 0
-			case 5: //PING ACK
-			{
-				memset(send_buf,0,sizeof(send_buf));
-				ack = (AckMsg*)resp->msg;
-				CommonLogger::instance().log_info("deal_logic_resp_queue: PING ACK");
-				unit = (NIF_MSG_UNIT2*)send_buf;
-				unit->head = htonl(0x1a2b3c4d);
-				unit->dialog = htonl(END);
-				unit->invoke = htonl(ack->msg_type);
-
-				sendlen = send_data(mihao_fd_, send_buf, sizeof(NIF_MSG_UNIT2)-sizeof(unsigned char*)+sizeof(unsigned int));
-				if (sendlen != sizeof(NIF_MSG_UNIT2)-sizeof(unsigned char*)+sizeof(unsigned int))
-				{
-					CommonLogger::instance().log_error("deal_logic_resp_queue: send PING msg to %s FAIL!!!", mt->cd);
-				}
-				CommonLogger::instance().log_info("deal_logic_resp_queue: send PING msg to APP");
-				break;
-			}
-			#endif
 			case 6: //NOTIFY_ACTIVE ACK
 			{
 				memset(send_buf,0,sizeof(send_buf));

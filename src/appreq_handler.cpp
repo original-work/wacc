@@ -167,14 +167,6 @@ int AppReqHandler::process(char *pmsg)
 
 int AppReqHandler::deal_ping(char *data)
 {
-#if 0
-	ReqMsg red_msg;
-	red_msg.msg_type = 5;
-	
-	app_req_queue_->insert_record((char*)&red_msg, sizeof(ReqMsg));
-	app_req_queue_->advance_widx();
-	CommonLogger::instance().log_info("deal_ping: insert PING Msg into app_req_queue_");
-#endif
 	NIF_MSG_UNIT2 *header = (NIF_MSG_UNIT2*)data;
 	memcpy(send_buf_, data, (sizeof(NIF_MSG_UNIT2)-sizeof(unsigned char*)));
 	sendn(send_buf_, sizeof(NIF_MSG_UNIT2) - sizeof(unsigned char*));
