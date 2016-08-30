@@ -153,7 +153,7 @@ int AppReqServThread::loop_process()
 			CommonLogger::instance().log_info("AppReqServThread: Recv new connection from APP");
 			CommonLogger::instance().log_info("AppReqServThread: sockfd:%d",collection_server_.sockfd());
 			if (deal_new_connection()<0)
-		    {
+		       {
 				return -1;
 			}
 		}
@@ -434,7 +434,7 @@ int AppReqServThread::deal_logic_resp_queue()
 						unit->dialog = htonl(END);
 						unit->invoke = htonl(ack->msg_type);
 						unit->length = htonl(sizeof(unsigned int));
-						unit->seq = info_mgr_->find_seq_by_tid(ack->tid);
+						unit->seq = htonl(info_mgr_->find_seq_by_tid(ack->tid));
 						CommonLogger::instance().log_info("deal_logic_resp_queue: MO ACK seq %u", unit->seq);
 						*((unsigned int*)(send_buf + sizeof(NIF_MSG_UNIT2) - sizeof(unsigned char*))) = htonl(ack->result);
 						sendlen = send_data(user->fd, send_buf, sizeof(NIF_MSG_UNIT2)-sizeof(unsigned char*)+sizeof(unsigned int));
