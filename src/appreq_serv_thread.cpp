@@ -315,7 +315,7 @@ int AppReqServThread::deal_logic_resp_queue()
 					db_->setString(3,user->imsi);
 					db_->setString(4,user->esn);
 					db_->setString(5,"MT");
-					db_->setInt(6,ack->result);
+					db_->setInt(6,0);
 					db_->setInt(7,10086);
 					db_->executeUpdate();
 				}
