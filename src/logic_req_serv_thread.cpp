@@ -788,7 +788,7 @@ int LogicReqServThread::deal_mtreq_ack(unsigned char *data, unsigned int len)
 	CommonLogger::instance().log_info("deal_mt_req: MT cd %s, len %d, tid %u, mod_id %u",
 		logic_mt->cd, mt->content_len, mt->tid, logic_mt->mod_id);
 	CommonLogger::instance().log_info("deal_mt_req: MT msg content is");
-	tools::print_hex((unsigned char*)mt->sms_content,256);
+	tools::print_hex((unsigned char*)mt->sms_content,mt->content_len);
 
 	logic_resp_queue_->insert_record((char*)&resp, sizeof(RespMsg));
 	logic_resp_queue_->advance_widx();
