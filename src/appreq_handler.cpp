@@ -391,7 +391,7 @@ int AppReqHandler::deal_MO(char *data)
 
 		CommonLogger::instance().log_info("deal_MO: cd:%s cg :%s seq:%u",re->cd, re->cg, ntohl(header->seq));
 		CommonLogger::instance().log_info("sms len:%d,content:", ntohl(re->content_len));
-		tools::print_hex((unsigned char*)re->content,strlen(re->content));/* luchq add 2015-06-18 */		
+		tools::print_hex((unsigned char*)re->content,ntohl(re->content_len));	
 		
 		info_mgr_->add_tid_msisdn(record->tid, record->cg);
 		info_mgr_->add_tid_seq(record->tid, ntohl(header->seq));
