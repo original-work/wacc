@@ -100,10 +100,11 @@ int main(int argc, char **argv)
 		perror("Connect ");
 		exit(errno);
 	}
+	printf("server connected\n");
 	
 	while(1){
-		char buf[1000]={0};
-		NIF_MSG_UNIT2* testMsg=(NIF_MSG_UNIT2*)buf;
+		bzero(buffer, MAXBUF + 1);
+		NIF_MSG_UNIT2* testMsg=(NIF_MSG_UNIT2*)buffer;
 		unsigned char msg_body[6]={0xaa,0xaa,0xaa,0xbb,0xbb,0xbb};
 		printf("sizeof(msg_body) is %u\n", sizeof(msg_body));
 		printf("sizeof(NIF_MSG_UNIT2) is %u\n", sizeof(NIF_MSG_UNIT2));
@@ -116,15 +117,7 @@ int main(int argc, char **argv)
 		testMsg->invoke=htonl(0XEEEEEE05);
 		testMsg->dialog=htonl(0x3);
 		testMsg->seq=htonl(0x123456);
-		//testMsg->length=htonl(sizeof(msg_body));
-		//memcpy(buf+sizeof(NIF_MSG_UNIT2)-8, msg_body, sizeof(msg_body));
-		
-		
-	
-		printf("server connected\n");
-		bzero(buffer, MAXBUF + 1);
-	
-		memcpy(buffer, buf, sizeof(buf));
+
 		/* 发消息给服务器 */
 		len = send(sockfd, buffer, sizeof(NIF_MSG_UNIT2)-8, 0);
 		if(len < 0) {

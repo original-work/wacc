@@ -109,9 +109,10 @@ int main(int argc, char **argv)
 		perror("Connect ");
 		exit(errno);
 	}
-	
-	char buf[1000]={0};
-	NIF_MSG_UNIT2* testMsg=(NIF_MSG_UNIT2*)buf;
+	printf("server connected\n");
+
+	bzero(buffer, MAXBUF + 1);
+	NIF_MSG_UNIT2* testMsg=(NIF_MSG_UNIT2*)buffer;
 	MO mo_msg;
 	unsigned char data[]="this is a test mo msg!";
 	strcpy(mo_msg.cg, "13816154202");
@@ -133,16 +134,9 @@ int main(int argc, char **argv)
 	testMsg->seq=htonl(0x123456);
 	testMsg->length=htonl(sizeof(mo_msg));
 	char* p_user =(char*)&mo_msg;
-	memcpy(buf+sizeof(NIF_MSG_UNIT2)-8, p_user, sizeof(mo_msg));
-	
-	
+	memcpy(buffer+sizeof(NIF_MSG_UNIT2)-8, p_user, sizeof(mo_msg));
 
-	printf("server connected\n");
-	bzero(buffer, MAXBUF + 1);
-
-	memcpy(buffer, buf, sizeof(buf));
 	/* 发消息给服务器 */
-
 	len = send(sockfd, buffer, sizeof(NIF_MSG_UNIT2)-8+sizeof(mo_msg), 0);
 	if(len < 0) {
 		printf("send fail!  error code is %d,  error info is '%s'\n", errno, strerror(errno));

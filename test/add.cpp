@@ -113,10 +113,11 @@ int main(int argc, char **argv)
 		perror("Connect ");
 		exit(errno);
 	}
+	printf("server connected\n");
 	
-	char buf[1000]={0};
-	NIF_MSG_UNIT2* testMsg=(NIF_MSG_UNIT2*)buf;
+	NIF_MSG_UNIT2* testMsg=(NIF_MSG_UNIT2*)buffer;
 	AddUser user;
+	bzero(buffer, MAXBUF + 1);
 	memset(user.mdn,0,sizeof(user.mdn));
 	strcpy(user.mdn, "18138274795");
 
@@ -133,16 +134,9 @@ int main(int argc, char **argv)
 	testMsg->seq=htonl(0x123456);
 	testMsg->length=htonl(sizeof(user));
 	char* p_user =(char*)&user;
-	memcpy(buf+sizeof(NIF_MSG_UNIT2)-8, p_user, sizeof(AddUser));
-	
-	
-
-	printf("server connected\n");
-	bzero(buffer, MAXBUF + 1);
-
-	memcpy(buffer, buf, sizeof(buf));
+	memcpy(buffer+sizeof(NIF_MSG_UNIT2)-8, p_user, sizeof(AddUser));
+		
 	/* 发消息给服务器 */
-
 	len = send(sockfd, buffer, sizeof(NIF_MSG_UNIT2)-8+sizeof(user), 0);
 	if(len < 0) {
 		printf("send fail!  error code is %d,  error info is '%s'\n", errno, strerror(errno));
@@ -156,8 +150,8 @@ int main(int argc, char **argv)
 
 	
 #if 0
-
 	MO mo_msg;
+	bzero(buffer, MAXBUF + 1);
 	unsigned char data[]="this is a test mo msg!";
 	strcpy(mo_msg.cd, "13816154202");
 	strcpy(mo_msg.cg, "18019398639");
@@ -170,25 +164,13 @@ int main(int argc, char **argv)
 	printf("sizeof(unsigned char *) is %u\n", sizeof(unsigned char *));
 	printf("mo_msg.content_len is %u\n", strlen((char*)data));
 	
-	testMsg->head=htonl(0x1a2b3c4d);
-	testMsg->dIpAdrs=htonl(0xdddddd);
-	testMsg->sIpAdrs=htonl(0xaaaaaa);
-	testMsg->version=htonl(0x1);
+
 	testMsg->invoke=htonl(0XEEEEEE03);
-	testMsg->dialog=htonl(0x3);
-	testMsg->seq=htonl(0x123456);
 	testMsg->length=htonl(sizeof(mo_msg));
 	p_user =(char*)&mo_msg;
-	memcpy(buf+sizeof(NIF_MSG_UNIT2)-8, p_user, sizeof(mo_msg));
-	
-	
+	memcpy(buffer+sizeof(NIF_MSG_UNIT2)-8, p_user, sizeof(mo_msg));	
 
-	printf("server connected\n");
-	bzero(buffer, MAXBUF + 1);
-
-	memcpy(buffer, buf, sizeof(buf));
 	/* 发消息给服务器 */
-
 	len = send(sockfd, buffer, sizeof(NIF_MSG_UNIT2)-8+sizeof(mo_msg), 0);
 	if(len < 0) {
 		printf("send fail!  error code is %d,  error info is '%s'\n", errno, strerror(errno));

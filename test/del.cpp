@@ -112,10 +112,12 @@ int main(int argc, char **argv)
 		perror("Connect ");
 		exit(errno);
 	}
+	printf("server connected\n");
 	
-	char buf[1000]={0};
-	NIF_MSG_UNIT2* testMsg=(NIF_MSG_UNIT2*)buf;
+	
+	NIF_MSG_UNIT2* testMsg=(NIF_MSG_UNIT2*)buffer;
 	DelUser user;
+	bzero(buffer, MAXBUF + 1);
 	memset(user.mdn,0,sizeof(user.mdn));
 	strcpy(user.mdn, "18118758370");
 
@@ -132,12 +134,8 @@ int main(int argc, char **argv)
 	testMsg->seq=htonl(0x123456);
 	testMsg->length=htonl(sizeof(user));
 	char* p_user =(char*)&user;
-	memcpy(buf+sizeof(NIF_MSG_UNIT2)-8, p_user, sizeof(DelUser));
+	memcpy(buffer+sizeof(NIF_MSG_UNIT2)-8, p_user, sizeof(DelUser));
 
-	printf("server connected\n");
-	bzero(buffer, MAXBUF + 1);
-
-	memcpy(buffer, buf, sizeof(buf));
 	/* 发消息给服务器 */
 
 	len = send(sockfd, buffer, sizeof(NIF_MSG_UNIT2)-8+sizeof(user), 0);

@@ -101,10 +101,10 @@ int main(int argc, char **argv)
 		perror("Connect ");
 		exit(errno);
 	}
+	printf("server connected\n");
 	
-	char buf[1000]={0};
-	NIF_MSG_UNIT2* testMsg=(NIF_MSG_UNIT2*)buf;
-
+	bzero(buffer, MAXBUF + 1);
+	NIF_MSG_UNIT2* testMsg=(NIF_MSG_UNIT2*)buffer;
 
 	printf("sizeof(NIF_MSG_UNIT2) is %u\n", sizeof(NIF_MSG_UNIT2));
 	printf("sizeof(unsigned char *) is %u\n", sizeof(unsigned char *));
@@ -117,13 +117,8 @@ int main(int argc, char **argv)
 	testMsg->dialog=htonl(0x3);
 	testMsg->seq=htonl(0x123456);
 	testMsg->length=0;
-
-	printf("server connected\n");
-	bzero(buffer, MAXBUF + 1);
-
-	memcpy(buffer, buf, sizeof(buf));
+	
 	/* 发消息给服务器 */
-
 	len = send(sockfd, buffer, sizeof(NIF_MSG_UNIT2)-8, 0);
 	if(len < 0) {
 		printf("send fail!  error code is %d,  error info is '%s'\n", errno, strerror(errno));
