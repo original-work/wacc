@@ -81,11 +81,10 @@ int main(int argc, char **argv)
 	int sockfd, len;
 	struct sockaddr_in dest;
 	char buffer[MAXBUF + 1];
-	if (argc != 3) 
+	if (argc != 4) 
 	{
-		printf("args error! correct usage is£º\n\t\t%s ip  port\n\tfor example:\t%s 127.0.0.1 80 filename\nthis program\
-			receive from ip port MAXBUF Bytes for most",
-		argv[0], argv[0]);
+		printf("args error! correct usage is£º\n\t\t%s ip  port\nfor example:\t%s 127.0.0.1 80 filename\nthis program receive from ip port %u Bytes for most",
+		argv[0], argv[0], MAXBUF);
 		exit(0);
 	}
 	
@@ -126,7 +125,9 @@ int main(int argc, char **argv)
         std::string str;
         while (std::getline (ifs, str))
         {
+        	static unsigned int co=0; 
 		char buf[1000]={0};
+		co++;
 		NIF_MSG_UNIT2* testMsg=(NIF_MSG_UNIT2*)buf;
 		AddUser user;
 		memset(user.mdn,0,sizeof(user.mdn));
@@ -157,10 +158,10 @@ int main(int argc, char **argv)
 
 		len = send(sockfd, buffer, sizeof(NIF_MSG_UNIT2)-8+sizeof(user), 0);
 		if(len < 0) {
-			printf("send fail!  error code is %d,  error info is '%s'\n", errno, strerror(errno));
+			printf("index %u send fail!  error code is %d,  error info is '%s'\n", co, errno, strerror(errno));
 		}
 		else{
-			printf("send success,  sent %d Bytes  \n", len);
+			printf("index %u send success,  sent %d Bytes  \n", co, len);
 			print_hex(buffer, len);
 		}
 	}
