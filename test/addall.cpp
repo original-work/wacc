@@ -161,7 +161,7 @@ int main(int argc, char **argv)
 			printf("index %u send fail!  error code is %d,  error info is '%s'\n", co, errno, strerror(errno));
 		}
 		else{
-			printf("index %u send success,  sent %d Bytes  \n", co, len);
+			printf("index %u send success,  mdn=%s  sent %d Bytes  \n", co, user.mdn, len);
 			print_hex(buffer, len);
 		}
 	}
