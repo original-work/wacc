@@ -804,7 +804,7 @@ int LogicReqServThread::deal_addreq_ack(unsigned int type, unsigned char *data, 
 	ack->tid = ntohl(*((unsigned int*)(data+sizeof(unsigned int))));
 
 	ack->msg_type = ADD_USER;
-	CommonLogger::instance().log_debug("deal_ack_req: ADD_USER  result is %u tid is %u",ack->result,ack->tid);
+	CommonLogger::instance().log_debug("deal_ack_req: ADD_USER  result is %u tid is %u mdn is %s",ack->result,ack->tid,ack->cd);
 
 	logic_resp_queue_->insert_record((char*)&resp, sizeof(RespMsg));
 	logic_resp_queue_->advance_widx();
