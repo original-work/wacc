@@ -83,7 +83,7 @@ int main(int argc, char **argv)
 	char buffer[MAXBUF + 1];
 	if (argc != 4) 
 	{
-		printf("args error! correct usage is£º\n\t\t%s ip  port  filename\nfor example:\t%s 127.0.0.1 80 filename\nthis program receive from ip port %u Bytes for most\n",
+		printf("args error!\ncorrect usage is:\t%s ip  port  filename\nfor example:\t%s 127.0.0.1 80 filename\nthis program receive from ip port %u Bytes for most\n",
 		argv[0], argv[0], MAXBUF);
 		exit(0);
 	}
