@@ -71,6 +71,7 @@ public:
 	std::string mysql_url() const {return url_;}
 	std::string mysql_user() const {return user_;}
 	std::string mysql_password() const {return password_;}
+	std::string mysql_database() const {return database_;}
 protected:
 	int deal_system(const std::string &line, const int &pos);
 	int deal_logger_configuration(const std::string &line, const int &pos);
@@ -126,6 +127,7 @@ private:
 	std::string url_;
 	std::string user_;
 	std::string password_;
+	std::string database_;
 
 };
 

@@ -75,7 +75,7 @@ int main(int argc, char *argv[])
 	MySQLConnWrapper db;
 	db.init(UsrAccConfig::instance().mysql_url(), UsrAccConfig::instance().mysql_user(), UsrAccConfig::instance().mysql_password());
 	db.connect();
-	db.switchDb("mihao");
+	db.switchDb(UsrAccConfig::instance().mysql_database());
 
 	LogicReqServThread logic_req_serv_thread;
 	logic_req_serv_thread.init(&info_mem_mgr, &app_req_queue, &logic_resp_queue, &recurrent_regnot_queue, &map_add_user_req, &db);

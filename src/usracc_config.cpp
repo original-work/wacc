@@ -306,6 +306,8 @@ int UsrAccConfig::deal_db(const std::string &line, const int &pos) {
 		user_ = value.c_str();
 	} else if (key == "password") { 
 		password_ = value.c_str();
+	}else if (key == "database") { 
+		database_ = value.c_str();
 	}else {
 		printf("unknown key \" %s \" in section \" BusinessInfo \".\n", key.c_str());
 		return -1;
