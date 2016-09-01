@@ -113,22 +113,23 @@ int main(int argc, char **argv)
 		perror("Connect ");
 		exit(errno);
 	}
+	printf("server connected\n");
 	
 	std::ifstream ifs (argv[3]);
+	if (!ifs.is_open ())
+	{
+	        printf("open file %s failed", argv[3]);
+	        return false;
+	}
 
-        if (!ifs.is_open ())
-        {
-                printf("open file %s failed", argv[3]);
-                return false;
-        }
+	std::string str;
 
-        std::string str;
         while (std::getline (ifs, str))
         {
         	static unsigned int co=0; 
-		char buf[1000]={0};
 		co++;
-		NIF_MSG_UNIT2* testMsg=(NIF_MSG_UNIT2*)buf;
+		bzero(buffer, MAXBUF + 1);
+		NIF_MSG_UNIT2* testMsg=(NIF_MSG_UNIT2*)buffer;
 		AddUser user;
 		memset(user.mdn,0,sizeof(user.mdn));
 		strcpy(user.mdn, str.c_str());
@@ -146,16 +147,13 @@ int main(int argc, char **argv)
 		testMsg->seq=htonl(0x123456);
 		testMsg->length=htonl(sizeof(user));
 		char* p_user =(char*)&user;
-		memcpy(buf+sizeof(NIF_MSG_UNIT2)-8, p_user, sizeof(AddUser));
-		
-		
+		memcpy(buffer+sizeof(NIF_MSG_UNIT2)-8, p_user, sizeof(AddUser));
 
-		printf("server connected\n");
-		bzero(buffer, MAXBUF + 1);
+		if(100==co){
+			usleep(100);
+		}
 
-		memcpy(buffer, buf, sizeof(buf));
 		/* 发消息给服务器 */
-
 		len = send(sockfd, buffer, sizeof(NIF_MSG_UNIT2)-8+sizeof(user), 0);
 		if(len < 0) {
 			printf("index %u send fail!  error code is %d,  error info is '%s'\n", co, errno, strerror(errno));
@@ -168,59 +166,6 @@ int main(int argc, char **argv)
 		
 	sleep(6);	
 
-	
-#if 0
-
-	MO mo_msg;
-	unsigned char data[]="this is a test mo msg!";
-	strcpy(mo_msg.cd, "13816154202");
-	strcpy(mo_msg.cg, "18019398639");
-	mo_msg.smsCode=4;
-	memcpy((void*)mo_msg.content,(void*)&data,strlen((char*)data));
-	mo_msg.content_len=htonl(strlen((char*)data));
-
-	printf("sizeof(msg_body) is %u\n", sizeof(mo_msg));
-	printf("sizeof(NIF_MSG_UNIT2) is %u\n", sizeof(NIF_MSG_UNIT2));
-	printf("sizeof(unsigned char *) is %u\n", sizeof(unsigned char *));
-	printf("mo_msg.content_len is %u\n", strlen((char*)data));
-	
-	testMsg->head=htonl(0x1a2b3c4d);
-	testMsg->dIpAdrs=htonl(0xdddddd);
-	testMsg->sIpAdrs=htonl(0xaaaaaa);
-	testMsg->version=htonl(0x1);
-	testMsg->invoke=htonl(0XEEEEEE03);
-	testMsg->dialog=htonl(0x3);
-	testMsg->seq=htonl(0x123456);
-	testMsg->length=htonl(sizeof(mo_msg));
-	p_user =(char*)&mo_msg;
-	memcpy(buf+sizeof(NIF_MSG_UNIT2)-8, p_user, sizeof(mo_msg));
-	
-	
-
-	printf("server connected\n");
-	bzero(buffer, MAXBUF + 1);
-
-	memcpy(buffer, buf, sizeof(buf));
-	/* 发消息给服务器 */
-
-	len = send(sockfd, buffer, sizeof(NIF_MSG_UNIT2)-8+sizeof(mo_msg), 0);
-	if(len < 0) {
-		printf("send fail!  error code is %d,  error info is '%s'\n", errno, strerror(errno));
-	}
-	else{
-		printf("send success,  sent %d Bytes  \n", len);
-		print_hex(buffer, len);
-	}
-
-#endif
-
-	sleep(20);	
-
-
-
-
-
-	
 		
 	/* 关闭连接 */
 	close(sockfd);

@@ -376,7 +376,7 @@ int AppReqServThread::deal_logic_resp_queue()
 							{
 								CommonLogger::instance().log_error("deal_logic_resp_queue: send ACTIVATE ACK msg to %s FAIL!!!", mt->cd);
 							}
-							CommonLogger::instance().log_info("deal_logic_resp_queue: send ACTIVATE ACK msg to APP result is %u tid is %u mdn is %s",ack->result,ack->tid,ack->cd);
+							CommonLogger::instance().log_info("deal_logic_resp_queue: send ACTIVATE ACK msg to APP result is %u tid is %u mdn is %s",ack->result,ack->tid,regnot->msisdn);
 
 							/*开户成功则插入mysql*/
 							if(0==ack->result){
