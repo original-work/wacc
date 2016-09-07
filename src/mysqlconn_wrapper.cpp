@@ -47,6 +47,13 @@ MySQLConnWrapper::~MySQLConnWrapper()
 	delete prep_stmt;
 	delete stmt;
 	delete con;
+	delete driver;
+
+	driver=NULL;
+	con=NULL;
+	stmt=NULL;
+	prep_stmt=NULL;
+	res=NULL;
 }
 
 
@@ -124,6 +131,7 @@ void MySQLConnWrapper::prepare(const string& query)
 void MySQLConnWrapper::delete_prepare()
 {
 	delete prep_stmt;
+	prep_stmt=NULL;
 }
 
 void MySQLConnWrapper::setInt(const int& num, const int& data)
