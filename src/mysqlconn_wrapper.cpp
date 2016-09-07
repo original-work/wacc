@@ -120,6 +120,12 @@ void MySQLConnWrapper::prepare(const string& query)
 	}
 }
 
+
+void MySQLConnWrapper::delete_prepare()
+{
+	delete prep_stmt;
+}
+
 void MySQLConnWrapper::setInt(const int& num, const int& data)
 {
 	prep_stmt->setInt(num, data);

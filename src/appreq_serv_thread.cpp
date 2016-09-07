@@ -318,6 +318,7 @@ int AppReqServThread::deal_logic_resp_queue()
 					db_->setInt(6,0);
 					db_->setInt(7,10086);
 					db_->executeUpdate();
+					db_->delete_prepare();
 				}
 				else
 					CommonLogger::instance().log_info("deal_logic_resp_queue: Call find_num fail, user maybe not exist");
@@ -388,7 +389,8 @@ int AppReqServThread::deal_logic_resp_queue()
 								db_->setString(3,user->imsi);
 								db_->setString(4,user->esn);
 								db_->setInt(5,user->fd);
-								db_->executeUpdate();								
+								db_->executeUpdate();
+								db_->delete_prepare();
 							}
 							/*   向操作表中插入操作记录*/
 							db_->prepare("INSERT INTO op_record(create_time, mdn, imsi, esn, opt_code, opt_result, seq) VALUES (?, ?, ?, ?, ?, ?, ?)");
@@ -401,6 +403,7 @@ int AppReqServThread::deal_logic_resp_queue()
 							db_->setInt(6,ack->result);
 							db_->setInt(7,regnot->seq);
 							db_->executeUpdate();
+							db_->delete_prepare();
 						}
 
 					}
@@ -460,6 +463,7 @@ int AppReqServThread::deal_logic_resp_queue()
 					db_->setInt(6,ack->result);
 					db_->setInt(7,unit->seq);
 					db_->executeUpdate();
+					db_->delete_prepare();
 				}
 				else{
 					CommonLogger::instance().log_info("deal_logic_resp_queue: tid %u not found",ack->tid);

@@ -197,7 +197,8 @@ int AppReqHandler::deal_notify_active(char *data)
 	db_->setInt(6,0);
 	db_->setInt(7,ntohl(header->seq));
 	db_->executeUpdate();
-
+	db_->delete_prepare();
+	
 	return 0;
 }/* -----  end of method AppReqHandler::deal_ping(char *data)  ----- */
 
@@ -332,7 +333,7 @@ int AppReqHandler::deal_del_user(char *data)
 		db_->setInt(6,0);
 		db_->setInt(7,ntohl(header->seq));
 		db_->executeUpdate();
-
+		db_->delete_prepare();
 	
 		info_mgr_->active_usr_table_.remove_num((char*)bcd_buf_, strlen(re->mdn));
 		memcpy(record->msisdn, re->mdn, strlen(re->mdn));
