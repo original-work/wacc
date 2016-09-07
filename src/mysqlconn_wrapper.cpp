@@ -47,9 +47,7 @@ MySQLConnWrapper::~MySQLConnWrapper()
 	delete prep_stmt;
 	delete stmt;
 	delete con;
-	delete driver;
 
-	driver=NULL;
 	con=NULL;
 	stmt=NULL;
 	prep_stmt=NULL;
