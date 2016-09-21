@@ -312,6 +312,7 @@ int LogicReqServThread::loop_process()
 	if ((ret = select_check_fds()) > 0)
 	{
 		unsigned int n = client_list_.size();
+		CommonLogger::instance().log_info("LogicReqServThread: loop_process n = %u",n);
 		for (unsigned int i = 0; i < n; ++i)
 		{
 			if (client_list_[i].connected())
@@ -537,7 +538,7 @@ int LogicReqServThread::deal_app_req_queue()
 			unit->invoke = htonl(SERVLOGIC_MT_REQ);
 			unit->length = htonl(sizeof(MTAckData));
 
-			CommonLogger::instance().log_info("deal_app_req_queue: result=%d, tid=%d",mtack->result,mtack->tid);
+			CommonLogger::instance().log_info("deal_app_req_queue: result=%u, tid=%u, seq=%u",mtack->result,mtack->tid,mtack->seq);
 			MTAckData *logic_mtack = (MTAckData*)(send_buf + sizeof(NIF_MSG_UNIT) - sizeof(unsigned char*));
 			logic_mtack->tid = htonl(mtack->tid);
 
