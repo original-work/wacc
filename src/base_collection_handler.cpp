@@ -42,6 +42,7 @@ int BaseCollectionHandler::recvn(char *buf, size_t recv_size) {
         ret = recv(sockfd_, buf+readed_size, need_read_size, 0);
         //printf("%d, %d, %d ,%d, %d\n", ret, sockfd_, need_read_size, readed_size, errno);
         if (ret<0) {
+	     CommonLogger::instance().log_error("[%s %d] BaseCollectionHandler::recvn  ret=%d, errno=%d", __FILE__,__LINE__,ret,errno);
             if (errno == EINTR) {
 			CommonLogger::instance().log_error("[%s %d] BaseCollectionHandler::recvn  errno == EINTR", __FILE__,__LINE__);
             } else if (errno == EAGAIN) {
