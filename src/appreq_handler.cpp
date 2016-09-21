@@ -429,8 +429,7 @@ int AppReqHandler::deal_mt_ack(char *data)
 
 	UsrMTAckData *re = (UsrMTAckData*)(data+sizeof(NIF_MSG_UNIT2)-sizeof(unsigned char*));
 
-	/*memcpy(record->cd, msisdn_, sizeof(record->cd));*/
-	memcpy(record->cd, msisdn_, strlen(msisdn_));
+	memcpy(record->cd, re->cd, strlen(re->cd));
 	record->result = ntohl(re->result);
 	record->tid = ntohl(re->tid);
 	record->seq = re->seq;
