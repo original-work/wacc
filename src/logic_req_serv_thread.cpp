@@ -547,13 +547,20 @@ int LogicReqServThread::deal_app_req_queue()
 			int send_len =  sizeof(NIF_MSG_UNIT) - sizeof(unsigned char*) + sizeof(MTAckData);
 
 			LogicConnInfo *conninfo = info_mgr_->logic_conns_mgr_.get_conn_info(mtack->seq);
-			if (conninfo != NULL && conninfo->used == 1 && conninfo->client->connected())
-			{
-				int r = conninfo->client->send_data(send_buf, send_len);
-				if (r < send_len || r == -1)
+			
+			if(conninfo != NULL){
+				CommonLogger::instance().log_info("deal_app_req_queue: conninfo->used=%d, conninfo->client->connected()=%d",conninfo->used,conninfo->client->connected());
+				if (conninfo->used == 1 && conninfo->client->connected())
 				{
-					conninfo->client->disconnect_to_server();
+					CommonLogger::instance().log_info("deal_app_req_queue: send mtack to serv_logic");
+					int r = conninfo->client->send_data(send_buf, send_len);
+					if (r < send_len || r == -1)
+					{
+						conninfo->client->disconnect_to_server();
+					}
 				}
+			}else{
+				CommonLogger::instance().log_info("deal_app_req_queue: conninfo is NULL");
 			}
 		}
 
