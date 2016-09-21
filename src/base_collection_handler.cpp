@@ -20,6 +20,7 @@
  * ================== END OF CHANGE REPORT HISTORY ===========
  */
 #include "base_collection_handler.h"
+#include "common_logger.h"
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <stdio.h>

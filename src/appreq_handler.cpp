@@ -24,7 +24,7 @@
 #include "usracc_config.h"
 #include "tid_generator.h"
 #include "common_logger.h"
-#include "tools.h" /* luchq add 2015-06-16 */
+#include "tools.h"
 #include <sys/types.h>
 #include <stdio.h>
 #include <time.h>
