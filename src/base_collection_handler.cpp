@@ -41,7 +41,7 @@ int BaseCollectionHandler::recvn(char *buf, size_t recv_size) {
 	while (need_read_size>0) {
 		ret = recv(sockfd_, buf+readed_size, need_read_size, 0);
 		if (ret<0) {
-			int bugno=errno;
+			int bugno=errno;//errno 记录最后一次系统错误码，所以要先保存下来added by wangxx 20160922
 			CommonLogger::instance().log_error("[%s %d] BaseCollectionHandler::recvn  ret=%d, errno=%d EINTR=%d EAGAIN=%d", __FILE__,__LINE__,ret,bugno,EINTR,EAGAIN);
 			if (bugno == EINTR) {
 				CommonLogger::instance().log_error("[%s %d] BaseCollectionHandler::recvn  errno == EINTR", __FILE__,__LINE__);
