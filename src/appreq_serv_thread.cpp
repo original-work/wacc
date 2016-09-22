@@ -298,7 +298,9 @@ int AppReqServThread::deal_logic_resp_queue()
 					{
 						CommonLogger::instance().log_error("deal_logic_resp_queue: Check App number fail, App=%s",user->msisdn);
 					}
-					sendlen = send_data(user->fd, send_buf, sizeof(NIF_MSG_UNIT2)-sizeof(unsigned char*)+sizeof(MTMsg)-sizeof(mt->sms_content)+mt->content_len);
+					int send_size=sizeof(NIF_MSG_UNIT2)-sizeof(unsigned char*)+sizeof(MTMsg)-sizeof(mt->sms_content)+mt->content_len;
+					CommonLogger::instance().log_error("deal_logic_resp_queue: send_size=%d",send_size);
+					sendlen = send_data(user->fd, send_buf, send_size);
 					if (sendlen != sizeof(NIF_MSG_UNIT2)-sizeof(unsigned char*)+sizeof(MTMsg)-sizeof(mt->sms_content)+mt->content_len)
 					{
 						CommonLogger::instance().log_info("deal_logic_resp_queue: send MT msg to %s 	FAIL!!! send length:%d", user->msisdn, sendlen);
