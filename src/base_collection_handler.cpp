@@ -35,31 +35,31 @@ BaseCollectionHandler::~BaseCollectionHandler() {
 }
 
 int BaseCollectionHandler::recvn(char *buf, size_t recv_size) {
-    int readed_size = 0;
-    int need_read_size = recv_size;
-    int ret;
-    while (need_read_size>0) {
-        ret = recv(sockfd_, buf+readed_size, need_read_size, 0);
-        if (ret<0) {
-	     CommonLogger::instance().log_error("[%s %d] BaseCollectionHandler::recvn  ret=%d, errno=%d EINTR=%d EAGAIN=%d", __FILE__,__LINE__,ret,errno,EINTR,EAGAIN);
-            if (errno == EINTR) {
-			CommonLogger::instance().log_error("[%s %d] BaseCollectionHandler::recvn  errno == EINTR", __FILE__,__LINE__);
-            } else if (errno == EAGAIN) {
-            	  CommonLogger::instance().log_error("[%s %d] BaseCollectionHandler::recvn  errno == EAGAIN", __FILE__,__LINE__);
-                break;
-            } else {
-            	  CommonLogger::instance().log_error("[%s %d] BaseCollectionHandler::recvn  return -1", __FILE__,__LINE__);
-                return -1;
-            }
-        } else if (ret == 0) {
-            CommonLogger::instance().log_error("[%s %d] BaseCollectionHandler::recvn  ret == 0, return -1", __FILE__,__LINE__);
-            return -1;
-        }
+	int readed_size = 0;
+	int need_read_size = recv_size;
+	int ret;
+	while (need_read_size>0) {
+		ret = recv(sockfd_, buf+readed_size, need_read_size, 0);
+		if (ret<0) {
+			CommonLogger::instance().log_error("[%s %d] BaseCollectionHandler::recvn  ret=%d, errno=%d EINTR=%d EAGAIN=%d", __FILE__,__LINE__,ret,errno,EINTR,EAGAIN);
+			if (errno == EINTR) {
+				CommonLogger::instance().log_error("[%s %d] BaseCollectionHandler::recvn  errno == EINTR", __FILE__,__LINE__);
+			} else if (errno == EAGAIN) {
+				CommonLogger::instance().log_error("[%s %d] BaseCollectionHandler::recvn  errno == EAGAIN", __FILE__,__LINE__);
+				break;
+			} else {
+				CommonLogger::instance().log_error("[%s %d] BaseCollectionHandler::recvn  errno=%d  return -1", __FILE__,__LINE__,errno);
+				return -1;
+			}
+		} else if (ret == 0) {
+			CommonLogger::instance().log_error("[%s %d] BaseCollectionHandler::recvn  ret == 0, return -1", __FILE__,__LINE__);
+			return -1;
+		}
 
-        need_read_size -= ret;
-        readed_size += ret;
-    }
-    return readed_size;
+		need_read_size -= ret;
+		readed_size += ret;
+	}
+	return readed_size;
 }
 
 
