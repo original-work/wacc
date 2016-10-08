@@ -354,7 +354,6 @@ int AppReqServThread::deal_logic_resp_queue()
 				map<unsigned int, char*>::iterator  iter = add_user_req_->find(ack->tid);
 				if(iter != add_user_req_->end())
 				{
-					add_user_req_->erase(ack->tid);//added by wangxx 20161008 23:47
 					ActivateMsg* regnot = (ActivateMsg*)iter->second;	
 					CommonLogger::instance().log_info("[%s %d] deal_logic_resp_queue: ACTIVATE ACK tid %u found mdn %s seq %u",__FILE__,__LINE__,ack->tid,regnot->msisdn,regnot->seq);
 					memset(bcd_buf_,0,sizeof(bcd_buf_));
@@ -413,6 +412,7 @@ int AppReqServThread::deal_logic_resp_queue()
 					else{
 						CommonLogger::instance().log_info("deal_logic_resp_queue: Call find_num fail %s", msisdn.c_str());
 					}
+					add_user_req_->erase(ack->tid);//added by wangxx 20161008 23:47
 				}
 				else{
 					CommonLogger::instance().log_info("deal_logic_resp_queue: tid %u not found",ack->tid);
