@@ -656,6 +656,7 @@ int LogicReqServThread::deal_locreq_ack(unsigned char *data, unsigned int len)
 		map<unsigned int, char*>::iterator  iter = add_user_req_->find(ntohl(ack->tid));
 		if(iter != add_user_req_->end())
 		{
+			add_user_req_->erase(ntohl(ack->tid));//added by wangxx 20161008 23:47
 			ActivateMsg* ActReq = (ActivateMsg*)iter->second;
 			memcpy(body->cd,ActReq->msisdn,strlen(ActReq->msisdn));
 		}
@@ -672,6 +673,7 @@ int LogicReqServThread::deal_locreq_ack(unsigned char *data, unsigned int len)
 			map<unsigned int, char*>::iterator  iter = add_user_req_->find(ntohl(ack->tid));
 			if(iter != add_user_req_->end())
 			{
+				add_user_req_->erase(ntohl(ack->tid));//added by wangxx 20161008 23:47
 				ActivateMsg* ActReq = (ActivateMsg*)iter->second;
 			       CommonLogger::instance().log_debug("deal_locreq_ack: Find mdn %s.", ActReq->msisdn);
 
