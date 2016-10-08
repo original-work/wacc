@@ -312,6 +312,7 @@ int LogicReqServThread::loop_process()
 	if ((ret = select_check_fds()) > 0)
 	{
 		unsigned int n = client_list_.size();
+		CommonLogger::instance().log_info("LogicReqServThread: loop_process n = %u",n);
 		for (unsigned int i = 0; i < n; ++i)
 		{
 			if (client_list_[i].connected())
@@ -537,7 +538,7 @@ int LogicReqServThread::deal_app_req_queue()
 			unit->invoke = htonl(SERVLOGIC_MT_REQ);
 			unit->length = htonl(sizeof(MTAckData));
 
-			CommonLogger::instance().log_info("deal_app_req_queue: result=%d, tid=%d",mtack->result,mtack->tid);
+			CommonLogger::instance().log_info("deal_app_req_queue: result=%u, tid=%u, seq=%u",mtack->result,mtack->tid,mtack->seq);
 			MTAckData *logic_mtack = (MTAckData*)(send_buf + sizeof(NIF_MSG_UNIT) - sizeof(unsigned char*));
 			logic_mtack->tid = htonl(mtack->tid);
 
@@ -547,13 +548,20 @@ int LogicReqServThread::deal_app_req_queue()
 			int send_len =  sizeof(NIF_MSG_UNIT) - sizeof(unsigned char*) + sizeof(MTAckData);
 
 			LogicConnInfo *conninfo = info_mgr_->logic_conns_mgr_.get_conn_info(mtack->seq);
-			if (conninfo != NULL && conninfo->used == 1 && conninfo->client->connected())
-			{
-				int r = conninfo->client->send_data(send_buf, send_len);
-				if (r < send_len || r == -1)
+			
+			if(conninfo != NULL){
+				CommonLogger::instance().log_info("deal_app_req_queue: conninfo->used=%d, conninfo->client->connected()=%d",conninfo->used,conninfo->client->connected());
+				if (conninfo->used == 1 && conninfo->client->connected())
 				{
-					conninfo->client->disconnect_to_server();
+					CommonLogger::instance().log_info("deal_app_req_queue: send mtack to serv_logic");
+					int r = conninfo->client->send_data(send_buf, send_len);
+					if (r < send_len || r == -1)
+					{
+						conninfo->client->disconnect_to_server();
+					}
 				}
+			}else{
+				CommonLogger::instance().log_info("deal_app_req_queue: conninfo is NULL");
 			}
 		}
 

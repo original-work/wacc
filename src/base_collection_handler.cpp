@@ -20,6 +20,7 @@
  * ================== END OF CHANGE REPORT HISTORY ===========
  */
 #include "base_collection_handler.h"
+#include "common_logger.h"
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <stdio.h>
@@ -34,27 +35,29 @@ BaseCollectionHandler::~BaseCollectionHandler() {
 }
 
 int BaseCollectionHandler::recvn(char *buf, size_t recv_size) {
-    int readed_size = 0;
-    int need_read_size = recv_size;
-    int ret;
-    while (need_read_size>0) {
-        ret = recv(sockfd_, buf+readed_size, need_read_size, 0);
-        //printf("%d, %d, %d ,%d, %d\n", ret, sockfd_, need_read_size, readed_size, errno);
-        if (ret<0) {
-            if (errno == EINTR) {
-            } else if (errno == EAGAIN) {
-                break;
-            } else {
-                return -1;
-            }
-        } else if (ret == 0) {
-            return -1;
-        }
+	int readed_size = 0;
+	int need_read_size = recv_size;
+	int ret;
+	while (need_read_size>0) {
+		ret = recv(sockfd_, buf+readed_size, need_read_size, 0);
+		if (ret<0) {
+			int bugno=errno;//errno 记录最后一次系统错误码，所以最好先保存下来added by wangxx 20160922
+			if (bugno == EINTR) {
+			} else if (bugno == EAGAIN) {
+				break;
+			} else {
+				CommonLogger::instance().log_error("[%s %d] BaseCollectionHandler::recvn  errno=%d  return -1", __FILE__,__LINE__,bugno);
+				return -1;
+			}
+		} else if (ret == 0) {
+			CommonLogger::instance().log_error("[%s %d] BaseCollectionHandler::recvn  ret == 0, return -1", __FILE__,__LINE__);
+			return -1;
+		}
 
-        need_read_size -= ret;
-        readed_size += ret;
-    }
-    return readed_size;
+		need_read_size -= ret;
+		readed_size += ret;
+	}
+	return readed_size;
 }
 
 

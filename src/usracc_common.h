@@ -363,6 +363,7 @@ typedef struct {
 
 typedef struct {
 	unsigned int result;
+	char cd[32];
 	unsigned char seq;
 	unsigned int tid;
 } UsrMTAckData;

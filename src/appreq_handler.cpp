@@ -24,7 +24,7 @@
 #include "usracc_config.h"
 #include "tid_generator.h"
 #include "common_logger.h"
-#include "tools.h" /* luchq add 2015-06-16 */
+#include "tools.h"
 #include <sys/types.h>
 #include <stdio.h>
 #include <time.h>
@@ -429,13 +429,12 @@ int AppReqHandler::deal_mt_ack(char *data)
 
 	UsrMTAckData *re = (UsrMTAckData*)(data+sizeof(NIF_MSG_UNIT2)-sizeof(unsigned char*));
 
-	/*memcpy(record->cd, msisdn_, sizeof(record->cd));*/
-	memcpy(record->cd, msisdn_, strlen(msisdn_));
+	memcpy(record->cd, re->cd, strlen(re->cd));
 	record->result = ntohl(re->result);
 	record->tid = ntohl(re->tid);
 	record->seq = re->seq;
 	CommonLogger::instance().log_info("deal_mt_ack: cd=%s",record->cd);
-	CommonLogger::instance().log_info("deal_mt_ack: result=%u, tid=%u",record->result, record->tid);
+	CommonLogger::instance().log_info("deal_mt_ack: result=%u, tid=%u, seq=%u",record->result,record->tid,record->seq);
 	app_req_queue_->insert_record((char*)&red_msg, sizeof(ReqMsg));
 	app_req_queue_->advance_widx();
 	CommonLogger::instance().log_info("deal_mt_ack: insert MT-ack Msg into app_req_queue_");
