@@ -671,7 +671,7 @@ int LogicReqServThread::deal_locreq_ack(unsigned char *data, unsigned int len)
 		logic_resp_queue_->insert_record((char*)&resp, sizeof(RespMsg));
 		logic_resp_queue_->advance_widx();
 
-		add_user_req_->erase(ntohl(ack->tid));//added by wangxx 20161008 23:47
+		//add_user_req_->erase(ntohl(ack->tid));//added by wangxx 20161008 23:47
 	
 		return rsCode;
 
@@ -748,7 +748,6 @@ int LogicReqServThread::deal_locreq_ack(unsigned char *data, unsigned int len)
 							}
 						}
 					}
-					add_user_req_->erase(ntohl(ack->tid));//added by wangxx 20161008 23:47
 					rsCode=0;
 					return rsCode;
 				}
@@ -770,7 +769,7 @@ int LogicReqServThread::deal_locreq_ack(unsigned char *data, unsigned int len)
 					logic_resp_queue_->insert_record((char*)&resp, sizeof(RespMsg));
 					logic_resp_queue_->advance_widx();
 
-					add_user_req_->erase(ntohl(ack->tid));//added by wangxx 20161008 23:47
+					//add_user_req_->erase(ntohl(ack->tid));//added by wangxx 20161008 23:47
 					return rsCode;
 				}
 			}
