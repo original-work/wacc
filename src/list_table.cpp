@@ -22,6 +22,7 @@
 #include "list_table.h"
 #include <stdio.h>
 #include <string.h>
+#include "common_logger.h"
 
 
 ListTable::ListTable() {
