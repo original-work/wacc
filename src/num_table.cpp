@@ -71,6 +71,7 @@ LIST_BLOCK_HEAD* NumTable::add_num(char* number,
 	//获取一个空的节点
 	LIST_BLOCK_HEAD* pblock = list_table_.get_block();
 
+	CommonLogger::instance().log_error("add_num: pblock is %s", pblock);
 	CommonLogger::instance().log_error("add_num: index_table_id_ is %d", index_table_id_);
 
 	if (pblock) {
