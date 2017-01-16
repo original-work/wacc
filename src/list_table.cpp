@@ -83,6 +83,7 @@ LIST_BLOCK_HEAD* ListTable::get_block() {
 
 		pblock_head->used = 1;
 		++list_head_.used_count;
+		CommonLogger::instance().log_error("get_block: list_head_.used_count is %d", list_head_.used_count);
 	}
 
 	return pblock_head;
