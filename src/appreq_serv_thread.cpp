@@ -186,7 +186,6 @@ int AppReqServThread::loop_process()
 void AppReqServThread::sync_data()
 {
 	CommonLogger::instance().log_debug("AppReqServThread: sync_data begin");
-	char send_buf[3000] = {0};
 	db_->executeQuery("select * from active_user");
 	while(db_->fetch()){
 		unsigned int count=0;
