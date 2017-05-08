@@ -181,6 +181,8 @@ int AppReqServThread::loop_process()
 	return 0;
 }		/* -----  end of method AppReqServThread::loop_process  ----- */
 
+/*void AppReqServThread::sync_data()不需要也 不能够同步数据到servicelogic 模块.
+这是本函数和void LogicReqServThread::sync_data()  的区别*/
 void AppReqServThread::sync_data()
 {
 	CommonLogger::instance().log_debug("AppReqServThread: sync_data begin");
