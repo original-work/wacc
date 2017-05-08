@@ -181,6 +181,88 @@ int AppReqServThread::loop_process()
 	return 0;
 }		/* -----  end of method AppReqServThread::loop_process  ----- */
 
+void AppReqServThread::sync_data()
+{
+	CommonLogger::instance().log_debug("AppReqServThread: sync_data begin");
+	char send_buf[3000] = {0};
+	db_->executeQuery("select * from active_user");
+	while(db_->fetch()){
+		unsigned int count=0;
+		count++;
+		if (0==count % 100){
+			usleep(20);
+		}
+		string mdn=db_->getString("mdn");
+		string imsi=db_->getString("imsi");
+		string esn=db_->getString("esn");
+		int fd=db_->getInt("fd");
+
+		memset(bcd_buf_,0,sizeof(bcd_buf_));
+		StrToBCD(mdn.c_str(), bcd_buf_, sizeof(bcd_buf_));
+
+		/*  首先添加到内存数据库*/
+		ActiveUser* user = (ActiveUser*)info_mgr_->active_usr_table_.find_num((char*)bcd_buf_, mdn.length());
+		if (user != NULL)
+		{
+			CommonLogger::instance().log_debug("LogicReqServThread: user already exists %s, remove it", mdn.c_str());
+			info_mgr_->active_usr_table_.remove_num((char*)bcd_buf_, mdn.length());
+		}
+		
+		user = (ActiveUser*)info_mgr_->active_usr_table_.add_num((char*)bcd_buf_, mdn.length());
+		if (user == NULL)
+		{
+			CommonLogger::instance().log_error("LogicReqServThread: sync_data, add user %s to mem db fail", mdn.c_str());
+			continue;
+		}
+
+		user->fd = fd;
+		memset(user->msisdn,0,sizeof(user->msisdn));
+		memset(user->imsi,0,sizeof(user->imsi));
+		memset(user->esn,0,sizeof(user->esn));
+		memcpy(user->msisdn, mdn.c_str(), mdn.length());
+		memcpy(user->imsi, imsi.c_str(), imsi.length());
+		memcpy(user->esn, esn.c_str(), esn.length());
+
+
+
+		/*  然后同步给业务逻辑模块*/
+		NIF_MSG_UNIT *unit = (NIF_MSG_UNIT*)send_buf;
+		unit->dialog = htonl(BEGIN);
+		unit->invoke = htonl(SERVLOGIC_USER_SYNC_REQ);
+		unit->length = htonl(sizeof(PeriodData));
+		PeriodData body;
+		memset(body.imsi,0,sizeof(body.imsi));
+		memset(body.msisdn,0,sizeof(body.msisdn));
+		memset(body.esn,0,sizeof(body.esn));
+
+		vector<TidParam> tid_list = UsrAccConfig::instance().tid_num_seg_list();
+		body.tid=htonl(tid_list[0].min_tid);
+		body.mod_id=UsrAccConfig::instance().module_id();
+		memcpy(body.imsi,imsi.c_str(), imsi.length());
+		memcpy(body.msisdn,mdn.c_str(), mdn.length());
+		memcpy(body.esn,esn.c_str(), esn.length());
+		memcpy((send_buf + sizeof(NIF_MSG_UNIT) - sizeof(unsigned char*)), (char*)&body, sizeof(PeriodData));
+		int send_len =  sizeof(NIF_MSG_UNIT) - sizeof(unsigned char*) + sizeof(PeriodData);
+
+		unsigned int n = client_list_.size();
+		unsigned int i = 0;
+
+		for (; i < n; ++i)
+		{
+			if (client_list_[i].connected())
+			{
+				int r = client_list_[i].send_data(send_buf, send_len);
+				if (r < send_len || r == -1)
+				{
+					client_list_[i].disconnect_to_server();
+				}
+				CommonLogger::instance().log_debug("[%s %d] LogicReqServThread: sync_data,  Send SERVLOGIC_USER_SYNC_REQ Msg, index=%d \
+				user mdn  %s  esn  %s  imsi  %s  fd %d  tid %u  mod_id %d",__FILE__,__LINE__,i,user->msisdn,user->esn,user->imsi,user->fd,tid_list[0].min_tid,body.mod_id);
+			}
+		}
+	}
+	CommonLogger::instance().log_debug("LogicReqServThread: sync_data end");
+}
 
 int AppReqServThread::handle_request(int fd)
 {
@@ -198,6 +280,7 @@ int AppReqServThread::handle_request(int fd)
 
 int AppReqServThread::deal_new_connection()
 {
+	char buffer [50];
 	if (current_connection_count_ >= connection_count_limits_ && connection_count_limits_ > 0) {
 
 		CommonLogger::instance().log_error("connection limited, cur %u, max %u",
@@ -209,6 +292,13 @@ int AppReqServThread::deal_new_connection()
 	BaseCollectionHandler* handler = collection_server_.deal_accept();
 	if (handler!=NULL) {
 		do {
+			/*every time we setup a new connection, we update fd in mysql and then syndata with servicelogic module. modified by wangxx 20170508 begin*/
+			sprintf(buffer, "UPDATE active_user SET fd=%d", handler->sockfd());
+			db_->prepare(buffer);
+			db_->executeUpdate();
+			db_->delete_prepare();
+			sync_data();
+			/*every time we setup a new connection, we update fd in mysql and then syndata with servicelogic module. modified by wangxx 20170508 end*/
 			event_.data.fd = handler->sockfd();
 			event_.events = EPOLLIN;
 			CommonLogger::instance().log_info("deal_new_connection: new sockfd:%d",handler->sockfd());
