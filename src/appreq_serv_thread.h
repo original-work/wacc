@@ -54,6 +54,7 @@ class AppReqServThread : public CThread
 		int send_data(int fd, char *data, unsigned int len);
 		int my_check_epoll();
 		int stop();
+		void sync_data();
 		int close_connection(int fd);
 		int close_all_connection();
 		int deal_recurrent_regnot_ack(AckMsg* ack, ActivateMsg* recurrent_regnot , ActiveUser* user);
