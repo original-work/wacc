@@ -160,26 +160,26 @@ void LogicReqServThread::sync_data()
 		ActiveUser* user = (ActiveUser*)info_mgr_->active_usr_table_.find_num((char*)bcd_buf_, mdn.length());
 		if (user != NULL)
 		{
-			CommonLogger::instance().log_debug("LogicReqServThread: user already exists %s, remove it", mdn.c_str());
-			info_mgr_->active_usr_table_.remove_num((char*)bcd_buf_, mdn.length());
+			CommonLogger::instance().log_debug("LogicReqServThread: user already exists %s", mdn.c_str());
 		}
-		
-		user = (ActiveUser*)info_mgr_->active_usr_table_.add_num((char*)bcd_buf_, mdn.length());
-		if (user == NULL)
+		else
 		{
-			CommonLogger::instance().log_error("LogicReqServThread: sync_data, add user %s to mem db fail", mdn.c_str());
-			continue;
+			user = (ActiveUser*)info_mgr_->active_usr_table_.add_num((char*)bcd_buf_, mdn.length());
+			if (user == NULL)
+			{
+				CommonLogger::instance().log_error("LogicReqServThread: sync_data, add user %s to mem db fail", mdn.c_str());
+				continue;
+			}
+
+			user->fd = fd;
+			memset(user->msisdn,0,sizeof(user->msisdn));
+			memset(user->imsi,0,sizeof(user->imsi));
+			memset(user->esn,0,sizeof(user->esn));
+			memcpy(user->msisdn, mdn.c_str(), mdn.length());
+			memcpy(user->imsi, imsi.c_str(), imsi.length());
+			memcpy(user->esn, esn.c_str(), esn.length());
+
 		}
-
-		user->fd = fd;
-		memset(user->msisdn,0,sizeof(user->msisdn));
-		memset(user->imsi,0,sizeof(user->imsi));
-		memset(user->esn,0,sizeof(user->esn));
-		memcpy(user->msisdn, mdn.c_str(), mdn.length());
-		memcpy(user->imsi, imsi.c_str(), imsi.length());
-		memcpy(user->esn, esn.c_str(), esn.length());
-
-
 
 		/*  然后同步给业务逻辑模块*/
 		NIF_MSG_UNIT *unit = (NIF_MSG_UNIT*)send_buf;
