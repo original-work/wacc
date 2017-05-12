@@ -660,7 +660,7 @@ bool AppReqServThread::StrToBCD(const char *Src,unsigned char *Des,int iDesLen)
 int AppReqServThread::deal_recurrent_regnot_ack(AckMsg* ack, ActivateMsg* recurrent_regnot , ActiveUser* user)
 {
 	if(0==ack->result){/*位置登记成功*/
-		CommonLogger::instance().log_info("[%s %d] deal_recurrent_regnot: SERVLOGIC_ACTIVATE_REQ return ok.  tid %u ",__FILE__,__LINE__,ack->tid);
+		CommonLogger::instance().log_info("[%s %d] deal_recurrent_regnot_ack: SERVLOGIC_ACTIVATE_REQ return ok.  tid %u ",__FILE__,__LINE__,ack->tid);
 		add_user_req_->erase(ack->tid);
 	}
 	else{
@@ -676,7 +676,7 @@ int AppReqServThread::deal_recurrent_regnot_ack(AckMsg* ack, ActivateMsg* recurr
 			record->user_info = user;
 			record->recurrent_regnot_flag=true;
 			record->do_locreq_flag=false;
-			CommonLogger::instance().log_debug("[%s %d] send LOCREQ, record  tid %u mod_id %u",__FILE__,__LINE__,record->tid, record->mod_id);
+			CommonLogger::instance().log_debug("[%s %d] deal_recurrent_regnot_ack: send LOCREQ, record  tid %u mod_id %u",__FILE__,__LINE__,record->tid, record->mod_id);
 
 			app_req_queue_->insert_record((char*)&red_msg, sizeof(ReqMsg));
 			app_req_queue_->advance_widx();
@@ -684,7 +684,7 @@ int AppReqServThread::deal_recurrent_regnot_ack(AckMsg* ack, ActivateMsg* recurr
 			add_user_req_->erase(ack->tid);
 		}
 		else{
-			CommonLogger::instance().log_info("[%s %d] deal_recurrent_regnot: SERVLOGIC_ACTIVATE_REQ return fail.  not send LOCREQ, tid %u return ok",__FILE__,__LINE__,ack->tid);
+			CommonLogger::instance().log_info("[%s %d] deal_recurrent_regnot_ack: SERVLOGIC_ACTIVATE_REQ return fail.  not send LOCREQ, tid %u return ok",__FILE__,__LINE__,ack->tid);
 			add_user_req_->erase(ack->tid);
 		}
 	}
