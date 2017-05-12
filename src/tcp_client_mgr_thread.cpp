@@ -108,7 +108,7 @@ int TcpClientMgrThread::loop_process()
 			if ((*pclient_list_)[i].connect_to_server() == 0)
 			{
 				/* wangxx add 2017-05-12 */
-				char* pointer=conn_data_;
+				NIF_MSG_UNIT* pointer=conn_data_;
 				CommonLogger::instance().log_info("TcpClientMgrThread::loop_process  head    =0x%08x", ntohl((NIF_MSG_UNIT *)pointer->head));
 				CommonLogger::instance().log_info("TcpClientMgrThread::loop_process  invoke =0x%08x", ntohl((NIF_MSG_UNIT *)pointer->invoke));
 				CommonLogger::instance().log_info("TcpClientMgrThread::loop_process  dialog  =0x%08x", ntohl((NIF_MSG_UNIT *)pointer->dialog));
