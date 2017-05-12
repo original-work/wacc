@@ -114,7 +114,7 @@ int TcpClientMgrThread::loop_process()
 				CommonLogger::instance().log_info("TcpClientMgrThread::loop_process  invoke =0x%08x", ntohl(pointer->invoke));
 				CommonLogger::instance().log_info("TcpClientMgrThread::loop_process  dialog  =0x%08x", ntohl(pointer->dialog));
 				CommonLogger::instance().log_info("TcpClientMgrThread::loop_process  send to serviceLogic msg content:");
-				tools::print_hex((unsigned char*)(conn_data_,sizeof(conn_data_));
+				tools::print_hex(conn_data_,sizeof(conn_data_));
 				/* end of wangxx add */
 				
 				/*everytime acc module set up connecttion with serviceLogic module, acc send SERVLOGIC_CONNECTION_REQ msg to serviceLogic.
