@@ -108,9 +108,10 @@ int TcpClientMgrThread::loop_process()
 			if ((*pclient_list_)[i].connect_to_server() == 0)
 			{
 				/* wangxx add 2017-05-12 */
-				CommonLogger::instance().log_info("TcpClientMgrThread::loop_process  head    =0x%08x", ntohl((NIF_MSG_UNIT *)conn_data_->head));
-				CommonLogger::instance().log_info("TcpClientMgrThread::loop_process  invoke =0x%08x", ntohl((NIF_MSG_UNIT *)conn_data_->invoke));
-				CommonLogger::instance().log_info("TcpClientMgrThread::loop_process  dialog  =0x%08x", ntohl((NIF_MSG_UNIT *)conn_data_->dialog));
+				char* pointer=conn_data_;
+				CommonLogger::instance().log_info("TcpClientMgrThread::loop_process  head    =0x%08x", ntohl((NIF_MSG_UNIT *)pointer->head));
+				CommonLogger::instance().log_info("TcpClientMgrThread::loop_process  invoke =0x%08x", ntohl((NIF_MSG_UNIT *)pointer->invoke));
+				CommonLogger::instance().log_info("TcpClientMgrThread::loop_process  dialog  =0x%08x", ntohl((NIF_MSG_UNIT *)pointer->dialog));
 				CommonLogger::instance().log_info("TcpClientMgrThread::loop_process  send to serviceLogic msg content:");
 				tools::print_hex((unsigned char*)(conn_data_,sizeof(conn_data_));
 				/* end of wangxx add */
