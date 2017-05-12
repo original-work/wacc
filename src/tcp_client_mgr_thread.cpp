@@ -25,6 +25,7 @@
 #include "usracc_config.h"
 #include <string.h>
 #include "common_logger.h"
+#include "tools.h"
 
 /*
  *--------------------------------------------------------------------------------------
