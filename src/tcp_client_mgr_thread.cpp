@@ -107,6 +107,16 @@ int TcpClientMgrThread::loop_process()
 		{
 			if ((*pclient_list_)[i].connect_to_server() == 0)
 			{
+				/* wangxx add 2017-05-12 */
+				CommonLogger::instance().log_info("TcpClientMgrThread::loop_process  head    =0x%08x", ntohl((NIF_MSG_UNIT *)conn_data_->head));
+				CommonLogger::instance().log_info("TcpClientMgrThread::loop_process  invoke =0x%08x", ntohl((NIF_MSG_UNIT *)conn_data_->invoke));
+				CommonLogger::instance().log_info("TcpClientMgrThread::loop_process  dialog  =0x%08x", ntohl((NIF_MSG_UNIT *)conn_data_->dialog));
+				CommonLogger::instance().log_info("TcpClientMgrThread::loop_process  send to serviceLogic msg content:");
+				tools::print_hex((unsigned char*)(conn_data_,sizeof(conn_data_));
+				/* end of wangxx add */
+				
+				/*everytime acc module set up connecttion with serviceLogic module, acc send SERVLOGIC_CONNECTION_REQ msg to serviceLogic.
+				if acc receive SERVLOGIC_CONNECTION_REQ ack from serviceLogic and result=0, acc begin to syndata with serviceLogic*/
 				(*pclient_list_)[i].send_data((char*)conn_data_, conn_data_len_);
 			}
 		}
