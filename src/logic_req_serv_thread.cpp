@@ -417,7 +417,6 @@ int LogicReqServThread::deal_app_req_queue()
 			active->recurrent_regnot_flag=false;
 			active->do_locreq_flag=false;
 			add_user_req_->insert(pair<unsigned int, char*>(active->tid, (char*)active));
-
 			for (; i < n; ++i)
 			{
 				if (client_list_[i].connected())
@@ -427,8 +426,7 @@ int LogicReqServThread::deal_app_req_queue()
 					{
 						client_list_[i].disconnect_to_server();
 					}
-					CommonLogger::instance().log_debug("deal_app_req_queue: Send Active Msg to first connected socket(servicelogic modle), index=%d",i);
-					/* luchq add for test */
+					CommonLogger::instance().log_debug("deal_app_req_queue: Send Active Msg to SERVLOGIC socket(servicelogic modle), index=%d",i);
 					CommonLogger::instance().log_debug("[%s %d] deal_app_req_queue: user msisdn 	%s",__FILE__,__LINE__,active->msisdn);
 					++i;
 					break;
@@ -460,6 +458,7 @@ int LogicReqServThread::deal_app_req_queue()
 					{
 						client_list_[i].disconnect_to_server();
 					}
+					CommonLogger::instance().log_debug("deal_app_req_queue: Send DEACTIVATE Msg to SERVLOGIC socket(servicelogic modle), index=%d",i);//added by wangxx 20170816
 				}
 			}
 		}
@@ -735,7 +734,7 @@ int LogicReqServThread::deal_locreq_ack(unsigned char *data, unsigned int len)
 					}
 
 					unit->invoke = htonl(SERVLOGIC_USER_SYNC_REQ);
-					CommonLogger::instance().log_debug("deal_locreq_ack:  Sync user info to other socket(servicelogic modle)");
+					
 
 					for (; i < n; ++i)
 					{
@@ -746,6 +745,7 @@ int LogicReqServThread::deal_locreq_ack(unsigned char *data, unsigned int len)
 							{
 								client_list_[i].disconnect_to_server();
 							}
+							CommonLogger::instance().log_debug("deal_locreq_ack:  Sync user info to other socket(servicelogic modle) index=%d",i);//added by wangxx 20170816
 						}
 					}
 					rsCode=0;
