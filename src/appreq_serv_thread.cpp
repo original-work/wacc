@@ -111,6 +111,7 @@ int AppReqServThread::init(InfoMemMgr *info_mem, MsgList* app_queue, MsgList* lo
 	TidGenerator::instance().init();
 
 	/*every time we restart wacc, we update fd in mysql to 1024 to avoid conflict with service_logic's fd. modified by wangxx 20170904 begin*/
+	char buffer [50];
 	sprintf(buffer, "UPDATE active_user SET fd=%d", 1024);
 	db_->prepare(buffer);
 	db_->executeUpdate();
