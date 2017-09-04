@@ -74,7 +74,7 @@ int TcpClient::connect_to_server() {
 	
 	error = -1;
 	len = sizeof(error);
-	CommonLogger::instance().log_info("connect server ip = %s , port = %u",inet_ntoa(sock_addr_.sin_addr), ntohs(sock_addr_.sin_port));
+	CommonLogger::instance().log_info("connect server ip = %s , port = %u, sockfd_ = %u",inet_ntoa(sock_addr_.sin_addr), ntohs(sock_addr_.sin_port), sockfd_);
 	if (connect(sockfd_, (struct sockaddr *)&sock_addr_, sizeof(sock_addr_))==-1) {
 		if (errno == EINPROGRESS) {
 			CommonLogger::instance().log_info("connect failed error = EINPROGRESS");
