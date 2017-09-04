@@ -109,7 +109,13 @@ int AppReqServThread::init(InfoMemMgr *info_mem, MsgList* app_queue, MsgList* lo
 	current_connection_count_ = 0;
 	connection_count_limits_ = UsrAccConfig::instance().app_max_connection_count();
 	TidGenerator::instance().init();
-	
+
+	/*every time we restart wacc, we update fd in mysql to 1024 to avoid conflict with service_logic's fd. modified by wangxx 20170904 begin*/
+	sprintf(buffer, "UPDATE active_user SET fd=%d", 1024);
+	db_->prepare(buffer);
+	db_->executeUpdate();
+	db_->delete_prepare();
+	/*every time we restart wacc, we update fd in mysql to 1024 to avoid conflict with service_logic's fd. modified by wangxx 20170904 end*/
 	return 0;
 }		/* -----  end of method AppReqServThread::init  ----- */
 
