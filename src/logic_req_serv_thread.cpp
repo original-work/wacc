@@ -426,7 +426,7 @@ int LogicReqServThread::deal_app_req_queue()
 					{
 						client_list_[i].disconnect_to_server();
 					}
-					CommonLogger::instance().log_debug("deal_app_req_queue: Send Active Msg to SERVLOGIC socket(servicelogic modle), index=%d",i);
+					CommonLogger::instance().log_debug("deal_app_req_queue: Send SERVLOGIC_LOCREQ_REQ Msg to SERVLOGIC socket(servicelogic modle), index=%d",i);
 					CommonLogger::instance().log_debug("[%s %d] deal_app_req_queue: user msisdn 	%s",__FILE__,__LINE__,active->msisdn);
 					++i;
 					break;
