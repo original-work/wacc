@@ -66,6 +66,7 @@ int BaseCollectionHandler::sendn(const char *buf, size_t send_size)
 {
     unsigned int need_send_length = send_size;
     int sended_length=0;
+    CommonLogger::instance().log_error("BaseCollectionHandler::sendn: sockfd_ is %u",sockfd_);
     while (need_send_length>0) {
         int ret = send(sockfd_,buf+sended_length,need_send_length,0);
         if (ret<0) {
