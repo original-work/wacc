@@ -546,6 +546,29 @@ int LogicReqServThread::deal_app_req_queue()
 
 			int send_len =  sizeof(NIF_MSG_UNIT) - sizeof(unsigned char*) + sizeof(MTAckData);
 
+
+			unsigned int n = client_list_.size();
+			for (unsigned int i=0; i < n; ++i)
+			{
+				if (client_list_[i].connected())
+				{
+					int r = client_list_[i].send_data(send_buf, send_len);
+					if (r < send_len || r == -1)
+					{
+						client_list_[i].disconnect_to_server();
+					}
+					CommonLogger::instance().log_info("deal_app_req_queue: send mtack to serv_logic, index=%d",i);
+					++i;
+					break;
+				}else{
+					CommonLogger::instance().log_debug("deal_app_req_queue: client_list_ not connected, index=%d",i);
+				}
+			}
+
+
+
+			
+			#if 0
 			LogicConnInfo *conninfo = info_mgr_->logic_conns_mgr_.get_conn_info(mtack->seq);
 			
 			if(conninfo != NULL){
@@ -562,6 +585,7 @@ int LogicReqServThread::deal_app_req_queue()
 			}else{
 				CommonLogger::instance().log_info("deal_app_req_queue: conninfo is NULL");
 			}
+			#endif
 		}
 
 		CommonLogger::instance().log_error("\r\n\r\n\r\n");
