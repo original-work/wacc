@@ -185,7 +185,7 @@ int AppReqHandler::deal_ping(char *data)
 		db_->delete_prepare();
 	}else{
 		char buffer [50];
-		sprintf(buffer, "UPDATE active_user SET fd=%d", sockfd_);
+		sprintf(buffer, "UPDATE active_user SET fd=%d", sockfd());
 		db_->prepare(buffer);
 		db_->executeUpdate();
 		db_->delete_prepare();
