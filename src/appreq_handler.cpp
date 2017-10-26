@@ -172,8 +172,86 @@ int AppReqHandler::deal_ping(char *data)
 	sendn(send_buf_, sizeof(NIF_MSG_UNIT2) - sizeof(unsigned char*));
 	CommonLogger::instance().log_error("deal_ping: send ack, seq is %u",ntohl(header->seq));
 
+	//added by wangxx 20171026 begin
+	db_->executeQuery("select * from refresh_fd_timer");
+	db_->fetch();
+	int ping_counter=db_->getInt("ping_counter");
+	if(ping_counter<24){
+		ping_counter++;
+		char buffer [50];
+		sprintf(buffer, "UPDATE refresh_fd_timer SET ping_counter=%d", ping_counter);
+		db_->prepare(buffer);
+		db_->executeUpdate();
+		db_->delete_prepare();
+	}else{
+		char buffer [50];
+		sprintf(buffer, "UPDATE active_user SET fd=%d", sockfd_);
+		db_->prepare(buffer);
+		db_->executeUpdate();
+		db_->delete_prepare();
+		sync_data();
+
+		memset(buffer,0,50);
+		sprintf(buffer, "UPDATE refresh_fd_timer SET ping_counter=0");
+		db_->prepare(buffer);
+		db_->executeUpdate();
+		db_->delete_prepare();
+	}
+	//added by wangxx 20171026 end
+	
 	return 0;
 }/* -----  end of method AppReqHandler::deal_ping(char *data)  ----- */
+
+
+
+/*void AppReqHandler::sync_data()不需要也 不能够同步数据到servicelogic 模块.
+这是本函数和void LogicReqServThread::sync_data()  的区别*/
+void AppReqHandler::sync_data()
+{
+	CommonLogger::instance().log_debug("AppReqHandler: sync_data begin");
+	db_->executeQuery("select * from active_user");
+	while(db_->fetch()){
+		unsigned int count=0;
+		count++;
+		if (0==count % 100){
+			usleep(20);
+		}
+		string mdn=db_->getString("mdn");
+		string imsi=db_->getString("imsi");
+		string esn=db_->getString("esn");
+		int fd=db_->getInt("fd");
+
+		memset(bcd_buf_,0,sizeof(bcd_buf_));
+		StrToBCD(mdn.c_str(), bcd_buf_, sizeof(bcd_buf_));
+
+		/*  首先添加到内存数据库*/
+		ActiveUser* user = (ActiveUser*)info_mgr_->active_usr_table_.find_num((char*)bcd_buf_, mdn.length());
+		if (user != NULL)
+		{
+			CommonLogger::instance().log_debug("AppReqHandler: user already exists %s, update fd", mdn.c_str());
+			user->fd=fd;
+		}
+		else
+		{
+			user = (ActiveUser*)info_mgr_->active_usr_table_.add_num((char*)bcd_buf_, mdn.length());
+			if (user == NULL)
+			{
+				CommonLogger::instance().log_error("AppReqHandler: sync_data, add user %s to mem db fail", mdn.c_str());
+				continue;
+			}
+
+			user->fd = fd;
+			memset(user->msisdn,0,sizeof(user->msisdn));
+			memset(user->imsi,0,sizeof(user->imsi));
+			memset(user->esn,0,sizeof(user->esn));
+			memcpy(user->msisdn, mdn.c_str(), mdn.length());
+			memcpy(user->imsi, imsi.c_str(), imsi.length());
+			memcpy(user->esn, esn.c_str(), esn.length());
+		}
+	}
+	CommonLogger::instance().log_debug("AppReqHandler: sync_data end");
+}
+
 
 int AppReqHandler::deal_notify_active(char *data)
 {

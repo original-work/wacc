@@ -51,6 +51,7 @@ class AppReqHandler : public BaseCollectionHandler
 	void app_req_queue(MsgList *p);
 	void client_list(map<int, BaseCollectionHandler*> *list);
 	void db(MySQLConnWrapper *p);
+	void sync_data();
 	char* msisdn() {return msisdn_;}
  protected:
 	unsigned long long ntoh64(unsigned long long inval);
@@ -61,7 +62,7 @@ class AppReqHandler : public BaseCollectionHandler
 	unsigned int offset_;
 	InfoMemMgr *info_mgr_;
 	MsgList *app_req_queue_;
-	map<int, BaseCollectionHandler*> *client_list_;	
+	map<int, BaseCollectionHandler*> *client_list_;
 	char msisdn_[32];
 	unsigned char bcd_buf_[256];
 	char send_buf_[kBufferSize];

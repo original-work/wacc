@@ -264,6 +264,14 @@ int AppReqServThread::deal_new_connection()
 	BaseCollectionHandler* handler = collection_server_.deal_accept();
 	if (handler!=NULL) {
 		do {
+			/*every time we setup a new connection, we update ping_counter=0. modified by wangxx 20171026 begin*/
+			sprintf(buffer, "UPDATE refresh_fd_timer SET ping_counter=0");
+			db_->prepare(buffer);
+			db_->executeUpdate();
+			db_->delete_prepare();
+			memset(buffer,0,50);
+			/*every time we setup a new connection, we update ping_counter=0. modified by wangxx 20171026 end*/
+			
 			/*every time we setup a new connection, we update fd in mysql and then syndata with memdb. modified by wangxx 20170508 begin*/
 			sprintf(buffer, "UPDATE active_user SET fd=%d", handler->sockfd());
 			db_->prepare(buffer);
